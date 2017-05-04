@@ -1,0 +1,11 @@
+iPOLARRIS
+
+This is a complimentary program to POLARRIS-f, a forward model for producing polarimetric radar observations from model simulations. This suite of tools reads in gridded data (from radar or simulation), runs radar retrievals, and makes standardized plots.
+
+Written by Brenda Dolan
+Colorado State University, Dept. Atmos. Sci.
+bdolan@atmos.colostate.edu
+May 2017
+
+based on code from Brody Fuchs
+
