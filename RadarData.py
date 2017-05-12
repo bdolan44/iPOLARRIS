@@ -744,8 +744,8 @@ class RadarData(RadarConfig.RadarConfig):
 
         # if this variable is already included in the defaults, then this is straightforward
         #print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
-        data = np.squeeze(self.data[var].sel(t=slice(tsi,tsi+1),z=slice(zmini,zmaxi),x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)).data)
-        xdat = np.squeeze(self.data[self.x_name].sel(t=slice(tsi,tsi+1),x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
+        data = np.squeeze(self.data[var].sel(t=slice(tsi,tsi+1),z=slice(zmini,zmaxi),x=slice(xmini,xmaxi),y=slice(y_ind,y_ind)).data)
+        xdat = np.squeeze(self.data[self.x_name].sel(t=slice(tsi,tsi+1),x=slice(xmini,xmaxi),y=slice(y_ind,y_ind)))
         zdat = np.squeeze(self.data[self.z_name].sel(t=slice(tsi,tsi+1),z=slice(zmini,zmaxi)))
         
         data = np.ma.masked_less(data,-900.0)
@@ -920,16 +920,19 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
         #print xmini,xmaxi,ymini,ymaxi
-        data = np.squeeze(self.data[var].sel(t=slice(tsi,tsi+1),z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
+        data = np.squeeze(self.data[var].sel(t=slice(tsi,tsi+1),z=slice(z_ind,z_ind),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
         xdat = np.squeeze(self.data[self.x_name].sel(t=slice(tsi,tsi+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)))
         ydat = np.squeeze(self.data[self.y_name].sel(t=slice(tsi,tsi+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)))
         
         data = np.ma.masked_less(data,-10.0)
         data = np.ma.masked_where(~np.isfinite(data),data)
 
+        print np.shape(data),tsi
+
         if var in self.lims.keys():
             range_lim = self.lims[var][1] - self.lims[var][0]
             #print np.shape(xdat),np.shape(ydat)
+
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
         else:
