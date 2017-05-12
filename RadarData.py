@@ -16,12 +16,12 @@
 from __future__ import division
 import numpy as np
 from netCDF4 import Dataset
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 import sys
 #from pyhid import beta_functions, cdf_fhc, radar_calculations
-import matplotlib
-matplotlib.use('Agg')
 from matplotlib import colors
 import matplotlib.ticker as plticker
 from general_tools import make_cmap
