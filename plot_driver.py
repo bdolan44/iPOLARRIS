@@ -9,38 +9,8 @@ import numpy as np
 import datetime
 import matplotlib.pyplot as plt
 
-import plot_driver
 from polarris_config import get_data
 import RadarData
-
-#######################################################
-
-
-# mc3e_wrf = get_data(exper='MC3E',radar_files=r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt')
-# twp_wrf = get_data(exper='TWPICE',radar_files=r'/Users/bdolan/scratch/POLARRIS_2/wrf_twp_files.txt')
-# flags = {'cfad_4panel_flag':False,
-#         'hid_cfad_flag':False,
-#         'joint_flag':False,
-#         'cfad_individ_flag':False,
-#         'hid_prof':False,
-#         'all_cappi':True,
-#         'all_xsec':False,
-#         'up_width':False,
-#         'qr_cappi':False,
-#         'qr_rhi':False,}
-#         
-#         
-# make_single_pplots(twp_wrf,[twp_wrf.date[0],twp_wrf.date[-1]],flags,'/Users/bdolan/scratch/gitlab/iPOLARRIS/',exp='TWPICE_WRF',extra=twp_wrf.mphys)
-# make_single_pplots(mc3e_wrf,[mc3e_wrf.date[0],mc3e_wrf.date[-1]],flags,'/Users/bdolan/scratch/gitlab/iPOLARRIS/',exp='MC3E_WRF',extra=mc3e_wrf.mphys)
-#         
-# flags={'cfad_comp':False,
-#         'hid_vert_comp':True,
-#       'w_area_comp':False,}
-# 
-# make_compare_pplots(twp_wrf,mc3e_wrf,flags,'./',extra=mc3e_wrf.mphys)
-# 
-
-#######################################################
 
 
 def make_single_pplots(rdat,tspan,flags,dir,exp='TWPICE',ty='png',extra='',z=2.0,y=-12.5):
