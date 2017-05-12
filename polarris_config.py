@@ -71,7 +71,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             xname = 'longitude'
             yname = 'latitude'
             zname='hgt'
-            band = 'c'
+            band = 'C'
             mphys=mphys
             time_parse=[11,19]
             wdate_format ='%Y-%m-%d_%H:%M:%S'
@@ -133,7 +133,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             xname = 'longitude'
             yname = 'latitude'
             zname='hgt'
-            band = 'c'
+            band = 'C'
             time_parse=[11,19]
             wdate_format ='%Y-%m-%d_%H:%M:%S'
 
