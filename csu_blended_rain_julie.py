@@ -22,8 +22,8 @@ from __future__ import absolute_import
 from __future__ import division
 import numpy as np
 import warnings
-from csu_radartools.common import (
-    _check_for_array, calc_rain_zr, calc_rain_nexrad, calc_rain_kdp)
+#from csu_radartools.common import (
+#    _check_for_array, calc_rain_zr, calc_rain_nexrad, calc_rain_kdp)
 
 
 def calc_rain_kdp_zdr(kdp, zdr, a=90.8, b=0.93, c=-0.169):
