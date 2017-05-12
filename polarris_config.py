@@ -29,7 +29,7 @@ def get_time(time_parse,filename,dformat):
     print date
     return date
 ###############
-def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files=r'/Users/bdolan/scratch/POLARRIS_2/wrf_twpice_files.txt'):
+def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files=r'./wrf_twp_files.txt'):
 
     ############MC3E radar#######
     if exper == 'MC3E':
@@ -54,9 +54,9 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             dformat=rdate_format
             usedate_range = 'True'
         elif type == 'wrf':
-            radarname='Cband'
+            radarname='WRF Cband'
             read_list = 'True'
-            radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt'
+            radar_files = r'./wrf_mc3e_files.txt'
             usedate_range = 'False'
             type  = 'wrf'
             dd_on = 'False'
@@ -74,7 +74,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             band = 'c'
             mphys=mphys
             time_parse=[11,19]
-            wdate_format ='%Y-%m-%d_%H-%M-%S'
+            wdate_format ='%Y-%m-%d_%H:%M:%S'
 
 
         else:
@@ -116,9 +116,9 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             w_name = 'Wvar'
             sstat = 'DWN'
         elif type == 'wrf':
-            radarname='Cband'
+            radarname='WRF Cband'
             read_list = 'True'
-            radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_twpice_files.txt'
+            radar_files = r'./wrf_twpice_files.txt'
             usedate_range = 'False'
             type  = 'wrf'
             dd_on = 'False'
@@ -135,7 +135,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             zname='hgt'
             band = 'c'
             time_parse=[11,19]
-            wdate_format ='%Y-%m-%d_%H-%M-%S'
+            wdate_format ='%Y-%m-%d_%H:%M:%S'
 
             mphys=mphys
         else:
