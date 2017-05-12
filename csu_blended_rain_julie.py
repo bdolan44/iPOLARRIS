@@ -38,6 +38,14 @@ def _check_for_array(dz, zdr, kdp):
         zdr = np.array([zdr])
     return dz, zdr, kdp, len_flag
 
+def calc_rain_kdp(kdp, a=40.5, b=0.85):
+    """
+    kdp = Specific Differential Phase (deg km^-1)
+    a, b = Adjustable coefficient, exponent
+    """
+    return a * kdp**b
+
+
 def calc_rain_kdp_zdr(kdp, zdr, a=90.8, b=0.93, c=-0.169):
     """
     kdp = Specific Differential Phase (deg km^-1)
