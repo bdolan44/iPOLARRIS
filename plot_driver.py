@@ -52,7 +52,7 @@ def make_single_pplots(rdat,tspan,flags,dir,exp='TWPICE',ty='png',extra='',z=2.0
         rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=drbins,z_resolution=1.0,levels='levs',tspan = tspan)
         plt.tight_layout()
         plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
-        
+        plt.clf()
         
     if flags['cfad_individ_flag'] == True:
         fig, ax = plt.subplots(1,1,figsize=(18,12))
@@ -68,30 +68,41 @@ def make_single_pplots(rdat,tspan,flags,dir,exp='TWPICE',ty='png',extra='',z=2.0
         rdat.cfad_plot(rdat.w_name,ax = ax,bins=cbins,z_resolution=1.0,levels='levs',tspan = tspan)
         plt.tight_layout()
         plt.savefig('{d}{p}_CFAD_W_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
+        plt.clf()
+        
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         rdat.cfad_plot(rdat.dz_name,ax = ax,bins=dzbins,z_resolution=1.0,levels='levs',tspan= tspan)
         plt.tight_layout()
+        plt.clf()
+        
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         plt.savefig('{d}{p}_CFAD_dBZ_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
         rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=drbins,z_resolution=1.0,levels='levs',tspan= tspan)
         plt.tight_layout()
+        plt.clf()
+        
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         plt.savefig('{d}{p}_CFAD_Zdr_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
         rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=drbins,z_resolution=1.0,levels='levs',tspan = tspan)
         plt.tight_layout()
+        plt.clf()
+        
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         plt.savefig('{d}{p}_CFAD_Kdp_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
         rdat.cfad_plot(rdat.rho_name,ax = ax,bins=rhbins,z_resolution=1.0,levels='levs',tspan = tspan)
         plt.tight_layout()
         plt.savefig('{d}{p}_CFAD_RHO_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
+        plt.clf()
         
     if flags['hid_cfad_flag'] == True:
         fig, ax = rdat.plot_hid_cdf()
         plt.savefig('{d}{p}_CFAD_HID_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
+        
+        plt.clf()
         
     if flags['joint_flag'] == True:
         rrbins = np.linspace(1,142,71)
@@ -121,6 +132,8 @@ def make_single_pplots(rdat,tspan,flags,dir,exp='TWPICE',ty='png',extra='',z=2.0
         axf[3].set_ylim(0,50)
         
         plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
+        plt.clf()
+        
 
     if flags['hid_prof'] == True:
         hidwater = [1,2,10]
@@ -138,17 +151,23 @@ def make_single_pplots(rdat,tspan,flags,dir,exp='TWPICE',ty='png',extra='',z=2.0
         plt.plot(mwrf_hail_vert,hts,color='r')
         plt.plot(mwrf_snow_vert,hts,color = 'yellow')
         plt.savefig('{d}{p}_HID_prof_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty),dpi=300)
+        plt.clf()
+        
     if flags['all_cappi']== True:
         for t in rdat.date:
             #z=2.0
             #print xlim
             rdat.cappi_multiplot(ts=t,xlim=xlim,ylim=ylim,z=2.0)
             plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=dir,p=rdat.expr,s=t,r=rdat.radar_name,x=extra,t=ty,z=z),dpi=300)
+            plt.clf()
+        
     if flags['all_xsec']== True:
         for t in rdat.date:
             #y=-12.5
             rdat.xsec_multiplot(ts=t,y=y,vectors=True,res = [15,2],xlim=xlim)    
             plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=dir,p=rdat.expr,s=t,r=rdat.radar_name,x=extra,t=ty,y=y),dpi=300)
+            plt.clf()
+        
     if flags['up_width'] == True:
         tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
         #print m_warea_wrf
@@ -157,16 +176,22 @@ def make_single_pplots(rdat,tspan,flags,dir,exp='TWPICE',ty='png',extra='',z=2.0
         plt.xlabel('Updraft Width (km$^2$)')
         plt.ylabel('Temperature (deg C)')
         plt.savefig('{d}{p}_upwidth_{s:%Y%m%d%H%M}-{e:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=dir,p=rdat.expr,s=ts,e=te,r=rdat.radar_name,x=extra,t=ty,y=y),dpi=300)
+        plt.clf()
+        
     if flags['qr_cappi'] == True:
         mx_vars = ['qc','qr','qg','qi','qh']
         for t in rdat.date:
             rdat.cappi_multiplot(z=z,ts=t,xlim=xlim,ylim=ylim,varlist=mx_vars)
             plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=dir,p=rdat.expr,s=t,r=rdat.radar_name,x=extra,t=ty,z=z),dpi=300)
+            plt.clf()
+        
     if flags['qr_rhi'] == True:
         mx_vars = ['qc','qr','qg','qi','qh']
         for t in rdat.date:
             rdat.xsec_multiplot(ts=t,y=y,xlim=xlim,varlist=mx_vars)
             plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=dir,p=rdat.expr,s=t,r=rdat.radar_name,x=extra,t=ty,y=y),dpi=300)
+            plt.clf()
+        
 
 def make_compare_pplots(rdat1,rdat2,flags,dir,exp1='TWPICE',exp2='MC3E',ty='png',extra=''):
 #    ts = tspan[0]
@@ -191,6 +216,8 @@ def make_compare_pplots(rdat1,rdat2,flags,dir,exp1='TWPICE',exp2='MC3E',ty='png'
         axf[1].set_ylabel('Temperature (deg C)')
         axf[1].set_title('{e} updraft width'.format(e=exp2))
         plt.savefig('{d}{e1}_{e2}_w_area_compare_{x}.{t}'.format(d=dir,e2=exp2,e1=exp1,x=extra,t=ty),dpi=300)
+        plt.clf()
+        
 
     if flags['hid_vert_comp'] == True:
         fig, ax = plt.subplots(1,3,figsize=(18,9))
@@ -249,6 +276,8 @@ def make_compare_pplots(rdat1,rdat2,flags,dir,exp1='TWPICE',exp2='MC3E',ty='png'
         axf[2].set_ylim(0,20)
 
         plt.savefig('{d}{e1}_{e2}_hid_vert_compare_{x}.{t}'.format(d=dir,e2=exp2,e1=exp1,x=extra,t=ty),dpi=300)
+        plt.clf()
+        
 
     if flags['cfad_comp'] == True:
         fig, ax = plt.subplots(1,3,figsize=(18,9))
@@ -371,4 +400,6 @@ def make_compare_pplots(rdat1,rdat2,flags,dir,exp1='TWPICE',exp2='MC3E',ty='png'
 
         plt.tight_layout()
         plt.savefig('{d}{e1}_{e2}_zdr_CFAD_compare_{x}.{t}'.format(d=dir,e2=exp2,e1=exp1,x=extra,t=ty),dpi=300)
+        plt.clf()
+        
 
