@@ -545,8 +545,8 @@ class RadarData(RadarConfig.RadarConfig):
     
     def calc_rr_pol(self):
 
-        import pydisdrometer as pyd
-        import pytmatrix as pyt
+#        import pydisdrometer as pyd
+#        import pytmatrix as pyt
         import csu_blended_rain_julie
 
     ### This is where I do mixing ratio calculations ### 
