@@ -30,7 +30,7 @@ flags = {'cfad_4panel_flag':False,
          'qr_rhi':False,}
 #         
 #         
- make_single_pplots(twp_wrf,[twp_wrf.date[0],twp_wrf.date[-1]],flags,'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/',exp='TWPICE_WRF',extra=twp_wrf.mphys)
+make_single_pplots(twp_wrf,[twp_wrf.date[0],twp_wrf.date[-1]],flags,'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/',exp='TWPICE_WRF',extra=twp_wrf.mphys)
 # make_single_pplots(mc3e_wrf,[mc3e_wrf.date[0],mc3e_wrf.date[-1]],flags,'/Users/bdolan/scratch/gitlab/iPOLARRIS/',exp='MC3E_WRF',extra=mc3e_wrf.mphys)
 #         
 # flags={'cfad_comp':False,
