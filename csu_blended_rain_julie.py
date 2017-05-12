@@ -25,6 +25,18 @@ import warnings
 #from csu_radartools.common import (
 #    _check_for_array, calc_rain_zr, calc_rain_nexrad, calc_rain_kdp)
 
+##############
+#  Arrays  ###
+##############
+
+
+def _check_for_array(dz, zdr, kdp):
+    len_flag = hasattr(dz, '__len__')
+    if not len_flag:
+        dz = np.array([dz])
+        kdp = np.array([kdp])
+        zdr = np.array([zdr])
+    return dz, zdr, kdp, len_flag
 
 def calc_rain_kdp_zdr(kdp, zdr, a=90.8, b=0.93, c=-0.169):
     """
