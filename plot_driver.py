@@ -7,8 +7,9 @@ import xarray as xr
 import numpy as np
 #import RadarData
 import datetime
-import matplotlib.pyplot as plt
+import matplotlib
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 from polarris_config import get_data
 import RadarData
