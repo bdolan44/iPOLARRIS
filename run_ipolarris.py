@@ -7,7 +7,7 @@ import xarray as xr
 import numpy as np
 #import RadarData
 import datetime
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 from polarris_config import get_data
 from plot_driver import make_single_pplots
@@ -17,7 +17,7 @@ from plot_driver import make_compare_pplots
 
 
 # mc3e_wrf = get_data(exper='MC3E',radar_files=r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt')
-twp_wrf = get_data(exper='TWPICE',radar_files=r'./wrf_twp_files.txt')
+twp_wrf = get_data(exper='TWPICE',radar_files=r'/Users/bdolan/scratch/POLARRIS_2/wrf_twp_files.txt')
 flags = {'cfad_4panel_flag':False,
          'hid_cfad_flag':False,
          'joint_flag':False,
@@ -30,7 +30,7 @@ flags = {'cfad_4panel_flag':False,
          'qr_rhi':False,}
 #         
 #         
-make_single_pplots(twp_wrf,[twp_wrf.date[0],twp_wrf.date[-1]],flags,'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/',exp='TWPICE_WRF',extra=twp_wrf.mphys)
+make_single_pplots(twp_wrf,[twp_wrf.date[0],twp_wrf.date[-1]],flags,'/Users/bdolan/scratch/POLARRIS_2/',exp='TWPICE',extra='TWPICE_{m}'.format(m=twp_wrf.mphys))
 # make_single_pplots(mc3e_wrf,[mc3e_wrf.date[0],mc3e_wrf.date[-1]],flags,'/Users/bdolan/scratch/gitlab/iPOLARRIS/',exp='MC3E_WRF',extra=mc3e_wrf.mphys)
 #         
 # flags={'cfad_comp':False,

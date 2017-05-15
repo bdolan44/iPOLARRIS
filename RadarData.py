@@ -920,7 +920,7 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
         #print xmini,xmaxi,ymini,ymaxi
-        data = np.squeeze(self.data[var].sel(t=slice(tsi,tsi+1),z=slice(z_ind,z_ind),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
+        data = np.squeeze(self.data[var].sel(t=slice(tsi,tsi+1),z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
         xdat = np.squeeze(self.data[self.x_name].sel(t=slice(tsi,tsi+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)))
         ydat = np.squeeze(self.data[self.y_name].sel(t=slice(tsi,tsi+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)))
         
@@ -932,7 +932,7 @@ class RadarData(RadarConfig.RadarConfig):
         if var in self.lims.keys():
             range_lim = self.lims[var][1] - self.lims[var][0]
             #print np.shape(xdat),np.shape(ydat)
-
+            print np.shape(data), np.shape(xdat),np.shape(ydat)
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
         else:
@@ -1052,7 +1052,7 @@ class RadarData(RadarConfig.RadarConfig):
         fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax], **kwargs)
         axf = ax.flatten()
-
+        
         for i, var in enumerate((good_vars)):    
             dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vectors,res=res)
         # now do the HID plot, call previously defined functions
