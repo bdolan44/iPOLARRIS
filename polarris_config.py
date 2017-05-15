@@ -29,7 +29,7 @@ def get_time(time_parse,filename,dformat):
     print date
     return date
 ###############
-def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files=r'./wrf_twp_files.txt'):
+def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files=r'wrf_twp_files.txt'):
 
     ############MC3E radar#######
     if exper == 'MC3E':
@@ -56,7 +56,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
         elif type == 'wrf':
             radarname='WRF Cband'
             read_list = 'True'
-            radar_files = r'./wrf_mc3e_files.txt'
+#            radar_files = r'wrf_mc3e_files.txt'
             usedate_range = 'False'
             type  = 'wrf'
             dd_on = 'False'
@@ -74,7 +74,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             band = 'C'
             mphys=mphys
             time_parse=[11,19]
-            wdate_format ='%Y-%m-%d_%H:%M:%S'
+            wdate_format ='%Y-%m-%d_%H-%M-%S'
 
 
         else:
@@ -118,7 +118,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
         elif type == 'wrf':
             radarname='WRF Cband'
             read_list = 'True'
-            radar_files = r'./wrf_twpice_files.txt'
+#            radar_files = r'wrf_twpice_files.txt'
             usedate_range = 'False'
             type  = 'wrf'
             dd_on = 'False'
@@ -135,7 +135,7 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             zname='hgt'
             band = 'C'
             time_parse=[11,19]
-            wdate_format ='%Y-%m-%d_%H:%M:%S'
+            wdate_format ='%Y-%m-%d_%H-%M-%S'
 
             mphys=mphys
         else:
@@ -165,23 +165,24 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
     for d in dum:
         #print d
         tm.append(get_time(time_parse,d,wdate_format))
-        vvar = xr.open_dataset(d)
+    vvar = xr.open_mfdataset(dum,concat_dim='t')
         #vvar.xr.Dataset({'time': datetime.datetime(2000, 1, 1)})
-        mydat.append(vvar)            
-    
+#        mydat.append(vvar)            
+#    vvar.close()
     "Read netcdf4 file with netCDF4"
     #dat.append(Dataset(self.filename))
 
-    if len(dum) == 1:
-        newdat = xr.concat([mydat[0]], 't')
-    else:
-        newdat = xr.auto_combine(mydat,concat_dim = 't')
+#    if len(dum) == 1:
+#        newdat = xr.concat([mydat[0]], 't')
+#    else:
+#        newdat = xr.auto_combine(mydat,concat_dim = 't')
 
-    rdata = RadarData.RadarData(newdat,tm,dz = dz_name,zdr=dr_name,
+    rdata = RadarData.RadarData(vvar,tm,dz = dz_name,zdr=dr_name,
                                               kdp=kd_name,rho=rh_name,temp=t_name,
                                               u=uname,v=vname,w=wname,x=xname,
                                               y=yname,z=zname,lat=lat, lon=lon,band = band,expr=exper,mphys=mphys)
                                               
+    #vvar.close()
     rdata.radar_name = radarname
     rdata.convert_t()
     print 'Calculating polarimetric fields like HID and rain...'
