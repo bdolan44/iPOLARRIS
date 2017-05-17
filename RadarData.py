@@ -431,6 +431,7 @@ class RadarData(RadarConfig.RadarConfig):
             #print self.kdp_name
             #print self.rho_name
             #print np.ma.max(self.T)
+            bad = self.data[self.dz_name] < -900.00
             try:
                 #msk = self.data[self.dz_name].data.where(self.data[self.dz_name].data < -10)
                 self.data[self.dz_name].data = np.ma.masked_where(self.T.mask,self.data[self.dz_name].data)
@@ -438,9 +439,9 @@ class RadarData(RadarConfig.RadarConfig):
                 self.data[self.kdp_name].data = np.ma.masked_where(self.T.mask,self.data[self.kdp_name].data)
                 self.data[self.rho_name].data = np.ma.masked_where(self.T.mask,self.data[self.rho_name].data)
             except:
-                self.data[self.zdr_name].data = np.ma.masked_where(self.data[self.dz_name].mask,self.data[self.zdr_name].data)
-                self.data[self.kdp_name].data = np.ma.masked_where(self.data[self.dz_name].mask,self.data[self.kdp_name].data)
-                self.data[self.rho_name].data = np.ma.masked_where(self.data[self.dz_name].mask,self.data[self.rho_name].data)
+                self.data[self.zdr_name].data = np.ma.masked_where(bad,self.data[self.zdr_name].data)
+                self.data[self.kdp_name].data = np.ma.masked_where(bad,self.data[self.kdp_name].data)
+                self.data[self.rho_name].data = np.ma.masked_where(bad,self.data[self.rho_name].data)
 
             #print self.hid_band
 #             print self.data[self.dz_name]
