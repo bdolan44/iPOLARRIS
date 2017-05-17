@@ -45,18 +45,14 @@ import RadarConfig
 
 class RadarData(RadarConfig.RadarConfig): 
 
+
     def __init__(self, data,times, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
-            temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',lat=None, lon=None, band='C',expr='CASE',mphys=None): 
+            temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',lat=None, lon=None, band='C',exper='CASE',
+            radar_name= None,mphys=None): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,
-                      z=z, u=u, v=v, w=w)
+                      z=z, u=u, v=v, w=w,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
 
-        self.radar_lat = lat
-        self.radar_lon = lon
-        self.band = band
-        print self.band
-    
-        self.expr =expr
         # ********** initialize the data *********************
 #        self.data = {} 
         #self.date = None
@@ -68,12 +64,14 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.time_parse = time_parse
 #            self.dformat = dformat
         self.data = data
-        self.date= times
         self.zind = 1
         self.yind = 2
         self.xind = 3
         self.ntimes =np.shape(times)[0]
-        self.nhgts = np.shape(self.data[self.z_name].data)[self.zind]
+        try:
+            self.nhgts = np.shape(self.data[self.z_name].data)[self.zind]
+        except:
+            self.nhgts = np.shape(self.data[self.z_name].data)
 #            self.read_data_from_nc(self.radar_file)
         self.calc_deltas()
 #        else:
@@ -83,15 +81,18 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.read_data_from_nc(self.dd_file,dd_flag=1)
 #        else:
 #            pass
-        if mphys is not None:
-            self.mphys = mphys
-
 
         # down here goes some zdr checking
         self.zdr_offset = 0 # initialize as 0
+        try:
+            self.top_index = np.where(self.data[self.z_name]== np.max(self.data[self.z_name]))[self.zind]
+        except:
+            self.top_index = np.where(self.data[self.z_name]== np.max(self.data[self.z_name]))[0]
+        try:
+            self.bot_index = np.where(self.data[self.z_name]== np.min(self.data[self.z_name]))[self.zind]
+        except:
+            self.bot_index = np.where(self.data[self.z_name]== np.min(self.data[self.z_name]))[0]
 
-        self.top_index = np.where(self.data[self.z_name]== np.max(self.data[self.z_name]))[self.zind]
-        self.bot_index = np.where(self.data[self.z_name]== np.min(self.data[self.z_name]))[self.zind]
 #         if hasattr(self.nc,'Latitude_deg') == True:
 #             print 'Getting attribute!'
 #             try:
@@ -219,17 +220,19 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def calc_deltas(self): # get grid sizes for x, y, z
-        self.dx = np.average(np.abs(np.diff(self.data[self.x_name].data[0,0,:])))
-        self.dy = np.average(np.abs(np.diff(self.data[self.y_name].data[0,:,0])))
-        self.dz = np.average(np.diff(self.data[self.z_name].data[0,:]))
-#############################################################################################################
-
-    def print_date(self, fmt='%Y-%m-%d %H:%M:%S %Z'):
-        return self.date.strftime(fmt)
-
-#############################################################################################################
-    def print_title(self):
-        return '%s, %s' % (self.radar_name, self.print_date())
+        try:
+            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].data[0,0,:])))
+        except:
+            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].data)))
+        try:
+            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].data[0,0,:])))
+        except:
+            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].data)))
+        try:
+            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].data[0,0,:])))
+        except:
+            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].data)))
+            
 
 
 #############################################################################################################
@@ -253,23 +256,6 @@ class RadarData(RadarConfig.RadarConfig):
 
     ##### some private worker bee functions #####
 
-    def _get_ab_incides(self, above=None, below=None):
-
-        if above is not None:
-            bot_index = np.int(np.argsort(np.abs(self.data[self.z_name].data[0] - above))[0])
-            print# bot_index
-        else:
-            bot_index = deepcopy(self.bot_index)
-        if below is not None:
-            top_index = np.argsort(np.abs(self.data[self.z_name].data[0] - below))[0]
-            #print 't',top_index
-        else:
-            top_index = deepcopy(self.top_index)
-
-            print bot_index
-            print 't',top_index
-
-        return int(bot_index), int(top_index)
 
 
     def _pick_data(self, data, pick):
@@ -465,8 +451,8 @@ class RadarData(RadarConfig.RadarConfig):
             self.scores = csu_fhc.csu_fhc_summer(dz=self.data[self.dz_name].data, zdr=self.data[self.zdr_name].data, rho=self.data[self.rho_name].data, 
                                 kdp=self.data[self.kdp_name].data, band=self.hid_band, use_temp=True, T=self.T)
        else:
-           self.scores = csu_fhc.csu_fhc_summer(dz=self.data[self.dz_name].data, zdr=self.data[self.zdr_name], rho=self.data[self.rho_name], 
-                                kdp=self.data[self.kdp_name], band=self.hid_band, use_temp=False) 
+           self.scores = csu_fhc.csu_fhc_summer(dz=self.data[self.dz_name].data, zdr=self.data[self.zdr_name].data, rho=self.data[self.rho_name].data, 
+                                kdp=self.data[self.kdp_name].data, band=self.hid_band, use_temp=False) 
 
            # set the hid
        self.hid = np.argmax(self.scores, axis=0)+1
