@@ -17,42 +17,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def get_time(time_parse,filename,dformat):
-    tp = time_parse[0]
-    te = time_parse[1]
-    print filename
-    base = os.path.basename(filename)
-    radar_name = base[:3]
-    radcdate=np.str(base[tp:tp+te])
-            #print radcdate
-    date=datetime.datetime.strptime(radcdate,dformat)
-    print date
-    return date
 ###############
-def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files=r'wrf_twp_files.txt'):
+def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r'wrf_twp_files.txt',pol_on = False):
 
     ############MC3E radar#######
     if exper == 'MC3E':
         if type == 'obs':
             radarname = 'CSAPR'
+            band = 'C'
             read_list = 'False'
-            radar_files = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/csapr/{d}/ncfiles/'.format(d=date)
+#            radar_files = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/csapr/{d}/ncfiles/'.format(d=date)
             dd_files = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/csapr/{d}/cdffiles/'.format(d=date)
             rdate_format = '%Y%m%d_%H%M%S'
             ddate_format = '%Y%m%d_%H%M'
             dz_name = 'DBZCS'
             dr_name = 'ZDRCS'
             kd_name = 'KDPCS'
+            t_name= None
             rh_name = 'RHOCS'
-            w_name = 'Wvar'
+            uname = None
+            vname = None
+            wname = None
+            xname = 'x'
+            yname = 'y'
+            zname = 'z'
+#            w_name = 'Wvar'
             doff = 0
             ddoff = 0
             ddadd= 13
             dext = 'cdf'
             ext='nc'
             dd_on = 'True'
-            dformat=rdate_format
+            wdate_format=rdate_format
             usedate_range = 'True'
+            time_parse=[doff,ddadd]
         elif type == 'wrf':
             radarname='WRF Cband'
             read_list = 'True'
@@ -93,9 +91,10 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
     ########TWP-ICE############
     elif exper == 'TWPICE':
         if type == 'obs':
-            radarame=='CPOL'
+            radarname='CPOL'
+            band = 'C'
             read_list = 'False'
-            radar_files = '/Volumes/rawah/data/jib/twp_ice/cpol/{d}/gridded/{d}/'.format(d=date)
+#            radar_files = '/Volumes/rawah/data/jib/twp_ice/cpol/{d}/gridded/{d}/'.format(d=date)
             dd_files = '/Volumes/rawah/data/jib/twp_ice/dualdoppler_files/{d}/DUALDOP/'.format(d=date)
             sfiles = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/'
             rdate_format = '%Y%m%d_%H%M%S'
@@ -106,15 +105,24 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             ddadd = 4
             dext = 'nc'
             ext='nc'
-            dformat=rdate_format
+            wdate_format=rdate_format
             dates1 = date
             ad = dates1+'_'
             dz_name = 'DZ'
             dr_name = 'CR'
+            t_name= None
             kd_name = 'KD'
             rh_name = 'RH'
-            w_name = 'Wvar'
+#            w_name = 'Wvar'
+            uname = None
+            vname = None
+            wname = None
+            xname = 'x'
+            yname = 'y'
+            zname = 'z'
             sstat = 'DWN'
+            time_parse=[doff,ddoff]
+
         elif type == 'wrf':
             radarname='WRF Cband'
             read_list = 'True'
@@ -137,7 +145,6 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
             time_parse=[11,19]
             wdate_format ='%Y-%m-%d_%H-%M-%S'
 
-            mphys=mphys
         else:
             print 'I do not recognize the type'
 
@@ -149,43 +156,26 @@ def get_data(exper = 'TWPICE',type='wrf',mphys='4ICE',date='2006123',radar_files
     else:
         print 'Experiment not in database'
 
+    mphys=mphys
+    
+    
 
     ###########################Now grab the radar data##############
 
     def foo(s1):
         return '{}'.format(s1.rstrip())
 
-    dum =[]
-    with open(radar_files) as f: 
-        for line in f:
-            dat = (line)
-            dum.append(foo(dat))
-    mydat= []
-    tm = []
-    for d in dum:
-        #print d
-        tm.append(get_time(time_parse,d,wdate_format))
-    vvar = xr.open_mfdataset(dum,concat_dim='t')
-        #vvar.xr.Dataset({'time': datetime.datetime(2000, 1, 1)})
-#        mydat.append(vvar)            
-#    vvar.close()
-    "Read netcdf4 file with netCDF4"
-    #dat.append(Dataset(self.filename))
-
-#    if len(dum) == 1:
-#        newdat = xr.concat([mydat[0]], 't')
-#    else:
-#        newdat = xr.auto_combine(mydat,concat_dim = 't')
-
-    rdata = RadarData.RadarData(vvar,tm,dz = dz_name,zdr=dr_name,
+    rdata = RadarData.RadarData(file,tm,dz = dz_name,zdr=dr_name,
                                               kdp=kd_name,rho=rh_name,temp=t_name,
                                               u=uname,v=vname,w=wname,x=xname,
-                                              y=yname,z=zname,lat=lat, lon=lon,band = band,expr=exper,mphys=mphys)
+                                              y=yname,z=zname,lat=lat, lon=lon,band = band,
+                                              exper=exper,mphys=mphys,radar_name = radarname)
                                               
     #vvar.close()
-    rdata.radar_name = radarname
-    rdata.convert_t()
+    #rdata.radar_name = radarname
+    #rdata.convert_t()
     print 'Calculating polarimetric fields like HID and rain...'
-    rdata.calc_pol_analysis()
+    if pol_on == True:
+        rdata.calc_pol_analysis()
 
     return(rdata)
