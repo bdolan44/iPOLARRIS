@@ -74,8 +74,8 @@ edg_a = []
 
 cbins = np.arange(-25,26,0.5)
 dzbins = np.arange(-10,60,1)
-drbins = np.arange(-2,6,0.1)
-kdbins = np.arange(-2,4,0.05)
+drbins = np.arange(-2,4,0.1)
+kdbins = np.arange(-2,4,0.1)
 rrbins = np.logspace(0.01,100.01,30)
 
 
@@ -127,15 +127,15 @@ st = rconf.sav_title()
 
 dzcfad_all = np.sum(dzcfad_a,axis=0)
 fig, ax = GF.cfad_plot('DZ',cfad = dzcfad_all, hts = hts_a[0],  bins = dzbins_a[0],cfad_on = 0,rconf = rconf,tspan = times_a,maxval=20,cont=True,levels = True)
-plt.savefig('{id}DZCFAD_{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
+plt.savefig('{id}CFADDZ{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
 
 
 drcfad_all = np.sum(drcfad_a,axis=0)
 fig, ax = GF.cfad_plot('DR',cfad = drcfad_all, hts = hts_a[0],  bins = drbins_a[0],cfad_on = 0,rconf = rconf,tspan = times_a,maxval=20,cont=True,levels = True)
-plt.savefig('{id}DRCFAD_{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
+plt.savefig('{id}CFADDR{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
 
 kdcfad_all = np.sum(kdcfad_a,axis=0)
 fig, ax = GF.cfad_plot('DR',cfad = kdcfad_all, hts = hts_a[0],  bins = kdbins_a[0],cfad_on = 0,rconf = rconf,tspan = times_a,maxval=20,cont=True,levels = True)
-plt.savefig('{id}KDCFAD_{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
+plt.savefig('{id}CFADKD{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
 
 
