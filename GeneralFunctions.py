@@ -146,7 +146,7 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
     if cont is True:
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
-        pc = ax.contourf(bins[0:-1],reshts,cfad_ma,levs,colors=cols)
+        pc = ax.contourf(bins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
     else:
 
         if levels is not None:
