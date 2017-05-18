@@ -45,7 +45,8 @@ mc3e_mphys = None
 mc3e_date = '20110523'
 mc3e_time_parse=[11,19]
 #mc3e_wdate_format = '%Y%m%d_%H%M%S'
-mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
+#mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
+mc3e_wdate_format = '%Y-%m-%d_%H:%M:%S'
 
 
 #twpice_radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_twpice.txt'
@@ -55,7 +56,8 @@ twpice_exper = 'TWPICE'
 twpice_mphys = None
 twpice_date = '2006123'
 twpice_time_parse=[11,19]
-twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
+#twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
+twpice_wdate_format = '%Y-%m-%d_%H:%M:%S'
 #twpice_wdate_format = '%Y%m%d_%H%M%S'
 
 
@@ -149,7 +151,7 @@ fig, ax = plt.subplots(1,3,figsize=(18,8))
 axf = ax.flatten()
 
 m_kdcfad_all = np.sum(mc3e_dat['kdcfad'],axis=0)/mc3ecnt
-t_kdcfad_all = np.sum(twpice_dat['kdcfad'],axis=0)twpicecnt
+t_kdcfad_all = np.sum(twpice_dat['kdcfad'],axis=0)/twpicecnt
 fig, ax = GF.cfad_plot('KD',cfad = m_kdcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['kdbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
 
 fig, ax = GF.cfad_plot('KD',cfad = t_kdcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['kdbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
