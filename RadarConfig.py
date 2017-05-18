@@ -39,7 +39,7 @@ class RadarConfig(object):
         self.radar_lon = lon
         self.band = band
         self.expr =exper
-        print tm
+        #print tm
         self.date = tm
         self.radar_name = radar_name
 

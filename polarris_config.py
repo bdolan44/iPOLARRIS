@@ -15,7 +15,8 @@ import RadarData
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
-
+import GeneralFunctions as GF
+import RadarConfig
 
 ###############
 def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r'wrf_twp_files.txt',pol_on = False):
@@ -158,7 +159,7 @@ def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r
 
     mphys=mphys
     
-    print mphys
+#    print mphys
 
     ###########################Now grab the radar data##############
 
@@ -173,7 +174,8 @@ def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r
                                               
     #vvar.close()
     #rdata.radar_name = radarname
-    #rdata.convert_t()
+    if type == 'wrf':
+        rdata.convert_t()
     print 'Calculating polarimetric fields like HID and rain...'
     if pol_on == True:
         rdata.calc_pol_analysis()
@@ -301,9 +303,9 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
         hail_vert.append(mwrf_graup_vert)
         snow_vert.append(mwrf_graup_vert)
     
+        hidhts,hiddum =GF.hid_cdf(rdat.hid, rdat.data[rdat.z_name][:].data,rdat.species,z_resolution=1.0, pick=None,z_ind =0)
         hid_hts.append(hidhts)
-        hid_cfad.append(GF.hid_cdf(rdat.hid, rdat.data[rdat.z_name][:].data,rdat.species,z_resolution=1.0, pick=None,z_ind =0))
-        print type(rdat.T.data)
+        hid_cfad.append(hiddum)
 #         tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.w_name][:].data,thresh=5.0, temps=np.arange(20,-60,-5),\
 #             z_ind=0,tcoord = True,temp = rdat.T.data)
 #         warea_wrf = m_warea_wrf*rdat.dx*rad.dy/rdat.ntimes

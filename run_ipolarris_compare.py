@@ -15,6 +15,7 @@ import datetime
 
 import RadarConfig
 import plot_driver
+from polarris_config import run_exper
 from polarris_config import get_data
 import warnings
 warnings.filterwarnings('ignore')
@@ -36,6 +37,7 @@ def get_time(time_parse,filename,dformat):
     
     return date
 
+#mc3e_radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_mc3e.txt'
 mc3e_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt'
 mc3e_yp = 'wrf'
 mc3e_exper = 'MC3E'
@@ -46,6 +48,7 @@ mc3e_time_parse=[11,19]
 mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
 
 
+#twpice_radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_twpice.txt'
 twpice_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_twp_files.txt'
 twpice_yp = 'wrf'
 twpice_exper = 'TWPICE'
@@ -58,14 +61,16 @@ twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
 
 
 ptype = 'png'
+#image_dir = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/'
 image_dir = r'/Users/bdolan/scratch/iPOLARRIS_images/'
 
 mc3e_dat = run_exper(mc3e_radar_files,mc3e_exper,mc3e_mphys,mc3e_date,mc3e_time_parse,mc3e_wdate_format,mc3e_yp)
 twpice_dat = run_exper(twpice_radar_files,twpice_exper,twpice_mphys,twpice_date,twpice_time_parse,twpice_wdate_format,twpice_yp)
 
 
-st_mc3e = mc3e_dat['rconf'].sav_title()
-st_twpice = twpice_dat['rconf'].sav_title()
+st_mc3e = 'MC3E {m} 21-02'.format(m=mc3e_mphys)#mc3e_dat['rconf'].sav_title()
+st_twpice = 'TWPICE {m} 16-21'.format(m=twpice_mphys)#twpice_dat['rconf'].sav_title()
+st_diff = 'MC3E-TWPICE_{m}'.format(m=mc3e_mphys)
 
 mc3ecnt = np.shape(mc3e_dat['hts'])[0]
 twpicecnt = np.shape(twpice_dat['hts'])[0]
@@ -99,11 +104,11 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['DZ'],fontsize = 18)
 
-axf[2].set_title('{e1}-{e2} {v}'.format(e1=mc3e_dat['rconf'].exper,e2=twpice_dat['rconf'].exper,v=mc3e_dat['rconf'].dz_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].dz_name))
 
 plt.tight_layout()
 
-plt.savefig('{id}CFADDZ{s}.{t}'.format(id=image_dir,s=st_mc3e,t=ptype),dpi=200)
+plt.savefig('{id}CFADDZ{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 
 #############Now DR##############
 
@@ -132,11 +137,11 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['DR'],fontsize = 18)
 
-axf[2].set_title('{e1}-{e2} {v}'.format(e1=mc3e_dat['rconf'].exper,e2=twpice_dat['rconf'].exper,v=mc3e_dat['rconf'].dz_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].dr_name))
 
 plt.tight_layout()
 
-plt.savefig('{id}CFADDR{s}.{t}'.format(id=image_dir,s=st_mc3e,t=ptype),dpi=200)
+plt.savefig('{id}CFADDR{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 
 #############Now W##############
 
@@ -163,11 +168,11 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['KD'],fontsize = 18)
 
-axf[2].set_title('{e1}-{e2} {v}'.format(e1=mc3e_dat['rconf'].exper,e2=twpice_dat['rconf'].exper,v=mc3e_dat['rconf'].dz_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].kd_name))
 
 plt.tight_layout()
 
-plt.savefig('{id}CFADKD{s}.{t}'.format(id=image_dir,s=st_mc3e,t=ptype),dpi=200)
+plt.savefig('{id}CFADKD{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 
 #############Now W##############
 
@@ -194,9 +199,9 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['Wvar'],fontsize = 18)
 
-axf[2].set_title('{e1}-{e2} {v}'.format(e1=mc3e_dat['rconf'].exper,e2=twpice_dat['rconf'].exper,v=mc3e_dat['rconf'].dz_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].dz_name))
 
 plt.tight_layout()
 
-plt.savefig('{id}CFADW{s}.{t}'.format(id=image_dir,s=st_mc3e,t=ptype),dpi=200)
+plt.savefig('{id}CFADW{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 

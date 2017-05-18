@@ -216,7 +216,7 @@ def plot_2dhist(hist,edge,ax=None,cbon = True,rconf = None):
 
     cb = ax.contourf(edge[1][:-1],edge[0][:-1],hist,norm=colors.Normalize(vmin=0, vmax=np.max(hist)),levels=np.arange(0.01,np.max(hist),0.01))
     if cbon == True:
-        print ' making colorbar'
+        #print ' making colorbar'
         plt.colorbar(cb,ax=ax)
     if rconf is not None:
             
@@ -247,8 +247,10 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0):
     # loop thru the species and just call the vertical hid volume
     all_vols = []
     for sp in range(len(species)):
-        all_vols.append(GF.vertical_hid_volume(data,hts,delz,[sp+1], z_resolution=z_resolution, pick=pick,z_ind=0)[1]) # need the +1
-
+        #print sp
+        htsn, tdat = GF.vertical_hid_volume(data,hts,delz,[sp+1], z_resolution=z_resolution, pick=pick,z_ind=0) # need the +1
+        all_vols.append(tdat)
+        
 
     all_vols = np.array(all_vols)
     all_cdf = np.zeros_like(all_vols)
@@ -260,7 +262,7 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0):
         level_cum_vol = np.cumsum(all_vols[:, iz])
         all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
 
-    return all_cdf
+    return htsn,all_cdf
 
 #############################################################################################################
 
@@ -284,15 +286,17 @@ def vertical_hid_volume(data,hts, delz,hid_nums, z_resolution=1.0, above=None, b
     for vi,vl in enumerate(looped):
         dum1 = data.reshape(data.shape[z_ind],-1)
         dum2 = dum1[vl:vl+multiple,...]
-        
-        lev_hid = dum2 # go to vl+multiple cuz not inclusive
+        #print hid_nums,np.shape(dum2)
+        lev_hid = np.ravel(dum2) # go to vl+multiple cuz not inclusive
+#        print np.shape(lev_hid),np.max(lev_hid)
         #print 'lev_hid',np.shape(lev_hid)
 #            print hid_nums, np.shape(lev_hid)
         where_this_hid = np.where(lev_hid == hid_nums)
-#            print np.shape(where_this_hid)
         this_hid_vol = where_this_hid[0].shape[0]
+        #print np.shape(this_hid_vol)
         vol[vi] += this_hid_vol
         #print self.data[self.z_name].data[0][vl+multiple]
+#    print np.shape(vol),vol[0],hid_nums
     return htsn, vol
 
 
@@ -309,7 +313,8 @@ def hid_vertical_fraction(data,hts,hid_nums,species, z_resolution=1.0, above=Non
 
     hid_nums = np.asarray(hid_nums)
 
-    hidcdf = GF.hid_cdf(data,hts,species,z_resolution=z_resolution,z_ind=z_ind)
+    htsn, hidcdf = GF.hid_cdf(data,hts,species,z_resolution=z_resolution,z_ind=z_ind)
+    
     hvf = np.zeros(hidcdf.shape[1])
 #        print 'hvf in hvf', np.shape(hvf)
 # now loop thru each hid_num
@@ -319,7 +324,7 @@ def hid_vertical_fraction(data,hts,hid_nums,species, z_resolution=1.0, above=Non
         else:
             hvf += hidcdf[hn-1, :] - hidcdf[hn-2, :]
 
-    return hts, hvf
+    return htsn, hvf
 
 #############################################################################################################
 
@@ -341,7 +346,7 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
         #print vl,i
 #            print self.data[self.z_name].data[vl]
         #print data[0,:]
-        print vl, rconf.hid_colors[1],data[0,i]
+#        print vl, rconf.hid_colors[1],data[0,i]
         ax.barh(vl, data[0, i], left = 0., edgecolor = 'none', color = rconf.hid_colors[1]) 
         for spec in range(1, len(rconf.species)): # now looping thru the species to make bar plot
             ax.barh(vl, data[spec, i], left = data[spec-1, i], \
