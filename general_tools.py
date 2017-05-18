@@ -165,11 +165,8 @@ def hist2d(varx=None, vary=None, binsx=None, binsy=None):
             binsx = 20
             binsy = 20
 
-        print np.nanmax(vary_ravel)
-        print np.nanmax(varx_ravel)
         hist, edges = np.histogramdd((vary_ravel, varx_ravel), bins=(binsy, binsx), normed=True)
         hist *= 100.0/np.sum(hist)
-        print np.shape(edges)
         return hist, edges
 
 

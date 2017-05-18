@@ -233,8 +233,156 @@ def plot_2dhist(hist,edge,ax=None,cbon = True,rconf = None):
 
 
 #############################################################################################################
+#############################################################################################################
+
+def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0):
+    # vertical HID_cdf with bar plots I think
+    delz = hts[1]-hts[0]
+    if np.mod(z_resolution, delz) != 0:
+            print 'Need even multiple of vertical resolution: {d.1f}'.format(d = delz)
+            return
+
+    multiple = np.int(z_resolution/delz)
+
+    # loop thru the species and just call the vertical hid volume
+    all_vols = []
+    for sp in range(len(species)):
+        all_vols.append(GF.vertical_hid_volume(data,hts,delz,[sp+1], z_resolution=z_resolution, pick=pick,z_ind=0)[1]) # need the +1
 
 
+    all_vols = np.array(all_vols)
+    all_cdf = np.zeros_like(all_vols)
+#9        print np.shape(all_vols)
+    # shape is 10,16, which is nspecies x nheights
+    # need to do cdf on each level
+    for iz in range(all_vols.shape[1]):
+        # loop thru the vertical
+        level_cum_vol = np.cumsum(all_vols[:, iz])
+        all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
+
+    return all_cdf
+
+#############################################################################################################
+
+def vertical_hid_volume(data,hts, delz,hid_nums, z_resolution=1.0, above=None, below=None, pick=None,z_ind=0):
+    # This function only returns the height and volume arrays, no plotting
+    if above is None:
+        above = 0
+    if below is None:
+        below = np.shape(hts)[0]
+
+    #print 'vhv dat',np.shape(data)
+    # Not sure if I need this here.....
+
+    multiple = np.int(z_resolution/delz)
+    vol = np.zeros(int(np.shape(hts)[0]/multiple))
+    htsn = np.zeros(int(np.shape(hts)[0]/multiple))
+    #print np.shape(vol)
+    #print self.data[self.z_name].data.shape[1]
+    looped = np.arange(0, int(np.shape(htsn)[0]), multiple)
+    #print looped,multiple
+    for vi,vl in enumerate(looped):
+        dum1 = data.reshape(data.shape[z_ind],-1)
+        dum2 = dum1[vl:vl+multiple,...]
+        
+        lev_hid = dum2 # go to vl+multiple cuz not inclusive
+        #print 'lev_hid',np.shape(lev_hid)
+#            print hid_nums, np.shape(lev_hid)
+        where_this_hid = np.where(lev_hid == hid_nums)
+#            print np.shape(where_this_hid)
+        this_hid_vol = where_this_hid[0].shape[0]
+        vol[vi] += this_hid_vol
+        #print self.data[self.z_name].data[0][vl+multiple]
+    return htsn, vol
+
+
+#############################################################################################################
+
+def hid_vertical_fraction(data,hts,hid_nums,species, z_resolution=1.0, above=None, below=None, pick=None,z_ind=0):
+
+    delz = hts[1]-hts[0]
+    if np.mod(z_resolution, delz) != 0:
+            print 'Need even multiple of vertical resolution: {d.1f}'.format(d = delz)
+            return
+    multiple = np.int(z_resolution/delz)
+    htsn = np.zeros(int(np.shape(hts)[0]/multiple))
+
+    hid_nums = np.asarray(hid_nums)
+
+    hidcdf = GF.hid_cdf(data,hts,species,z_resolution=z_resolution,z_ind=z_ind)
+    hvf = np.zeros(hidcdf.shape[1])
+#        print 'hvf in hvf', np.shape(hvf)
+# now loop thru each hid_num
+    for hn in hid_nums:
+        if hn == 1:
+            hvf += hidcdf[hn-1, :]
+        else:
+            hvf += hidcdf[hn-1, :] - hidcdf[hn-2, :]
+
+    return hts, hvf
+
+#############################################################################################################
+
+
+def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
+    # this will just plot it
+    if rconf is None:
+        print "sorry, need rconf to run properly"
+        return
+    #print np.shape(data)
+    if ax is None:
+        fig, ax = plt.subplots(1,1)
+    else:
+        fig = ax.get_figure()   
+
+    fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
+
+    for i, vl in enumerate(hts):
+        #print vl,i
+#            print self.data[self.z_name].data[vl]
+        #print data[0,:]
+        print vl, rconf.hid_colors[1],data[0,i]
+        ax.barh(vl, data[0, i], left = 0., edgecolor = 'none', color = rconf.hid_colors[1]) 
+        for spec in range(1, len(rconf.species)): # now looping thru the species to make bar plot
+            ax.barh(vl, data[spec, i], left = data[spec-1, i], \
+            color = rconf.hid_colors[spec+1], edgecolor = 'none')
+    ax.set_xlim(0,100)
+    ax.set_xlabel('Cumulative frequency (%)')
+    ax.set_ylabel('Height (km MSL)')
+    # now have to do a custom colorbar?
+
+    return fig, ax 
+
+
+
+#############################################################################################################
+
+def updraft_width_profile(data,hts,thresh=5.0, temps=np.arange(20,-60,-5),z_ind=0,tcoord = True,temp = None):
+    import scipy.interpolate as sint
+    # this gets the width of the updraft as a function of temperature
+        
+    uw = np.zeros(np.shape(hts)[0])
+    #temps = self.data[self.z_name].data[0,:]
+    # basically just loop thru the Z and get the associated temperature and area
+
+    for iz, z in enumerate(hts):
+        dum1 = data.reshape(data.shape[z_ind],-1)
+        values_above = np.where(dum1[iz,...] >= thresh)[0]
+        num_above = len(values_above)
+        uw[iz] = num_above#*self.dx*self.dy/self.ntimes
+    #print np.shape(uw)
+    #print np.shape(self.T[0,:,0,0])
+    # now inerpolate this to the temps listed
+    if tcoord ==  True:
+        if temp is None:
+            print "IF you want temperature coordinates, please supply a temperature"
+        else:
+            f_temp_u = sint.interp1d(temp, uw, bounds_error=False)
+            uwp_interp = f_temp_u(temps)
+    #return temps, uw
+        return temps,uwp_interp
+    else:
+        return hts,uw
 
 #               ADD some percentile plots   
 #############################################################################################################
@@ -303,149 +451,9 @@ def plot_2dhist(hist,edge,ax=None,cbon = True,rconf = None):
         return plt
 #############################################################################################################
 
-    def vertical_hid_volume(self, hid_nums, z_resolution=1.0, above=None, below=None, pick=None):
-        # This function only returns the height and volume arrays, no plotting
-        if above is None:
-            above = 0
-        if below is None:
-            below = self.nhgts
-
-        #bot_index, top_index = self._get_ab_incides(above=above, below=below)
-        #data = self._pick_data(self.data[self.hid_name].data, pick)
-        data = self.data[self.hid_name].sel(z=slice(above,below)).data
-        msk = (np.less(self.data[self.dz_name].data, -900))
-        data[msk] = -1
-        #print 'vhv dat',np.shape(data)
-        # Not sure if I need this here.....
-        if np.mod(z_resolution, self.dz) != 0:
-            print 'Need even multiple of vertical resolution: %.1f'%self.dz
-            return
-
-        multiple = np.int(z_resolution/self.dz)
-        vol = np.zeros(int(self.data[self.z_name].data.shape[1]/multiple))
-        hts = np.zeros(int(self.data[self.z_name].data.shape[1]/multiple))
-        #print np.shape(vol)
-        #print self.data[self.z_name].data.shape[1]
-        looped = np.arange(0, int(self.data[self.z_name].data[0].shape[0]), multiple)
-        #print looped,multiple
-        for vi,vl in enumerate(looped):
-            lev_hid = data[:,vl:vl+multiple,...] # go to vl+multiple cuz not inclusive
-            #print 'lev_hid',np.shape(lev_hid)
-#            print hid_nums, np.shape(lev_hid)
-            where_this_hid = np.where(lev_hid == hid_nums)
-#            print np.shape(where_this_hid)
-            this_hid_vol = where_this_hid[0].shape[0]
-            vol[vi] += this_hid_vol
-            #print self.data[self.z_name].data[0][vl+multiple]
-        hts = self.data[self.z_name].data[0][looped]
-
-        #print hts
-#         print self.data[self.z_name].data[0]
-#         print self.data[self.z_name].data[0][::looped]
-#         hts = self.data[self.z_name].data[::multiple]
-#        print 'hts in vert hid vol', np.shape(hts)
-        return hts, vol
-
+ 
 
 #############################################################################################################
-#############################################################################################################
-
-    def hid_vertical_fraction(self, hid_nums, z_resolution=1.0, above=None, below=None, pick=None):
-
-
-        if np.mod(z_resolution, self.dz) != 0:
-            print 'Need even multiple of vertical resolution: %.1f'%self.dz
-            return None
-        else:
-            #hts = self.data[self.z_name].data[0][::int(np.round(z_resolution/self.dz))]
-            
-            hts2 = np.squeeze(self.data[self.z_name].sel(t=slice(0,1),z=slice(above,below)).data)
-            #hts2 = (self.data[self.z_name].sel(t=slice(0,-1),z=slice(above,below))).data
-            #print np.shape(hts2)
-            hts = hts2[::int(np.round(z_resolution/self.dz))]
-            # This gives the percent of the storm that is taken up by the combo of HID values
-        hid_nums = np.asarray(hid_nums)
-
-        hidcdf = self.hid_cdf(z_resolution=z_resolution)
-        hvf = np.zeros(hidcdf.shape[1])
-#        print 'hvf in hvf', np.shape(hvf)
-    # now loop thru each hid_num
-        for hn in hid_nums:
-            if hn == 1:
-                hvf += hidcdf[hn-1, :]
-            else:
-                hvf += hidcdf[hn-1, :] - hidcdf[hn-2, :]
-
-        return hts, hvf
-
-
-#############################################################################################################
-
-    def hid_cdf(self, z_resolution=1.0, pick=None):
-        # vertical HID_cdf with bar plots I think
-        if np.mod(z_resolution, self.dz) != 0:
-            print 'Need even multiple of vertical resolution: %.1f'%self.dz
-            return None
-
-        # loop thru the species and just call the vertical hid volume
-        all_vols = []
-        for sp in range(len(self.species)):
-            all_vols.append(self.vertical_hid_volume([sp+1], z_resolution=z_resolution, pick=pick)[1]) # need the +1
-
-
-        all_vols = np.array(all_vols)
-        all_cdf = np.zeros_like(all_vols)
-#9        print np.shape(all_vols)
-        # shape is 10,16, which is nspecies x nheights
-        # need to do cdf on each level
-        for iz in range(all_vols.shape[1]):
-            # loop thru the vertical
-            level_cum_vol = np.cumsum(all_vols[:, iz])
-            all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
-
-        return all_cdf
-
-
-#############################################################################################################
-
-
-    def plot_hid_cdf(self, data=None, z_resolution=1.0, ax=None, pick=None):
-        # this will just plot it
-
-        if data is not None:
-            pass
-        else:
-            pass # will call the hid_cdf function here
-            data = self.hid_cdf(z_resolution=z_resolution, pick=pick)
-        #print np.shape(data)
-        if ax is None:
-            fig, ax = plt.subplots(1,1)
-        else:
-            fig = ax.get_figure()   
-
-        fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
-        multiple = np.int(z_resolution/self.dz)
-
-        for i, vl in enumerate(np.arange(0, self.data[self.z_name].data.shape[1], multiple)):
-            #print vl,i
-#            print self.data[self.z_name].data[vl]
-            #print data[0,:]
-            ax.barh(self.data[self.z_name].data[0][vl], data[0, i], left = 0., edgecolor = 'none', color = self.hid_colors[1]) 
-            for spec in range(1, len(self.species)): # now looping thru the species to make bar plot
-                ax.barh(self.data[self.z_name].data[0][vl], data[spec, i], left = data[spec-1, i], \
-                color = self.hid_colors[spec+1], edgecolor = 'none')
-        ax.set_xlim(0,100)
-        ax.set_xlabel('Cumulative frequency (%)')
-        ax.set_ylabel('Height (km MSL)')
-        # now have to do a custom colorbar?
-#        self.HID_barplot_colorbar(fig)  # call separate HID colorbar function for bar plots
-
-            #fig.suptitle('%04d/%02d/%02d - %02d:%02d:%02d %s, cell %d, HID CDF' \
-            #                %(self.year,self.month,self.date,self.hour,self.minute,self.second, \
-            #                self.radar, self.cell_num), fontsize = 14)
-#        ax.set_title('%s %s Hydrometeor identification CDF' % (self.print_date(), self.radar_name))
-
-        return fig, ax 
 
 
 #############################################################################################################
@@ -607,31 +615,3 @@ def plot_2dhist(hist,edge,ax=None,cbon = True,rconf = None):
         return fig, ax
 
 
-#############################################################################################################
-
-    def updraft_width_profile(self, thresh=5.0, temps=np.arange(20,-60,-5),thresh_dz=False):
-        import scipy.interpolate as sint
-        # this gets the width of the updraft as a function of temperature
-            
-        uw = np.zeros(self.data[self.z_name].data[0,...].shape)
-        #temps = self.data[self.z_name].data[0,:]
-        # basically just loop thru the Z and get the associated temperature and area
-
-        data = self.data[self.w_name].data
-        if thresh_dz == True:
-            data[self.data[self.dz_name].data < -900.0]=np.nan
-        for iz, z in enumerate(self.data[self.z_name].data[0]):
-            values_above = np.where(data[:,iz,...] >= thresh)[0]
-            num_above = len(values_above)
-            uw[iz] = num_above*self.dx*self.dy/self.ntimes
-            if self.data[self.x_name].units == "[deg]":
-                #print 'changing units'
-                uw[iz]=uw[iz]*110.*110.
-
-        #print np.shape(uw)
-        #print np.shape(self.T[0,:,0,0])
-        # now inerpolate this to the temps listed
-        f_temp_u = sint.interp1d(self.T[0,:,0,0], uw, bounds_error=False)
-        uwp_interp = f_temp_u(temps)
-        #return temps, uw
-        return temps,uwp_interp

@@ -70,7 +70,7 @@ class RadarConfig(object):
     def print_date(self,tm=None, fmt='%Y-%m-%d %H:%M:%S %Z'):
         #print tm
         if tm is not None:
-            print tm
+            #print tm
             if len(tm) > 1:
                 date1 = tm[0]
                 date2 = tm[-1]
