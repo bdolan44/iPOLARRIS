@@ -1211,7 +1211,7 @@ class RadarData(RadarConfig.RadarConfig):
             udat= np.ma.masked_where(msk,udat)
             xdat= np.ma.masked_where(msk,xdat)
             ydat= np.ma.masked_where(msk,ydat)
-            print type(vdat)
+            #print type(vdat)
         #print np.max(vdat)
         #print 'vect shp',np.shape(udat),np.shape(vdat),np.shape(xdat),np.min(ydat),np.max(ydat)
 

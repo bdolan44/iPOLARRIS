@@ -278,10 +278,10 @@ def vertical_hid_volume(data,hts, delz,hid_nums, z_resolution=1.0, above=None, b
 
     multiple = np.int(z_resolution/delz)
     vol = np.zeros(int(np.shape(hts)[0]/multiple))
-    htsn = np.zeros(int(np.shape(hts)[0]/multiple))
     #print np.shape(vol)
     #print self.data[self.z_name].data.shape[1]
-    looped = np.arange(0, int(np.shape(htsn)[0]), multiple)
+    looped = np.arange(0, int(np.shape(hts)[0]), multiple)
+    htsn = hts[looped]
     #print looped,multiple
     for vi,vl in enumerate(looped):
         dum1 = data.reshape(data.shape[z_ind],-1)

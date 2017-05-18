@@ -183,9 +183,9 @@ axf = ax.flatten()
 
 m_wcfad_all = np.sum(mc3e_dat['wcfad'],axis=0)/mc3ecnt
 t_wcfad_all = np.sum(twpice_dat['wcfad'],axis=0)/twpicecnt
-fig, ax = GF.cfad_plot('KD',cfad = m_wcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['wbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('Wvar',cfad = m_wcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['wbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
 
-fig, ax = GF.cfad_plot('KD',cfad = t_wcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['wbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('Wvar',cfad = t_wcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['wbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
 
 
 diff_cfad = m_wcfad_all - t_wcfad_all
@@ -207,3 +207,12 @@ plt.tight_layout()
 
 plt.savefig('{id}CFADW{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 
+#############Now W##############
+
+fig, ax = plt.subplots(1,2,figsize=(18,8))
+axf = ax.flatten()
+t = GF.plot_hid_cdf(np.nansum(mc3e_dat['hidcfad'],axis=0)/mc3ecnt,mc3e_dat['hidhts'][0],ax=axf[0],rconf=mc3e_dat['rconf'])
+t = GF.plot_hid_cdf(np.nansum(twpice_dat['hidcfad'],axis=0)/twpicecnt,twpice_dat['hidhts'][0],ax=axf[1],rconf=twpice_dat['rconf'])
+plt.tight_layout()
+
+plt.savefig('{id}CFAD_HID_{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)

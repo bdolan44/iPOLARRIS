@@ -304,6 +304,7 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
         snow_vert.append(mwrf_graup_vert)
     
         hidhts,hiddum =GF.hid_cdf(rdat.hid, rdat.data[rdat.z_name][:].data,rdat.species,z_resolution=1.0, pick=None,z_ind =0)
+        print np.shape(hiddum)
         hid_hts.append(hidhts)
         hid_cfad.append(hiddum)
 #         tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.w_name][:].data,thresh=5.0, temps=np.arange(20,-60,-5),\
