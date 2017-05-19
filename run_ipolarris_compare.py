@@ -139,7 +139,7 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['DR'],fontsize = 18)
 
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].dr_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].zdr_name))
 
 plt.tight_layout()
 
@@ -170,7 +170,7 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['KD'],fontsize = 18)
 
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].kd_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].kdp_name))
 
 plt.tight_layout()
 
@@ -201,7 +201,7 @@ plt.colorbar(cb,ax=axf[2])
 axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 axf[2].set_xlabel(mc3e_dat['rconf'].names['Wvar'],fontsize = 18)
 
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].dz_name))
+axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].w_name))
 
 plt.tight_layout()
 
@@ -212,7 +212,9 @@ plt.savefig('{id}CFADW{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 fig, ax = plt.subplots(1,2,figsize=(18,8))
 axf = ax.flatten()
 t = GF.plot_hid_cdf(np.nansum(mc3e_dat['hidcfad'],axis=0)/mc3ecnt,mc3e_dat['hidhts'][0],ax=axf[0],rconf=mc3e_dat['rconf'])
+axf[0].set_title='MC3E'
 t = GF.plot_hid_cdf(np.nansum(twpice_dat['hidcfad'],axis=0)/twpicecnt,twpice_dat['hidhts'][0],ax=axf[1],rconf=twpice_dat['rconf'])
+axf[0].set_title='TWPICE'
 plt.tight_layout()
 
 plt.savefig('{id}CFAD_HID_{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
