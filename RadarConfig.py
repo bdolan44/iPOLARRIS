@@ -102,12 +102,12 @@ class RadarConfig(object):
         extra = ''
         if self.exper is not None:
             extra = '{e}_{x}'.format(e=extra,x = self.exper)
-        if self.radar_name is not None:
-            extra = '{e}_{r}'.format(e=extra,r=self.radar_name)
+#        if self.radar_name is not None:
+#            extra = '{e}_{r}'.format(e=extra,r=self.radar_name)
         if self.mphys is not None:
             extra = '{e}_{m}'.format(e=extra,m=self.mphys)
         
-        extra = '{e}_{t}'.format(e=extra, t=self.print_date(tm,fmt = '%Y%m%d%_H%M%S'))
+#        extra = '{e}_{t}'.format(e=extra, t=self.print_date(tm,fmt = '%Y%m%d%_H%M%S'))
         return extra
 #############################################################################################################
 

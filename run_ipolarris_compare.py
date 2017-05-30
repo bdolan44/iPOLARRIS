@@ -45,8 +45,8 @@ mc3e_mphys = None
 mc3e_date = '20110523'
 mc3e_time_parse=[11,19]
 #mc3e_wdate_format = '%Y%m%d_%H%M%S'
-#mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
-mc3e_wdate_format = '%Y-%m-%d_%H:%M:%S'
+mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
+#mc3e_wdate_format = '%Y-%m-%d_%H:%M:%S'
 
 
 #twpice_radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_twpice.txt'
@@ -56,8 +56,8 @@ twpice_exper = 'TWPICE'
 twpice_mphys = None
 twpice_date = '2006123'
 twpice_time_parse=[11,19]
-#twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
-twpice_wdate_format = '%Y-%m-%d_%H:%M:%S'
+twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
+#twpice_wdate_format = '%Y-%m-%d_%H:%M:%S'
 #twpice_wdate_format = '%Y%m%d_%H%M%S'
 
 
@@ -88,10 +88,12 @@ axf = ax.flatten()
 m_dzcfad_all = np.sum(mc3e_dat['dzcfad'],axis=0)/mc3ecnt
 t_dzcfad_all = np.sum(twpice_dat['dzcfad'],axis=0)/twpicecnt
 
-fig, ax = GF.cfad_plot('DZ',cfad = m_dzcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['dzbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('DZ',cfad = m_dzcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['dzbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
 
-fig, ax = GF.cfad_plot('DZ',cfad = t_dzcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['dzbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('DZ',cfad = t_dzcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['dzbins'],ax=axf[0],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
 
+axf[0].set_ylim(0,18)
+axf[1].set_ylim(0,18)
 
 diff_cfad = m_dzcfad_all - t_dzcfad_all
 cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
@@ -120,10 +122,12 @@ axf = ax.flatten()
 m_drcfad_all = np.sum(mc3e_dat['drcfad'],axis=0)/mc3ecnt
 t_drcfad_all = np.sum(twpice_dat['drcfad'],axis=0)/twpicecnt
 
-fig, ax = GF.cfad_plot('DR',cfad = m_drcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['drbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('DR',cfad = m_drcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['drbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
 
-fig, ax = GF.cfad_plot('DR',cfad = t_drcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['drbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('DR',cfad = t_drcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['drbins'],ax=axf[0],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
 
+axf[0].set_ylim(0,18)
+axf[1].set_ylim(0,18)
 
 
 diff_cfad = m_drcfad_all - t_drcfad_all
@@ -152,10 +156,12 @@ axf = ax.flatten()
 
 m_kdcfad_all = np.sum(mc3e_dat['kdcfad'],axis=0)/mc3ecnt
 t_kdcfad_all = np.sum(twpice_dat['kdcfad'],axis=0)/twpicecnt
-fig, ax = GF.cfad_plot('KD',cfad = m_kdcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['kdbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('KD',cfad = m_kdcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['kdbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
 
-fig, ax = GF.cfad_plot('KD',cfad = t_kdcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['kdbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('KD',cfad = t_kdcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['kdbins'],ax=axf[2],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
 
+axf[0].set_ylim(0,18)
+axf[1].set_ylim(0,18)
 
 diff_cfad = m_kdcfad_all - t_kdcfad_all
 cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
@@ -183,9 +189,11 @@ axf = ax.flatten()
 
 m_wcfad_all = np.sum(mc3e_dat['wcfad'],axis=0)/mc3ecnt
 t_wcfad_all = np.sum(twpice_dat['wcfad'],axis=0)/twpicecnt
-fig, ax = GF.cfad_plot('Wvar',cfad = m_wcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['wbins'],ax=axf[0],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('Wvar',cfad = m_wcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['wbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
 
-fig, ax = GF.cfad_plot('Wvar',cfad = t_wcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['wbins'],ax=axf[1],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
+fig, ax = GF.cfad_plot('Wvar',cfad = t_wcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['wbins'],ax=axf[0],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
+axf[0].set_ylim(0,18)
+axf[1].set_ylim(0,18)
 
 
 diff_cfad = m_wcfad_all - t_wcfad_all
@@ -211,10 +219,14 @@ plt.savefig('{id}CFADW{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
 
 fig, ax = plt.subplots(1,2,figsize=(18,8))
 axf = ax.flatten()
-t = GF.plot_hid_cdf(np.nansum(mc3e_dat['hidcfad'],axis=0)/mc3ecnt,mc3e_dat['hidhts'][0],ax=axf[0],rconf=mc3e_dat['rconf'])
-axf[0].set_title='MC3E'
-t = GF.plot_hid_cdf(np.nansum(twpice_dat['hidcfad'],axis=0)/twpicecnt,twpice_dat['hidhts'][0],ax=axf[1],rconf=twpice_dat['rconf'])
+fig, ax = GF.plot_hid_cdf(np.nansum(mc3e_dat['hidcfad'],axis=0)/mc3ecnt,mc3e_dat['hidhts'][0],ax=axf[1],rconf=mc3e_dat['rconf'])
+axf[1].set_title='MC3E'
+fig, ax = GF.plot_hid_cdf(np.nansum(twpice_dat['hidcfad'],axis=0)/twpicecnt,twpice_dat['hidhts'][0],ax=axf[0],rconf=twpice_dat['rconf'])
 axf[0].set_title='TWPICE'
+
+axf[0].set_ylim(0,18)
+axf[1].set_ylim(0,18)
+
 plt.tight_layout()
 
 plt.savefig('{id}CFAD_HID_{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
