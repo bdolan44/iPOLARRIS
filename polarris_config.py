@@ -226,7 +226,7 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
     edg_a = []
 
     cbins = np.arange(-25,26,0.5)
-    dzbins = np.arange(-10,60,1)
+    dzbins = np.arange(-10,70,1)
     drbins = np.arange(-2,6,0.05)
     kdbins = np.arange(-2,6,0.05)
     rrbins = np.logspace(0.01,100.01,30)

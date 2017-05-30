@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as n
 import os
 import glob
 from netCDF4 import Dataset
@@ -36,12 +36,12 @@ def get_time(time_parse,filename,dformat):
     
     return date
 
-radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_twp_files.txt'
+radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_mc3e.txt'
 image_dir = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/'
 yp = 'wrf'
-exper = 'TWPICE'
-mphys = '4ICE'
-date = '2006123'
+exper = 'MC3E'
+mphys = 'SBM'
+date = '20110523'
 time_parse=[11,19]
 wdate_format ='%Y-%m-%d_%H:%M:%S'
 
@@ -126,7 +126,7 @@ for d in dum:
     del rdat
 
 st = rconf.sav_title()
-print st
+
 dzcfad_all = np.sum(dzcfad_a,axis=0)
 fig, ax = GF.cfad_plot('DZ',cfad = dzcfad_all, hts = hts_a[0],  bins = dzbins_a[0],cfad_on = 0,rconf = rconf,tspan = times_a,maxval=20,cont=True,levels = True)
 plt.savefig('{id}CFADDZ{s}.{t}'.format(id=image_dir,s=st,t=ptype),dpi=200)
