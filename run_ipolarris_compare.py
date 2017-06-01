@@ -41,7 +41,7 @@ def get_time(time_parse,filename,dformat):
 mc3e_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt'
 mc3e_yp = 'wrf'
 mc3e_exper = 'MC3E'
-mc3e_mphys = None
+mc3e_mphys = '4ICE'
 mc3e_date = '20110523'
 mc3e_time_parse=[11,19]
 #mc3e_wdate_format = '%Y%m%d_%H%M%S'
@@ -53,7 +53,7 @@ mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
 twpice_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_twp_files.txt'
 twpice_yp = 'wrf'
 twpice_exper = 'TWPICE'
-twpice_mphys = None
+twpice_mphys = '4ICE'
 twpice_date = '2006123'
 twpice_time_parse=[11,19]
 twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
@@ -61,172 +61,73 @@ twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
 #twpice_wdate_format = '%Y%m%d_%H%M%S'
 
 
-
 ptype = 'png'
 #image_dir = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/'
-image_dir = r'/Users/bdolan/scratch/iPOLARRIS_images/'
+image_dir = r'/Users/bdolan/scratch/iPOLARRIS_images_test/'
 
-mc3e_dat = run_exper(mc3e_radar_files,mc3e_exper,mc3e_mphys,mc3e_date,mc3e_time_parse,mc3e_wdate_format,mc3e_yp)
-twpice_dat = run_exper(twpice_radar_files,twpice_exper,twpice_mphys,twpice_date,twpice_time_parse,twpice_wdate_format,twpice_yp)
+flags = {'cfad_4panel_flag':False,  # 4 panel CFADs of Dbz, Zdr, Kdp and W
+         'hid_cfad_flag':False,     # HID CFAD
+         'joint_flag':False,        #Z vs. Zdr
+         'cfad_individ_flag':False,  #Make separate images for dbz, Zdr, Kdp, W and Rho
+         'hid_prof':False,          #Profile of HID species with height
+         'all_cappi':False,         # make a cappi cross section for all times. change parameters in plot_driver.py
+         'all_xsec':True,          # make RHI cross sections for all times. change parmaters in plot_driver.py
+         'up_width':False,          # Make a plot of the vertical velocity profile with temperature.
+         'qr_cappi':False,          # Make cappi cross section of mixing ratios. change parameters in plot_driver.py
+         'qr_rhi':False}            # make RHI cross sections of mixing ratios. change parameters in plot_driver.py
 
+plot_single = 0         #Set this flag to 1, plus the flags above, for individual plots at each time.
+plot_int = 1           #Set this flag for integrated time plots over all files in the list.
+plot_diff = 0            #set this flag to compare two different datasets in the integrated plots.
 
-st_mc3e = 'MC3E {m} 21-02'.format(m=mc3e_mphys)#mc3e_dat['rconf'].sav_title()
-st_twpice = 'TWPICE {m} 16-21'.format(m=twpice_mphys)#twpice_dat['rconf'].sav_title()
-st_diff = 'MC3E-TWPICE_{m}'.format(m=mc3e_mphys)
-
-mc3ecnt = np.shape(mc3e_dat['hts'])[0]
-twpicecnt = np.shape(twpice_dat['hts'])[0]
-
-
-
-#############1st dBZ##############
-
-
-fig, ax = plt.subplots(1,3,figsize=(18,8))
-axf = ax.flatten()
-
-m_dzcfad_all = np.sum(mc3e_dat['dzcfad'],axis=0)/mc3ecnt
-t_dzcfad_all = np.sum(twpice_dat['dzcfad'],axis=0)/twpicecnt
-
-fig, ax = GF.cfad_plot('DZ',cfad = m_dzcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['dzbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
-
-fig, ax = GF.cfad_plot('DZ',cfad = t_dzcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['dzbins'],ax=axf[0],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
-
-axf[0].set_ylim(0,18)
-axf[1].set_ylim(0,18)
-
-diff_cfad = m_dzcfad_all - t_dzcfad_all
-cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-#print np.shape(bins[0:-1]), np.shape(radz), np.shape(np.transpose(cfad_ma))
-
-#levels=[1.,5.,10.,20.,25.,30.,35.,40.,45.,50.,55.,60.]
-levels=np.arange(-2,2.1,0.1)
-cb=axf[2].contourf(mc3e_dat['dzbins'][:-1],mc3e_dat['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
-
-#    pc = plt.contour([bins[0:-1]],radz, np.transpose(cfad_ma))#, vmin = 0.02, vmax = 15, cmap = cmap)
-plt.colorbar(cb,ax=axf[2])
-axf[2].set_ylabel('Height (km MSL)',fontsize=18)
-axf[2].set_xlabel(mc3e_dat['rconf'].names['DZ'],fontsize = 18)
-
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].dz_name))
-
-plt.tight_layout()
-
-plt.savefig('{id}CFADDZ{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
-
-#############Now DR##############
-
-fig, ax = plt.subplots(1,3,figsize=(18,8))
-axf = ax.flatten()
-
-m_drcfad_all = np.sum(mc3e_dat['drcfad'],axis=0)/mc3ecnt
-t_drcfad_all = np.sum(twpice_dat['drcfad'],axis=0)/twpicecnt
-
-fig, ax = GF.cfad_plot('DR',cfad = m_drcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['drbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
-
-fig, ax = GF.cfad_plot('DR',cfad = t_drcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['drbins'],ax=axf[0],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
-
-axf[0].set_ylim(0,18)
-axf[1].set_ylim(0,18)
+mc3e_dat = run_exper(mc3e_radar_files,mc3e_exper,mc3e_mphys,mc3e_date,mc3e_time_parse,mc3e_wdate_format,mc3e_yp,plot_on=plot_single,flags=flags,image_dir=image_dir)
+twpice_dat = run_exper(twpice_radar_files,twpice_exper,twpice_mphys,twpice_date,twpice_time_parse,twpice_wdate_format,twpice_yp,plot_on=1,flags=flags,image_dir=image_dir)
 
 
-diff_cfad = m_drcfad_all - t_drcfad_all
-cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-#print np.shape(bins[0:-1]), np.shape(radz), np.shape(np.transpose(cfad_ma))
+dat1 = mc3e_dat
+dat2 = twpice_dat
 
-#levels=[1.,5.,10.,20.,25.,30.,35.,40.,45.,50.,55.,60.]
-levels=np.arange(-8,8.1,0.1)
-cb=axf[2].contourf(mc3e_dat['drbins'][:-1],mc3e_dat['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
+if plot_int == 1:
 
-#    pc = plt.contour([bins[0:-1]],radz, np.transpose(cfad_ma))#, vmin = 0.02, vmax = 15, cmap = cmap)
-plt.colorbar(cb,ax=axf[2])
-axf[2].set_ylabel('Height (km MSL)',fontsize=18)
-axf[2].set_xlabel(mc3e_dat['rconf'].names['DR'],fontsize = 18)
+    #######Make plots of Integrated CFADS 
+    plot_driver.plot_cfad_int(dat1,typ='dz',image_dir = image_dir,ptype=ptype)
+    plot_driver.plot_cfad_int(dat1,typ='dr',image_dir = image_dir,ptype=ptype)
+    plot_driver.plot_cfad_int(dat1,typ='kd',image_dir = image_dir,ptype=ptype)
+    plot_driver.plot_cfad_int(dat1,typ='w',image_dir = image_dir,ptype=ptype)
+    
 
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].zdr_name))
+    #######Now HID##############
+    plot_driver.plot_hid_int(dat1,typ='hid',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_hid_prof_int(dat1,typ='hid',image_dir=image_dir,ptype=ptype)
 
-plt.tight_layout()
-
-plt.savefig('{id}CFADDR{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
-
-#############Now W##############
-
-fig, ax = plt.subplots(1,3,figsize=(18,8))
-axf = ax.flatten()
-
-m_kdcfad_all = np.sum(mc3e_dat['kdcfad'],axis=0)/mc3ecnt
-t_kdcfad_all = np.sum(twpice_dat['kdcfad'],axis=0)/twpicecnt
-fig, ax = GF.cfad_plot('KD',cfad = m_kdcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['kdbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
-
-fig, ax = GF.cfad_plot('KD',cfad = t_kdcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['kdbins'],ax=axf[2],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
-
-axf[0].set_ylim(0,18)
-axf[1].set_ylim(0,18)
-
-diff_cfad = m_kdcfad_all - t_kdcfad_all
-cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-#print np.shape(bins[0:-1]), np.shape(radz), np.shape(np.transpose(cfad_ma))
-
-#levels=[1.,5.,10.,20.,25.,30.,35.,40.,45.,50.,55.,60.]
-levels=np.arange(-8,8.1,0.1)
-cb=axf[2].contourf(mc3e_dat['kdbins'][:-1],mc3e_dat['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
-
-#    pc = plt.contour([bins[0:-1]],radz, np.transpose(cfad_ma))#, vmin = 0.02, vmax = 15, cmap = cmap)
-plt.colorbar(cb,ax=axf[2])
-axf[2].set_ylabel('Height (km MSL)',fontsize=18)
-axf[2].set_xlabel(mc3e_dat['rconf'].names['KD'],fontsize = 18)
-
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].kdp_name))
-
-plt.tight_layout()
-
-plt.savefig('{id}CFADKD{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
-
-#############Now W##############
-
-fig, ax = plt.subplots(1,3,figsize=(18,8))
-axf = ax.flatten()
-
-m_wcfad_all = np.sum(mc3e_dat['wcfad'],axis=0)/mc3ecnt
-t_wcfad_all = np.sum(twpice_dat['wcfad'],axis=0)/twpicecnt
-fig, ax = GF.cfad_plot('Wvar',cfad = m_wcfad_all, hts = mc3e_dat['hts'][0],  bins = mc3e_dat['wbins'],ax=axf[1],cfad_on = 0,rconf = mc3e_dat['rconf'],tspan = mc3e_dat['time'],maxval=20,cont=True,levels = True)
-
-fig, ax = GF.cfad_plot('Wvar',cfad = t_wcfad_all, hts = twpice_dat['hts'][0],  bins = twpice_dat['wbins'],ax=axf[0],cfad_on = 0,rconf = twpice_dat['rconf'],tspan = twpice_dat['time'],maxval=20,cont=True,levels = True)
-axf[0].set_ylim(0,18)
-axf[1].set_ylim(0,18)
+    ########Now 2D histograms######
+    plot_driver.plot_joint_int(dat1,typ='zzdr',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_joint_int(dat1,typ='zkdp',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_joint_int(dat1,typ='zw',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_joint_int(dat1,typ='wr',image_dir=image_dir,ptype=ptype)
+    ########Updraft Width##########
+    plot_driver.plot_upwidth_int(dat1,image_dir=image_dir,ptype=ptype)
 
 
-diff_cfad = m_wcfad_all - t_wcfad_all
-cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-#print np.shape(bins[0:-1]), np.shape(radz), np.shape(np.transpose(cfad_ma))
+if plot_diff == 1:
 
-#levels=[1.,5.,10.,20.,25.,30.,35.,40.,45.,50.,55.,60.]
-levels=np.arange(-8,8.1,0.1)
-cb=axf[2].contourf(mc3e_dat['wbins'][:-1],mc3e_dat['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
+    ############PLOTTING Differences#################
 
-#    pc = plt.contour([bins[0:-1]],radz, np.transpose(cfad_ma))#, vmin = 0.02, vmax = 15, cmap = cmap)
-plt.colorbar(cb,ax=axf[2])
-axf[2].set_ylabel('Height (km MSL)',fontsize=18)
-axf[2].set_xlabel(mc3e_dat['rconf'].names['Wvar'],fontsize = 18)
+    ########Make plots of CFAD trios (dat1 , dat2 , difference)##############
+    plot_driver.plot_cfad_compare(dat1,dat2,typ='dz',image_dir = image_dir,ptype=ptype)
+    plot_driver.plot_cfad_compare(dat1,dat2,typ='dr',image_dir = image_dir,ptype=ptype)
+    plot_driver.plot_cfad_compare(dat1,dat2,typ='kd',image_dir = image_dir,ptype=ptype)
+    plot_driver.plot_cfad_compare(dat1,dat2,typ='w',image_dir = image_dir,ptype=ptype)
 
-axf[2].set_title('{d} {v}'.format(d=st_diff,v=mc3e_dat['rconf'].w_name))
+    #########Now HID##############
+    plot_driver.plot_hid_2panel(dat1,dat2,typ='hid',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_hid_profile(dat1,dat2,typ='hid',image_dir=image_dir,ptype=ptype)
+# 
+    ########Now 2D histograms######
+    plot_driver.plot_joint_comp(dat1,dat2,typ='zzdr',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_joint_comp(dat1,dat2,typ='zkdp',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_joint_comp(dat1,dat2,typ='zw',image_dir=image_dir,ptype=ptype)
+    plot_driver.plot_joint_comp(dat1,dat2,typ='wr',image_dir=image_dir,ptype=ptype)
 
-plt.tight_layout()
-
-plt.savefig('{id}CFADW{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
-
-#############Now W##############
-
-fig, ax = plt.subplots(1,2,figsize=(18,8))
-axf = ax.flatten()
-fig, ax = GF.plot_hid_cdf(np.nansum(mc3e_dat['hidcfad'],axis=0)/mc3ecnt,mc3e_dat['hidhts'][0],ax=axf[1],rconf=mc3e_dat['rconf'])
-axf[1].set_title='MC3E'
-fig, ax = GF.plot_hid_cdf(np.nansum(twpice_dat['hidcfad'],axis=0)/twpicecnt,twpice_dat['hidhts'][0],ax=axf[0],rconf=twpice_dat['rconf'])
-axf[0].set_title='TWPICE'
-
-axf[0].set_ylim(0,18)
-axf[1].set_ylim(0,18)
-
-plt.tight_layout()
-
-plt.savefig('{id}CFAD_HID_{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype),dpi=200)
+    ########Updraft Width##########
+    plot_driver.plot_upwidth(dat1,dat2,image_dir=image_dir,ptype=ptype)

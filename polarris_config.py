@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import GeneralFunctions as GF
 import RadarConfig
+import plot_driver
 
 ###############
 def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r'wrf_twp_files.txt',pol_on = False):
@@ -63,6 +64,7 @@ def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r
             dr_name = 'zdr01'
             kd_name='kdp01'
             rh_name='rhohv01'
+            rr_name='precip'
             t_name='t_air'
             uname = 'u'
             vname = 'v'
@@ -136,6 +138,8 @@ def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r
             kd_name='kdp01'
             rh_name='rhohv01'
             t_name='t_air'
+            rr_name='precip'
+
             uname = 'u'
             vname = 'v'
             wname = 'w'
@@ -168,7 +172,7 @@ def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r
 
     rdata = RadarData.RadarData(file,tm,dz = dz_name,zdr=dr_name,
                                               kdp=kd_name,rho=rh_name,temp=t_name,
-                                              u=uname,v=vname,w=wname,x=xname,
+                                              u=uname,v=vname,w=wname,x=xname,rr=rr_name,
                                               y=yname,z=zname,lat=lat, lon=lon,band = band,
                                               exper=exper,mphys=mphys,radar_name = radarname)
                                               
@@ -176,7 +180,7 @@ def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r
     #rdata.radar_name = radarname
     if type == 'wrf':
         rdata.convert_t()
-    print 'Calculating polarimetric fields like HID and rain...'
+    #print 'Calculating polarimetric fields like HID and rain...'
     if pol_on == True:
         rdata.calc_pol_analysis()
 
@@ -197,7 +201,7 @@ def get_time(time_parse,filename,dformat):
     
     return date
 
-def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
+def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=0,flags=None,image_dir='./',ptype='png'):
 
     dum =[]
     with open(radar_files) as f: 
@@ -222,8 +226,18 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
 
     times_a=[]
     warea=[]
+    wareat=[]
     histzzdr_a = []
     edg_a = []
+
+    histkdz_a = []
+    edgkdz_a = []
+
+    histzw_a = []
+    edgzw_a = []
+
+    histwr_a = []
+    edgwr_a = []
 
     cbins = np.arange(-25,26,0.5)
     dzbins = np.arange(-10,60,1)
@@ -246,7 +260,7 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
         print d
     #        dn = 
         tm=get_time(time_parse,d,wdate_format)
-        vvar = xr.open_dataset(d)
+        vvar = xr.open_dataset(d,autoclose=True)
 
         rdat = get_data(exper = exper,type=yp,mphys=mphys,date=date,file=vvar, tm = [tm],pol_on =1)
         bad = np.where(rdat.data[rdat.dz_name].data<-10.)
@@ -280,9 +294,25 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
         times_a.append(tm)
     
         hist,edg = GF.hist2d(rdat.data[rdat.zdr_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(-2,4.1,0.2),binsy=np.arange(-10,60,1))
-
+#        edgx = 
         histzzdr_a.append(hist)
         edg_a.append(edg)
+
+        histkdz,edgkdz = GF.hist2d(rdat.data[rdat.kdp_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(-2,4.1,0.2),binsy=np.arange(-10,60,1))
+#        edgx = 
+        histkdz_a.append(histkdz)
+        edgkdz_a.append(edgkdz)
+
+        histzw,edgzw = GF.hist2d(rdat.data[rdat.w_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(-25,25.5,0.5),binsy=np.arange(-10,60,1))
+#        edgx = 
+        histzw_a.append(histzw)
+        edgzw_a.append(edgzw)
+
+        histwr,edgwr = GF.hist2d(rdat.data[rdat.rr_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(0,200,1),binsy=np.arange(-25,25.5,0.5))
+#        edgx = 
+        histwr_a.append(histwr)
+        edgwr_a.append(edgwr)
+
         vvar.close()
     
         hidwater = [1,2,10]
@@ -292,7 +322,6 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
         
         rdat.hid[bad]=-1
         
-        
         hidhts, mwrf_water_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidwater,rdat.species,z_resolution =1.0,z_ind=1)
         hidhts, mwrf_graup_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidgraup,rdat.species,z_resolution =1.0,z_ind=1)
         hidhts, mwrf_hail_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidhail,rdat.species,z_resolution =1.0,z_ind=1)
@@ -300,27 +329,32 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
 
         water_vert.append(mwrf_water_vert)
         graup_vert.append(mwrf_graup_vert)
-        hail_vert.append(mwrf_graup_vert)
-        snow_vert.append(mwrf_graup_vert)
+        hail_vert.append(mwrf_hail_vert)
+        snow_vert.append(mwrf_snow_vert)
     
         hidhts,hiddum =GF.hid_cdf(rdat.hid, rdat.data[rdat.z_name][:].data,rdat.species,z_resolution=1.0, pick=None,z_ind =0)
-        print np.shape(hiddum)
+#        print np.shape(hiddum)
         hid_hts.append(hidhts)
         hid_cfad.append(hiddum)
-#         tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.w_name][:].data,thresh=5.0, temps=np.arange(20,-60,-5),\
-#             z_ind=0,tcoord = True,temp = rdat.T.data)
-#         warea_wrf = m_warea_wrf*rdat.dx*rad.dy/rdat.ntimes
-#         if rdat.data[rdat.x_name].units == "[deg]":
-#             ware_wrf=warea_wrf*110.*110.
-# 
-# 
-#         warea.append(warea_wrf)
+        tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.w_name][:].data,thresh=5.0, temps=np.arange(20,-60,-5),\
+            z_ind=0,tcoord = True,temp = rdat.T.data[:,0,0])
+        warea_wrf = m_warea_wrf*rdat.dx*rdat.dy/rdat.ntimes
+        if rdat.data[rdat.x_name].units == "[deg]":
+            ware_wrf=warea_wrf*110.*110.
+
+
+        warea.append(warea_wrf)
+        wareat.append(tmp)
         
         rconf = RadarConfig.RadarConfig()
         rconf.date = times_a
         rconf.mphys = rdat.mphys
         rconf.exper = rdat.exper
         rconf.radar_name = rdat.radar_name
+        
+        if plot_on ==1:
+            plot_driver.make_single_pplots(rdat,flags,exp = exper,ty=ptype,dir=image_dir)
+        
         del rdat
 
 
@@ -332,12 +366,19 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp):
           'hts':hts_a,
           'histzzdr':histzzdr_a,
           'edgzzdr':edg_a,
+          'histkdz':histkdz_a,
+          'edgkdz':edgkdz_a,
+          'histzw':histzw_a,
+          'edgzw':edgzw_a,
+          'histwr':histwr_a,
+          'edgwr':edgwr_a,
           'hidhts':hid_hts,
           'water_vert':water_vert,
           'graup_vert':graup_vert,
           'hail_vert':hail_vert,
           'snow_vert':snow_vert,
-#           'warea':warea,
+           'warea':warea,
+           'wareat':wareat,
           'time':times_a,
           'dzbins':dzbins,
           'drbins':drbins,

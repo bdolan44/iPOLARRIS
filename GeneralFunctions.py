@@ -388,6 +388,36 @@ def updraft_width_profile(data,hts,thresh=5.0, temps=np.arange(20,-60,-5),z_ind=
         return temps,uwp_interp
     else:
         return hts,uw
+#############################################################################################################
+
+
+def plot_w_profile(data, hts,rep_func=np.average, masked=True, ax=None):
+    # this will plot the vertical profile
+    wprof = self.w_profile(rep_func=rep_func, masked=masked)
+
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+    # ax has been passed in, do nothing to ax, but need to get the parent fig
+        fig = ax.get_figure()
+
+    u = ax.plot(wprof['up'], self.data[self.z_name], color='red', linewidth=2, label='updrafts')
+    d = ax.plot(wprof['down'], self.data[self.z_name], color='blue', linewidth=2, label='downdrafts')
+
+    max_abs = np.abs(np.array(ax.get_xlim())).max()
+
+    ax.set_xlim(-1*max_abs, max_abs)
+    #ax.set_xlim()
+    ax.axvline(x=0, color='black')
+    ax.set_xlabel('Vertical motion (m/s)')
+    ax.set_ylabel('Altitude (km MSL)')
+    ax.grid(True)
+    ax.legend(loc='best')
+    ax.set_title('%s %s Vertical motion profile' % (self.print_date(), self.radar_name))
+
+    return fig, ax
+
+
 
 #               ADD some percentile plots   
 #############################################################################################################
@@ -589,34 +619,4 @@ def updraft_width_profile(data,hts,thresh=5.0, temps=np.arange(20,-60,-5),z_ind=
 
 
         return out
-
-#############################################################################################################
-
-
-    def plot_w_profile(self, rep_func=np.average, masked=True, ax=None):
-        # this will plot the vertical profile
-        wprof = self.w_profile(rep_func=rep_func, masked=masked)
-
-        if ax is None:
-            fig, ax = plt.subplots()
-        else:
-        # ax has been passed in, do nothing to ax, but need to get the parent fig
-            fig = ax.get_figure()
-
-        u = ax.plot(wprof['up'], self.data[self.z_name], color='red', linewidth=2, label='updrafts')
-        d = ax.plot(wprof['down'], self.data[self.z_name], color='blue', linewidth=2, label='downdrafts')
-
-        max_abs = np.abs(np.array(ax.get_xlim())).max()
-
-        ax.set_xlim(-1*max_abs, max_abs)
-        #ax.set_xlim()
-        ax.axvline(x=0, color='black')
-        ax.set_xlabel('Vertical motion (m/s)')
-        ax.set_ylabel('Altitude (km MSL)')
-        ax.grid(True)
-        ax.legend(loc='best')
-        ax.set_title('%s %s Vertical motion profile' % (self.print_date(), self.radar_name))
-
-        return fig, ax
-
 
