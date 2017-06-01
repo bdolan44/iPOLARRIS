@@ -1,3 +1,22 @@
+"""
+run_ipoloarris_compare.py
+
+Brenda Dolan, CSU, May 2017
+bdolan@atmos.colostate.edu
+
+This program runs through two different file lists and generates plots and difference plots between the two. This could be between simulations
+and observations, between locations, or between microphysics schemes.
+
+Several other helper functions are used:
+- polarris_config.py defines some of the variable names. If you want to change to a different radar, you will need ot modify that program
+- plot_driver.py houses many of the plotting functions. If you want to change the cross-section plots, bounds used for a project, etc, that program will need to be modified.
+
+-RadarData.py is the class fuction that houses the data, and is where the plotting for single times is done.
+-RadarConfig.py defines many of the variable ranges and other more "global" attributes.
+-GeneralFunctions also has some general functions (ha) and houses the plotting code for time-integrated plots.
+
+"""
+
 import numpy as np
 import os
 import glob
@@ -37,97 +56,63 @@ def get_time(time_parse,filename,dformat):
     
     return date
 
+#######################################################################
+#######change the parameters below to run different cases #############
+#######################################################################
+
+disc =0
+ptype = 'png'
+ext = 'regdiff' ##Use this variable to label any sensitivity studies, like changing axis ratio or whatever.
+
+if disc==1:
+    image_dir = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/'
+    d1_wdate_format = '%Y-%m-%d_%H:%M:%S'
+    d2_wdate_format = '%Y-%m-%d_%H:%M:%S'
+else:
+    image_dir = r'/Users/bdolan/scratch/iPOLARRIS_images_test/'
+    d1_wdate_format = '%Y-%m-%d_%H-%M-%S'
+    d2_wdate_format = '%Y-%m-%d_%H-%M-%S'
+
 #mc3e_radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_mc3e.txt'
-mc3e_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt'
-mc3e_yp = 'wrf'
-mc3e_exper = 'MC3E'
-mc3e_mphys = '4ICE'
-mc3e_date = '20110523'
-mc3e_time_parse=[11,19]
+d1_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt'
+d1_yp = 'wrf'
+d1_exper = 'MC3E'
+d1_mphys = '4ICE'
+d1_date = '20110523'
+d1_time_parse=[11,19]
 #mc3e_wdate_format = '%Y%m%d_%H%M%S'
-mc3e_wdate_format = '%Y-%m-%d_%H-%M-%S'
-#mc3e_wdate_format = '%Y-%m-%d_%H:%M:%S'
 
 
 #twpice_radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_twpice.txt'
-twpice_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_twp_files.txt'
-twpice_yp = 'wrf'
-twpice_exper = 'TWPICE'
-twpice_mphys = '4ICE'
-twpice_date = '2006123'
-twpice_time_parse=[11,19]
-twpice_wdate_format = '%Y-%m-%d_%H-%M-%S'
-#twpice_wdate_format = '%Y-%m-%d_%H:%M:%S'
-#twpice_wdate_format = '%Y%m%d_%H%M%S'
+d2_radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_twp_files.txt'
+d2_yp = 'wrf'
+d2_exper = 'TWPICE'
+d2_mphys = '4ICE'
+d2_date = '2006123'
+d2_time_parse=[11,19]
 
 
-ptype = 'png'
-#image_dir = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/'
-image_dir = r'/Users/bdolan/scratch/iPOLARRIS_images_test/'
-
-flags = {'cfad_4panel_flag':False,  # 4 panel CFADs of Dbz, Zdr, Kdp and W
-         'hid_cfad_flag':False,     # HID CFAD
-         'joint_flag':False,        #Z vs. Zdr
-         'cfad_individ_flag':False,  #Make separate images for dbz, Zdr, Kdp, W and Rho
-         'hid_prof':False,          #Profile of HID species with height
-         'all_cappi':False,         # make a cappi cross section for all times. change parameters in plot_driver.py
-         'all_xsec':True,          # make RHI cross sections for all times. change parmaters in plot_driver.py
-         'up_width':False,          # Make a plot of the vertical velocity profile with temperature.
-         'qr_cappi':False,          # Make cappi cross section of mixing ratios. change parameters in plot_driver.py
-         'qr_rhi':False}            # make RHI cross sections of mixing ratios. change parameters in plot_driver.py
-
-plot_single = 0         #Set this flag to 1, plus the flags above, for individual plots at each time.
-plot_int = 1           #Set this flag for integrated time plots over all files in the list.
-plot_diff = 0            #set this flag to compare two different datasets in the integrated plots.
-
-mc3e_dat = run_exper(mc3e_radar_files,mc3e_exper,mc3e_mphys,mc3e_date,mc3e_time_parse,mc3e_wdate_format,mc3e_yp,plot_on=plot_single,flags=flags,image_dir=image_dir)
-twpice_dat = run_exper(twpice_radar_files,twpice_exper,twpice_mphys,twpice_date,twpice_time_parse,twpice_wdate_format,twpice_yp,plot_on=1,flags=flags,image_dir=image_dir)
+dat1 = run_exper(d1_radar_files,d1_exper,d1_mphys,d1_date,d1_time_parse,d1_wdate_format,d1_yp,image_dir=image_dir)
+dat2 = run_exper(d2_radar_files,d2_exper,d2_mphys,d2_date,d2_time_parse,d2_wdate_format,d2_yp,image_dir=image_dir)
 
 
-dat1 = mc3e_dat
-dat2 = twpice_dat
+############PLOTTING Differences#################
 
-if plot_int == 1:
+########Make plots of CFAD trios (dat1 , dat2 , difference)##############
+plot_driver.plot_cfad_compare(dat1,dat2,typ='dz',image_dir = image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_cfad_compare(dat1,dat2,typ='dr',image_dir = image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_cfad_compare(dat1,dat2,typ='kd',image_dir = image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_cfad_compare(dat1,dat2,typ='w',image_dir = image_dir,ptype=ptype,extra=ext)
 
-    #######Make plots of Integrated CFADS 
-    plot_driver.plot_cfad_int(dat1,typ='dz',image_dir = image_dir,ptype=ptype)
-    plot_driver.plot_cfad_int(dat1,typ='dr',image_dir = image_dir,ptype=ptype)
-    plot_driver.plot_cfad_int(dat1,typ='kd',image_dir = image_dir,ptype=ptype)
-    plot_driver.plot_cfad_int(dat1,typ='w',image_dir = image_dir,ptype=ptype)
-    
-
-    #######Now HID##############
-    plot_driver.plot_hid_int(dat1,typ='hid',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_hid_prof_int(dat1,typ='hid',image_dir=image_dir,ptype=ptype)
-
-    ########Now 2D histograms######
-    plot_driver.plot_joint_int(dat1,typ='zzdr',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_joint_int(dat1,typ='zkdp',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_joint_int(dat1,typ='zw',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_joint_int(dat1,typ='wr',image_dir=image_dir,ptype=ptype)
-    ########Updraft Width##########
-    plot_driver.plot_upwidth_int(dat1,image_dir=image_dir,ptype=ptype)
-
-
-if plot_diff == 1:
-
-    ############PLOTTING Differences#################
-
-    ########Make plots of CFAD trios (dat1 , dat2 , difference)##############
-    plot_driver.plot_cfad_compare(dat1,dat2,typ='dz',image_dir = image_dir,ptype=ptype)
-    plot_driver.plot_cfad_compare(dat1,dat2,typ='dr',image_dir = image_dir,ptype=ptype)
-    plot_driver.plot_cfad_compare(dat1,dat2,typ='kd',image_dir = image_dir,ptype=ptype)
-    plot_driver.plot_cfad_compare(dat1,dat2,typ='w',image_dir = image_dir,ptype=ptype)
-
-    #########Now HID##############
-    plot_driver.plot_hid_2panel(dat1,dat2,typ='hid',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_hid_profile(dat1,dat2,typ='hid',image_dir=image_dir,ptype=ptype)
+#########Now HID##############
+plot_driver.plot_hid_2panel(dat1,dat2,typ='hid',image_dir=image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_hid_profile(dat1,dat2,typ='hid',image_dir=image_dir,ptype=ptype,extra=ext)
 # 
-    ########Now 2D histograms######
-    plot_driver.plot_joint_comp(dat1,dat2,typ='zzdr',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_joint_comp(dat1,dat2,typ='zkdp',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_joint_comp(dat1,dat2,typ='zw',image_dir=image_dir,ptype=ptype)
-    plot_driver.plot_joint_comp(dat1,dat2,typ='wr',image_dir=image_dir,ptype=ptype)
+########Now 2D histograms######
+plot_driver.plot_joint_comp(dat1,dat2,typ='zzdr',image_dir=image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_joint_comp(dat1,dat2,typ='zkdp',image_dir=image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_joint_comp(dat1,dat2,typ='zw',image_dir=image_dir,ptype=ptype,extra=ext)
+plot_driver.plot_joint_comp(dat1,dat2,typ='wr',image_dir=image_dir,ptype=ptype,extra=ext)
 
-    ########Updraft Width##########
-    plot_driver.plot_upwidth(dat1,dat2,image_dir=image_dir,ptype=ptype)
+########Updraft Width##########
+plot_driver.plot_upwidth(dat1,dat2,image_dir=image_dir,ptype=ptype,extra=ext)

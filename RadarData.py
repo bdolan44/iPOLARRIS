@@ -1643,7 +1643,7 @@ class RadarData(RadarConfig.RadarConfig):
             #fig.suptitle('%04d/%02d/%02d - %02d:%02d:%02d %s, cell %d, HID CDF' \
             #                %(self.year,self.month,self.date,self.hour,self.minute,self.second, \
             #                self.radar, self.cell_num), fontsize = 14)
-        ax.set_title('%s %s Hydrometeor identification CDF' % (self.print_date(), self.radar_name))
+        ax.set_title('%s %s HID CDF' % (self.print_date(), self.radar_name))
 
         return fig, ax 
 

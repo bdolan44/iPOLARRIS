@@ -292,17 +292,21 @@ def plot_cfad_compare(dat1,dat2,typ='dz',image_dir='./',ptype = 'png',n1 = None,
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
 
     levels=np.arange(-2,2.1,0.1)
-    cb=axf[2].contourf(dat1['{t}bins'.format(typ)][:-1],dat1['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
+    cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],dat1['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
 
     plt.colorbar(cb,ax=axf[2])
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
-    axf[2].set_xlabel(dat1['rconf'].names['{tp}'.format(tp=typ.upper())],fontsize = 18)
+    if typ == 'w':
+        axf[2].set_xlabel(dat1['rconf'].names['{tp}var'.format(tp=typ.upper())],fontsize = 18)
+    else:
+        axf[2].set_xlabel(dat1['rconf'].names['{tp}'.format(tp=typ.upper())],fontsize = 18)
 
-    axf[2].set_title('{d-{v}'.format(d=n1,v=n2))
+    axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
 
     plt.tight_layout()
+    st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
 
-    plt.savefig('{id}CFAD_{tp}_{s}.{t}'.format(id=image_dir,s=st_diff,t=ptype,tp=typ.upper()),dpi=200)
+    plt.savefig('{id}CFAD_{tp}_{s}_{x}.{t}'.format(id=image_dir,s=st_diff,t=ptype,x=extra,tp=typ.upper()),dpi=200)
     plt.clf()
 
 def plot_hid_2panel(dat1,dat2,typ='hid',image_dir = './',ptype = 'png',extra= 'wrf',n1 = None,n2 = None,):
@@ -339,16 +343,16 @@ def plot_hid_profile(dat1,dat2,typ='hid',image_dir = './',ptype = 'png',extra='w
     if n2 is None:
         n2 = '{e}_{x}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys)
 
-    tw_water_vert1 = dat1['water_vert']
-    tw_graup_vert1 = dat1['graup_vert']
-    tw_hail_vert1 = dat1['hail_vert']
-    tw_snow_vert1 = dat1['snow_vert']
+    tw_water_vert1 = np.nanmean(dat1['water_vert'],axis=0)
+    tw_graup_vert1 = np.nanmean(dat1['graup_vert'],axis=0)
+    tw_hail_vert1 = np.nanmean(dat1['hail_vert'],axis=0)
+    tw_snow_vert1 = np.nanmean(dat1['snow_vert'],axis=0)
 
-    tw_water_vert2 = dat2['water_vert']
-    tw_graup_vert2 = dat2['graup_vert']
-    tw_hail_vert2 = dat2['hail_vert']
-    tw_snow_vert2 = dat2['snow_vert']
-    hts = dat1['hidhts']
+    tw_water_vert2 = np.nanmean(dat2['water_vert'],axis=0)
+    tw_graup_vert2 = np.nanmean(dat2['graup_vert'],axis=0)
+    tw_hail_vert2 = np.nanmean(dat2['hail_vert'],axis=0)
+    tw_snow_vert2 = np.nanmean(dat2['snow_vert'],axis=0)
+    hts = dat1['hidhts'][0]
 
     lw=3
     axf[0].plot(tw_water_vert1,hts,color='blue',label='Water',lw=lw)
@@ -551,11 +555,11 @@ def make_single_pplots(rdat,flags,dir='./',exp='TWPICE',ty='png',extra='test',z=
         hts, mwrf_graup_vert = rdat.hid_vertical_fraction(hidgraup,z_resolution =0.5)
         hts, mwrf_hail_vert = rdat.hid_vertical_fraction(hidhail,z_resolution =0.5)
         hts, mwrf_snow_vert = rdat.hid_vertical_fraction(hidsnow,z_resolution =0.5)
-
-        plt.plot(mwrf_water_vert,hts,color='b',label='water')
-        plt.plot(mwrf_graup_vert,hts,color='g',label='graupel')
-        plt.plot(mwrf_hail_vert,hts,color='r',label='hail')
-        plt.plot(mwrf_snow_vert,hts,color = 'yellow',label='snow')
+        lw = 4
+        plt.plot(mwrf_water_vert,hts,color='b',label='water',lw=lw)
+        plt.plot(mwrf_graup_vert,hts,color='g',label='graupel',lw=lw)
+        plt.plot(mwrf_hail_vert,hts,color='r',label='hail',lw=lw)
+        plt.plot(mwrf_snow_vert,hts,color = 'yellow',label='snow',lw=lw)
         plt.xlabel('Frequency (%)')
         plt.ylabel('Height (km)')
         plt.title(title_string)
