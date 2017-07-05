@@ -419,7 +419,7 @@ def plot_upstat(dat1,dat2,typ='hid',image_dir = './',ptype = 'png',extra='wrf',n
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
         
-def make_single_pplots(rdat,flags,dir='./',exp='TWPICE',ty='png',extra='test',z=2.0,y=None):
+def make_single_pplots(rdat,flags,dir='./',exp='TWPICE',ty='png',extra='test',z=12.0,y=None):
     tspan= [rdat.date,rdat.date]
     ts = tspan[0]
 #    print ts
@@ -570,7 +570,7 @@ def make_single_pplots(rdat,flags,dir='./',exp='TWPICE',ty='png',extra='test',z=
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
-        rdat.cappi_multiplot(ts=ts[0],xlim=xlim,ylim=ylim,z=2.0)
+        rdat.cappi_multiplot(ts=ts[0],xlim=xlim,ylim=ylim,z=14.0)
         plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=dir,p=rdat.exper,s=ts[0],r=rdat.radar_name,x=extra,t=ty,z=z),dpi=300)
         plt.clf()
         
