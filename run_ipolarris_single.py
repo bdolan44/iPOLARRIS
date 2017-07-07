@@ -41,6 +41,116 @@ import warnings
 warnings.filterwarnings('ignore')
 import GeneralFunctions as GF
 
+def match_dd(rdate,ddates):
+    dum=abs(rdate-np.array(ddates))
+
+    try:
+        mval=np.argwhere(dum == np.min(dum))
+        diff=np.min(dum)
+        if diff.total_seconds() < 600.:
+                return mval
+        else:
+                return 'no'
+    except ValueError: 
+        print 'Something DD is not working here!'
+        
+def match_snd(rdate,sdates):
+    dum=abs(rdate-np.array(sdates))
+
+    try:
+        mval=np.argwhere(dum == np.min(dum))
+        diff=np.min(dum)
+        #allow 12 hours between the radar obs and the sounding
+        if diff.total_seconds() < 43200:
+                return mval
+        else:
+                return 'no'
+    except ValueError: 
+        print 'Something sound is not working here!'
+
+
+def find_dd_match(config):
+    rdum =[]
+    with open(config.radar_files) as f: 
+    #    dum.append(foo(f.readline()))
+    #    dum.append(foo(f.readline()))
+
+        for line in f:
+            dat = (line)
+            rdum.append(foo(dat))
+    ddum =[]
+
+    with open(config.dd_files) as g: 
+    #    dum.append(foo(f.readline()))
+    #    dum.append(foo(f.readline()))
+
+        for line in g:
+            dat = (line)
+            ddum.append(foo(dat))
+
+   ddates = []
+   for v,dname in enumerate(ddum):
+
+        base = os.path.basename(dname)
+    
+        radcdate=np.str(base[config.ddoff:config.ddoff+config.ddadd])
+        #print radcdate
+        #ddate_format='%Y%m%d_%H%M'
+        if config.ad != '':
+            dates=datetime.datetime.strptime(config.dates1+'_{r}'.format(a=config.ad,r=radcdate),config.ddate_format)
+        else:
+            dates=datetime.datetime.strptime('{r}'.format(a=config.ad,r=radcdate),config.ddate_format)
+        ddates.append(dates)
+
+    slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config.sfiles,s=config.sstat)))
+
+
+    sdates=[]
+    for v,sname in enumerate(slist):
+
+        base = os.path.basename(sname)
+#            print base
+        radcdate=np.str(base[13:13+9])
+
+        dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config.sdate_format)
+        sdates.append(dates)
+
+    radlist=[]
+
+mdfiles = {}
+msfiels = {}
+    for v,cname in enumerate(rdum):
+#            print cname
+        base = os.path.basename(cname)
+        radcdate=np.str(base[config.doff:config.doff+15])
+        dates=datetime.datetime.strptime(radcdate,config.rdate_format)
+        #print dates, etime,stime
+        if (dates <= config.etime) and (dates >= config.stime):
+            #print cname
+            mval = match_dd(dates,ddates)
+            #print dates,ddates
+        
+            if mval != 'no':
+                dfile = dlist[mval]
+                print 'Found DD match!', dfile
+                
+
+            #now find a sounding match
+            mv = match_snd(dates,sdates)
+            if mv != 'no':
+                print slist[mv]
+                snd = SkewT.Sounding(slist[mv])
+                radar.add_sounding_object(snd) # this will add the sounding object to the radar object
+                            # and then will take the heights and temps
+                radar.interp_sounding()
+            radar.calc_pol_analysis()
+            if radar.date is 'None':
+                radar.date = date
+            radlist.append(radar)
+        
+    return radlist
+
+
 
 def foo(s1):
     return '{}'.format(s1.rstrip())
@@ -62,49 +172,17 @@ def get_time(time_parse,filename,dformat):
 #######change the parameters below to run different cases #############
 #######################################################################
 
-disc =0
-ptype = 'png'
-plot_single = 1         #Set this flag to 1, plus the flags above, for individual plots at each time.
-plot_int = 1           #Set this flag for integrated time plots over all files in the list.
+config = {}
+with open("polarris_config.txt") as f:
+    for line in f:
+        #print line
+        if not line.startswith("#"):
+            key, val, comment = line.split('==')
+            config[(key.replace(" ", ""))] = val.replace(" ", "")
 
-ext = 'test' ##Use this variable to label any sensitivity studies, like changing axis ratio or whatever.
+if config.dd_on == True:
+    
 
-if disc==1:
-    image_dir = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/'
-    wdate_format = '%Y-%m-%d_%H:%M:%S'
-else:
-    image_dir = r'/Users/bdolan/scratch/iPOLARRIS_images_test/'
-    wdate_format = '%Y-%m-%d_%H-%M-%S'
-
-
-#radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_mc3e.txt'
-radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_mc3e_files.txt'
-yp = 'wrf'
-exper = 'MC3E'
-date = '20110523'
-mphys = '4ICE'
-
-#radar_files = r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_sbm_twpice.txt'
-#radar_files = r'/Users/bdolan/scratch/POLARRIS_2/wrf_twpice_files.txt'
-#exper = 'TWPICE'
-#date = '20060123'
-time_parse=[11,19]
-
-#mphys = 'SBM'
-
-
-flags = {'cfad_4panel_flag':True,  # 4 panel CFADs of Dbz, Zdr, Kdp and W
-         'hid_cfad_flag':True,     # HID CFAD
-         'joint_flag':True,        #Z vs. Zdr
-         'cfad_individ_flag':True,  #Make separate images for dbz, Zdr, Kdp, W and Rho
-         'hid_prof':True,          #Profile of HID species with height
-         'all_cappi':True,         # make a cappi cross section for all times. change parameters in plot_driver.py
-         'all_xsec':True,          # make RHI cross sections for all times. change parmaters in plot_driver.py
-         'up_width':True,          # Make a plot of the vertical velocity profile with temperature.
-         'qr_cappi':True,          # Make cappi cross section of mixing ratios. change parameters in plot_driver.py
-         'qr_rhi':True}            # make RHI cross sections of mixing ratios. change parameters in plot_driver.py
-
-###########Run through each file in the radar_files list and plot if that is turned on########
 
 dat1 = run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=plot_single,flags=flags,image_dir=image_dir)
 

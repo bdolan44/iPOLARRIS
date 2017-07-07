@@ -46,9 +46,9 @@ import RadarConfig
 class RadarData(RadarConfig.RadarConfig): 
 
 
-    def __init__(self, data,times, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
+    def __init__(self, data,times, ddfile = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',lat=None, lon=None, band='C',exper='CASE',
-            radar_name= None,mphys=None): 
+            radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,
                       z=z, u=u, v=v, w=w,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
@@ -64,6 +64,11 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.time_parse = time_parse
 #            self.dformat = dformat
         self.data = data
+        if ddfile is not None:
+            self.check_size(ddfile)
+        else:
+            self.ddata == None
+        self.z_thresh=z_thresh
         self.zind = 1
         self.yind = 2
         self.xind = 3
@@ -75,11 +80,6 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.read_data_from_nc(self.radar_file)
         self.calc_deltas()
         self.rr_name = rr
-#        else:
-#            pass
-
-#        if self.dd_file is not None:
-#            self.read_data_from_nc(self.dd_file,dd_flag=1)
 #        else:
 #            pass
 
@@ -134,16 +134,11 @@ class RadarData(RadarConfig.RadarConfig):
                 self.date=datetime.datetime.strptime(radcdate,self.dformat)
             except ValueError:
                 pass
-        else:
-            self.date = date
 
         # run some basic functions so not needed to be typed out
         self.nc4_read()
         self.nc4_varnames()
         
-        if dd_flag == 1:
-            self.check_size()
-        else:
             self.nc4_dict()
 
     #############################################################################################################
@@ -158,28 +153,29 @@ class RadarData(RadarConfig.RadarConfig):
         self.ncvariables = self.nc.variables.keys()
     #############################################################################################################
 
-    def check_size(self):
+    def check_size(self,dfile):
+        ddata = xr.open_dataset(dfile,autoclose=True)
         if self.x_name in self.data:
             ochksz = np.shape(self.data[self.x_name])
 #            print self.nc.variables[self.x_name]
-            ddsz = np.shape(self.nc.variables[self.x_name])
+            ddsz = np.shape(ddata.variables[self.x_name])
             
             if ochksz != ddsz:
                 "Create a new array of the dimensions for the pol file to put DD data in"
-                xvals = self.nc.variables[self.x_name][:]
-                yvals = self.nc.variables[self.y_name][:]
-                zvals = self.nc.variables[self.z_name][:]
+                xvals = ddata.variables[self.x_name][:]
+                yvals = ddata.variables[self.y_name][:]
+                zvals = ddata.variables[self.z_name][:]
                 
                 whx = np.nonzero(np.in1d(self.data[self.x_name], xvals))[0]
                 why = np.nonzero(np.in1d(self.data[self.y_name], yvals))[0]
                 whz = np.nonzero(np.in1d(self.data[self.z_name], zvals))[0]
 #                print whx
                 
-                for key in self.nc.variables.keys():
-                    if self.nc.variables[key].ndim == 3:
+                for key in ddata.variables.keys():
+                    if ddata.variables[key].ndim == 3:
                         test =np.zeros_like(self.data[self.dz_name])
                         test = np.ma.masked_where(test==0,test)
-                        test[whz[0]:whz[-1]+1,why[0]:why[-1]+1,whx[0]:whx[-1]+1] = self.nc.variables[key][:]
+                        test[whz[0]:whz[-1]+1,why[0]:why[-1]+1,whx[0]:whx[-1]+1] = ddata.variables[key][:]
     #                    for i,v in enumerate(whz):
     #                        for j,u in enumerate(why):
     #                            for k,w in enumerate(whx):
@@ -421,7 +417,7 @@ class RadarData(RadarConfig.RadarConfig):
    ############ Here is calling CSU radartools for HID, RR, etc... ############################
 #############################################################################################################
     def calc_pol_analysis(self):
-        self.set_hid(use_temp = 'True',band=self.band)
+        self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh)
         self.calc_qr_pol()
         self.calc_rr_pol()
 
@@ -432,7 +428,10 @@ class RadarData(RadarConfig.RadarConfig):
 
 
    # Just a wrapper on the CSU radartools HID function
-    def set_hid(self, band=None, use_temp=False, name='HID'):
+    def set_hid(self, band=None, use_temp=False, name='HID',zthresh = -9999.0):
+       bad = self.data[self.dz_name].data < self.z_thresh
+
+
        if band is None:
            self.hid_band = self.band
        else:
@@ -444,7 +443,6 @@ class RadarData(RadarConfig.RadarConfig):
             #print self.kdp_name
             #print self.rho_name
             #print np.ma.max(self.T)
-            bad = self.data[self.dz_name] < -900.00
             try:
                 #msk = self.data[self.dz_name].data.where(self.data[self.dz_name].data < -10)
                 self.data[self.dz_name].data = np.ma.masked_where(self.T.mask,self.data[self.dz_name].data)
@@ -474,7 +472,7 @@ class RadarData(RadarConfig.RadarConfig):
 #       try:
 #            self.hid = np.ma.masked_where(self.T.mask,self.hid)
 #       except:
-       self.hid[self.data[self.dz_name].data< -900.0]=-1
+       self.hid[bad]=-1
        self.add_field((self.data[self.dz_name].dims,self.hid,), name)
 
 #############################################################################################################
@@ -744,6 +742,7 @@ class RadarData(RadarConfig.RadarConfig):
         #print xmini,xmaxi,zmini,zmaxi
         # if this variable is already included in the defaults, then this is straightforward
         #print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
+        print zmini,zmaxi,y_ind,xmini,xmaxi
         data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)).data)
         xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
         zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
@@ -1142,12 +1141,13 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             fig = ax.get_figure()
 
+        print xmini,xmaxi,y_ind,zmini,zmaxi
         xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind+1)).data)
         zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).data)
         udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind+1)).data)
         wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind+1)).data)
-        #print 'vect shp',np.shape(udat)#,np.shape(wdat),np.shape(xdat),np.shape(zdat)
-
+        print 'vect shp',np.shape(udat),np.shape(wdat),np.shape(xdat),np.shape(zdat)
+        print xskip
 
         q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
             udat[::zskip, ::xskip], wdat[::zskip, ::xskip], \
@@ -1272,8 +1272,9 @@ class RadarData(RadarConfig.RadarConfig):
 
         multiple = np.int(z_resolution/self.dz)
         sz=np.shape(self.data[self.z_name].data)[0]
+        #print np.shape(sz),sz, multiple
         looped = np.arange(0, sz, multiple)
-        cfad_out = np.zeros((int(sz)/multiple, nbins-1))
+        cfad_out = np.zeros((sz//multiple, nbins-1))
         #print looped
         #print cfad_out.shape, multiple
         if tspan == None:

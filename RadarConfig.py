@@ -78,7 +78,7 @@ class RadarConfig(object):
                 tme = dt.datetime.strftime(date2,fmt)
                 tmf = '{s}-{e}'.format(s=tms,e=tme)
             else:
-                tmf = dt.datetime.strftime(tm,fmt)
+                tmf = dt.datetime.strftime(tm[0],fmt)
         else:
             tmf = dt.datetime.strftime(self.date[0],fmt)
         #print tmf

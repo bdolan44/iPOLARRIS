@@ -20,168 +20,36 @@ import RadarConfig
 import plot_driver
 
 ###############
-def get_data(exper = 'TWPICE',tm=0,type='wrf',mphys='4ICE',date='2006123',file=r'wrf_twp_files.txt',pol_on = False):
-
-    ############MC3E radar#######
-    if exper == 'MC3E':
-        if type == 'obs':
-            radarname = 'CSAPR'
-            band = 'C'
-            read_list = 'False'
-#            radar_files = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/csapr/{d}/ncfiles/'.format(d=date)
-            dd_files = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/csapr/{d}/cdffiles/'.format(d=date)
-            rdate_format = '%Y%m%d_%H%M%S'
-            ddate_format = '%Y%m%d_%H%M'
-            dz_name = 'DBZCS'
-            dr_name = 'ZDRCS'
-            kd_name = 'KDPCS'
-            t_name= None
-            rh_name = 'RHOCS'
-            uname = None
-            vname = None
-            wname = None
-            xname = 'x'
-            yname = 'y'
-            zname = 'z'
-#            w_name = 'Wvar'
-            doff = 0
-            ddoff = 0
-            ddadd= 13
-            dext = 'cdf'
-            ext='nc'
-            dd_on = 'True'
-            wdate_format=rdate_format
-            usedate_range = 'True'
-            time_parse=[doff,ddadd]
-        elif type == 'wrf':
-            radarname='WRF_Cband'
-            read_list = 'True'
-#            radar_files = r'wrf_mc3e_files.txt'
-            usedate_range = 'False'
-            type  = 'wrf'
-            dd_on = 'False'
-            dz_name = 'zhh01'
-            dr_name = 'zdr01'
-            kd_name='kdp01'
-            rh_name='rhohv01'
-            rr_name='precip'
-            t_name='t_air'
-            uname = 'u'
-            vname = 'v'
-            wname = 'w'
-            xname = 'longitude'
-            yname = 'latitude'
-            zname='hgt'
-            band = 'C'
-            mphys=mphys
-            time_parse=[11,19]
-            wdate_format ='%Y-%m-%d_%H-%M-%S'
+def get_data(config, tm, rfile, dmatch,smatch):
 
 
-        else:
-            print 'I do not recognize the type'
-
-        sfiles = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/'
-        sdate_format = '%Y%m%d%H'
-        sstat = 'LMN'
-        dates1 = date
-        ad = ''
-        lat = 36.79616
-        lon = -97.450546
-        alt = 0.327
-
-
-    ########TWP-ICE############
-    elif exper == 'TWPICE':
-        if type == 'obs':
-            radarname='CPOL'
-            band = 'C'
-            read_list = 'False'
-#            radar_files = '/Volumes/rawah/data/jib/twp_ice/cpol/{d}/gridded/{d}/'.format(d=date)
-            dd_files = '/Volumes/rawah/data/jib/twp_ice/dualdoppler_files/{d}/DUALDOP/'.format(d=date)
-            sfiles = '/Volumes/rawah/data/jib/MC3E_darwin_analysis/'
-            rdate_format = '%Y%m%d_%H%M%S'
-            ddate_format = '%Y%m%d_%H%M'
-            sdate_format = '%Y%m%d%H'
-            doff = 4
-            ddoff = 12
-            ddadd = 4
-            dext = 'nc'
-            ext='nc'
-            wdate_format=rdate_format
-            dates1 = date
-            ad = dates1+'_'
-            dz_name = 'DZ'
-            dr_name = 'CR'
-            t_name= None
-            kd_name = 'KD'
-            rh_name = 'RH'
-#            w_name = 'Wvar'
-            uname = None
-            vname = None
-            wname = None
-            xname = 'x'
-            yname = 'y'
-            zname = 'z'
-            sstat = 'DWN'
-            time_parse=[doff,ddoff]
-
-        elif type == 'wrf':
-            radarname='WRF_Cband'
-            read_list = 'True'
-#            radar_files = r'wrf_twpice_files.txt'
-            usedate_range = 'False'
-            type  = 'wrf'
-            dd_on = 'False'
-            dz_name = 'zhh01'
-            dr_name = 'zdr01'
-            kd_name='kdp01'
-            rh_name='rhohv01'
-            t_name='t_air'
-            rr_name='precip'
-
-            uname = 'u'
-            vname = 'v'
-            wname = 'w'
-            xname = 'longitude'
-            yname = 'latitude'
-            zname='hgt'
-            band = 'C'
-            time_parse=[11,19]
-            wdate_format ='%Y-%m-%d_%H-%M-%S'
-
-        else:
-            print 'I do not recognize the type'
-
-        lat = -12.24917
-        lon = 131.04444
-        dd_on='True'
-        usedate_range = 'True'
-
-    else:
-        print 'Experiment not in database'
-
-    mphys=mphys
-    
-#    print mphys
-
-    ###########################Now grab the radar data##############
-
-    def foo(s1):
-        return '{}'.format(s1.rstrip())
-
-    rdata = RadarData.RadarData(file,tm,dz = dz_name,zdr=dr_name,
-                                              kdp=kd_name,rho=rh_name,temp=t_name,
-                                              u=uname,v=vname,w=wname,x=xname,rr=rr_name,
-                                              y=yname,z=zname,lat=lat, lon=lon,band = band,
-                                              exper=exper,mphys=mphys,radar_name = radarname)
+    rdata = RadarData.RadarData(rfile,dmatch = dmatch,tm=tm,dz = config.dz_name,zdr=config.dr_name,
+                                              kdp=config.kd_name,rho=config.,temp=config.t_name,
+                                              u=config.uname,v=config.vname,w=config.wname,x=config.xname,
+                                              rr=config.rr_name,band = config.band,
+                                              y=config.yname,z=config.zname,lat=config.lat, lon=config.lon,
+                                              exper=config.exper,mphys=config.mphys,radar_name = config.radarname,
+                                              z_thresh=config.zthresh)
                                               
+    if dmatch is not None:
+        wvardum = np.zeros_like(radar.data[radar.dz_name])
+        wvardum = np.ma.masked_equal(wvardum,0)
+        radar.data[radar.w_name] = wvardum
+        radar.wvar = wvardum
+        radar.w_name = w_name
+
+    if smatch is not None:
+        snd = SkewT.Sounding(smatch)
+        rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
+                    # and then will take the heights and temps
+        rdata.interp_sounding()
+
     #vvar.close()
     #rdata.radar_name = radarname
-    if type == 'wrf':
+    if config.convert_Tk_Tc == True:
         rdata.convert_t()
     #print 'Calculating polarimetric fields like HID and rain...'
-    if pol_on == True:
+    if config.pol_on == True:
         rdata.calc_pol_analysis()
 
     return(rdata)
@@ -201,16 +69,14 @@ def get_time(time_parse,filename,dformat):
     
     return date
 
-def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=0,flags=None,image_dir='./',ptype='png'):
+def run_exper(config, dmatch = None, smatch=None,interactive=False):
 
     dum =[]
-    with open(radar_files) as f: 
-    #    dum.append(foo(f.readline()))
-    #    dum.append(foo(f.readline()))
-
+    with open(config.radar_files) as f: 
         for line in f:
             dat = (line)
             dum.append(foo(dat))
+
     dzcfad_a=[]
     drcfad_a=[]
     kdcfad_a=[]
@@ -222,7 +88,6 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=0,
     drbins_a=[]
     kdbins_a=[]
     rhbins_a=[]
-
 
     times_a=[]
     warea=[]
@@ -239,11 +104,6 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=0,
     histwr_a = []
     edgwr_a = []
 
-    cbins = np.arange(-25,26,0.5)
-    dzbins = np.arange(-10,60,1)
-    drbins = np.arange(-2,6,0.05)
-    kdbins = np.arange(-2,6,0.05)
-    rrbins = np.logspace(0.01,100.01,30)
 
     water_vert = []
     graup_vert =[]
@@ -259,84 +119,92 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=0,
     for d in dum:
         print d
     #        dn = 
-        tm=get_time(time_parse,d,wdate_format)
-        vvar = xr.open_dataset(d,autoclose=True)
+        tm=get_time(config.time_parse,d,config.wdate_format)
+        rvar = xr.open_dataset(d,autoclose=True)
+        if dmatch is not None:
+            ddata = xr.open_dataset(dmatch[d],autoclose=True)
+        else:
+            ddata = None
+        if smatch is not None:
+            sfile = smatch[d]
+        else:
+            sfile = None
 
-        rdat = get_data(exper = exper,type=yp,mphys=mphys,date=date,file=vvar, tm = [tm],pol_on =1)
-        bad = np.where(rdat.data[rdat.dz_name].data<-10.)
+        rdat = get_data(config,tm,rvar,ddata,sfile)
+        
+        
+        bad = np.where(rdat.data[rdat.dz_name].data<config.zthresh)
         rdat.data[rdat.dz_name].data[bad]=np.nan
     
-        dzcfad, hts, dzbins = GF.cfad(data = rdat.data[rdat.dz_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = dzbins,
-                            ret_z=1,ret_bin = 1,thresh=-10)
+        dzcfad, hts, dzbins = GF.cfad(data = rdat.data[rdat.dz_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config.dzbins,
+                            ret_z=1,ret_bin = 1,thresh=config.zthresh)
 
         dzcfad_a.append(dzcfad)
         dzbins_a.append(dzbins)
 
         rdat.data[rdat.zdr_name].data[bad]=np.nan
     
-        drcfad, hts, drbins = GF.cfad(data = rdat.data[rdat.zdr_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = drbins,
-                            ret_z=1,ret_bin = 1,thresh=-10)
+        drcfad, hts, drbins = GF.cfad(data = rdat.data[rdat.zdr_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config.drbins,
+                            ret_z=1,ret_bin = 1,thresh=config.zthresh)
         drcfad_a.append(drcfad)
         drbins_a.append(drbins)
 
-        kdcfad, hts, kdbins = GF.cfad(data = rdat.data[rdat.kdp_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = kdbins,
-                            ret_z=1,ret_bin = 1,thresh=-10)
+        kdcfad, hts, kdbins = GF.cfad(data = rdat.data[rdat.kdp_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config.kdbins,
+                            ret_z=1,ret_bin = 1,thresh=config.zthresh)
         kdcfad_a.append(kdcfad)
         kdbins_a.append(kdbins)
     
 
-        wcfad, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = cbins,
-                            ret_z=1,ret_bin = 1,thresh=-10)
+        wcfad, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config.wbins,
+                            ret_z=1,ret_bin = 1,thresh=config.zthresh)
         wcfad_a.append(wcfad)
         wbins_a.append(wbins)
 
         hts_a.append(hts)
         times_a.append(tm)
     
-        hist,edg = GF.hist2d(rdat.data[rdat.zdr_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(-2,4.1,0.2),binsy=np.arange(-10,60,1))
+        hist,edg = GF.hist2d(rdat.data[rdat.zdr_name].data,rdat.data[rdat.dz_name].data,binsx = config.drbins,binsy=config.dzbins)
 #        edgx = 
         histzzdr_a.append(hist)
         edg_a.append(edg)
 
-        histkdz,edgkdz = GF.hist2d(rdat.data[rdat.kdp_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(-2,4.1,0.2),binsy=np.arange(-10,60,1))
+        histkdz,edgkdz = GF.hist2d(rdat.data[rdat.kdp_name].data,rdat.data[rdat.dz_name].data,binsx = config.kdbins,binsy=config.dzbins)
 #        edgx = 
         histkdz_a.append(histkdz)
         edgkdz_a.append(edgkdz)
 
-        histzw,edgzw = GF.hist2d(rdat.data[rdat.w_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(-25,25.5,0.5),binsy=np.arange(-10,60,1))
+        histzw,edgzw = GF.hist2d(rdat.data[rdat.w_name].data,rdat.data[rdat.dz_name].data,binsx = config.wbins,binsy=config.dzbins)
 #        edgx = 
         histzw_a.append(histzw)
         edgzw_a.append(edgzw)
 
-        histwr,edgwr = GF.hist2d(rdat.data[rdat.rr_name].data,rdat.data[rdat.dz_name].data,binsx = np.arange(0,200,1),binsy=np.arange(-25,25.5,0.5))
+        histwr,edgwr = GF.hist2d(rdat.data[rdat.rr_name].data,rdat.data[rdat.dz_name].data,binsx = config.rrbins,binsy=config.dzbins)
 #        edgx = 
         histwr_a.append(histwr)
         edgwr_a.append(edgwr)
 
         vvar.close()
+        if dmatch is not None:
+            ddata.close()
     
-        hidwater = [1,2,10]
-        hidgraup = [7,8]
-        hidhail = [9]
-        hidsnow =[3,4,5,6]
         
         rdat.hid[bad]=-1
         
-        hidhts, mwrf_water_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidwater,rdat.species,z_resolution =1.0,z_ind=1)
-        hidhts, mwrf_graup_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidgraup,rdat.species,z_resolution =1.0,z_ind=1)
-        hidhts, mwrf_hail_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidhail,rdat.species,z_resolution =1.0,z_ind=1)
-        hidhts, mwrf_snow_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,hidsnow,rdat.species,z_resolution =1.0,z_ind=1)
+        hidhts, mwrf_water_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,config.hidwater,rdat.species,z_resolution =config.z_resolution,z_ind=1)
+        hidhts, mwrf_graup_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,config.hidgraup,rdat.species,z_resolution =config.z_resolution,z_ind=1)
+        hidhts, mwrf_hail_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,config.hidhail,rdat.species,z_resolution =config.z_resolution,z_ind=1)
+        hidhts, mwrf_snow_vert = GF.hid_vertical_fraction(rdat.hid,rdat.data[rdat.z_name][:].data,config.hidsnow,rdat.species,z_resolution =config.z_resolution,z_ind=1)
 
         water_vert.append(mwrf_water_vert)
         graup_vert.append(mwrf_graup_vert)
         hail_vert.append(mwrf_hail_vert)
         snow_vert.append(mwrf_snow_vert)
     
-        hidhts,hiddum =GF.hid_cdf(rdat.hid, rdat.data[rdat.z_name][:].data,rdat.species,z_resolution=1.0, pick=None,z_ind =0)
+        hidhts,hiddum =GF.hid_cdf(rdat.hid, rdat.data[rdat.z_name][:].data,rdat.species,z_resolution=config.z_resolution, pick=None,z_ind =0)
 #        print np.shape(hiddum)
         hid_hts.append(hidhts)
         hid_cfad.append(hiddum)
-        tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.w_name][:].data,thresh=5.0, temps=np.arange(20,-60,-5),\
+        tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.w_name][:].data,thresh=config.wthresh, temps=config.trange,\
             z_ind=0,tcoord = True,temp = rdat.T.data[:,0,0])
         warea_wrf = m_warea_wrf*rdat.dx*rdat.dy/rdat.ntimes
         if rdat.data[rdat.x_name].units == "[deg]":
@@ -351,10 +219,16 @@ def run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=0,
         rconf.mphys = rdat.mphys
         rconf.exper = rdat.exper
         rconf.radar_name = rdat.radar_name
-        
-        if plot_on ==1:
+        flags = {}
+        for k in config.ks:
+            flags[k]=config.ks[k]
+                
+        if any(flags == True):
             plot_driver.make_single_pplots(rdat,flags,exp = exper,ty=ptype,dir=image_dir)
         
+        if interactive is True:
+            return rdat
+            
         del rdat
 
 
