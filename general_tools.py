@@ -164,6 +164,10 @@ def hist2d(varx=None, vary=None, binsx=None, binsy=None):
         if not bins_q:
             binsx = 20
             binsy = 20
+#         print vary_ravel
+#         print varx_ravel
+#         print binsy
+#         print binsx
 
         hist, edges = np.histogramdd((vary_ravel, varx_ravel), bins=(binsy, binsx), normed=True)
         hist *= 100.0/np.sum(hist)

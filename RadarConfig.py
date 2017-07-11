@@ -68,7 +68,7 @@ class RadarConfig(object):
 #############################################################################################################
 
     def print_date(self,tm=None, fmt='%Y-%m-%d %H:%M:%S %Z'):
-        #print tm
+        print tm
         if tm is not None:
             #print tm
             if len(tm) > 1:
@@ -80,7 +80,7 @@ class RadarConfig(object):
             else:
                 tmf = dt.datetime.strftime(tm[0],fmt)
         else:
-            tmf = dt.datetime.strftime(self.date[0],fmt)
+            tmf = dt.datetime.strftime(self.date,fmt)
         #print tmf
         return tmf
 

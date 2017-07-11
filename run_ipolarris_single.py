@@ -40,6 +40,9 @@ from polarris_config import get_data
 import warnings
 warnings.filterwarnings('ignore')
 import GeneralFunctions as GF
+import sys
+
+
 
 def match_dd(rdate,ddates):
     dum=abs(rdate-np.array(ddates))
@@ -71,7 +74,7 @@ def match_snd(rdate,sdates):
 
 def find_dd_match(config):
     rdum =[]
-    with open(config.radar_files) as f: 
+    with open(config['radar_files']) as f: 
     #    dum.append(foo(f.readline()))
     #    dum.append(foo(f.readline()))
 
@@ -80,7 +83,7 @@ def find_dd_match(config):
             rdum.append(foo(dat))
     ddum =[]
 
-    with open(config.dd_files) as g: 
+    with open(config['dd_files']) as g: 
     #    dum.append(foo(f.readline()))
     #    dum.append(foo(f.readline()))
 
@@ -88,23 +91,58 @@ def find_dd_match(config):
             dat = (line)
             ddum.append(foo(dat))
 
-   ddates = []
-   for v,dname in enumerate(ddum):
+    ddates = []
+    for v,dname in enumerate(ddum):
 
         base = os.path.basename(dname)
-    
-        radcdate=np.str(base[config.ddoff:config.ddoff+config.ddadd])
+
+        radcdate=np.str(base[config['ddoff']:config['ddoff']+config['ddadd']])
         #print radcdate
         #ddate_format='%Y%m%d_%H%M'
-        if config.ad != '':
-            dates=datetime.datetime.strptime(config.dates1+'_{r}'.format(a=config.ad,r=radcdate),config.ddate_format)
+        if eval(config['ad']) != '':
+#            print radcdate
+            dates=datetime.datetime.strptime(config['date']+'_{r}'.format(a=config['ad'],r=radcdate),config['ddate_format'])
         else:
-            dates=datetime.datetime.strptime('{r}'.format(a=config.ad,r=radcdate),config.ddate_format)
+            dates=datetime.datetime.strptime('{r}'.format(a=config['ad'],r=radcdate),config['ddate_format'])
         ddates.append(dates)
 
-    slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config.sfiles,s=config.sstat)))
 
+    radlist=[]
 
+    mdfiles = {}
+    for v,cname in enumerate(rdum):
+        #print cname
+        base = os.path.basename(cname)
+        radcdate=np.str(base[config['doff']:config['doff']+15])
+        dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
+        #print dates, etime,stime
+        if (dates >= config['etime']) and (dates <= config['stime']):
+            #print cname
+            mval = match_dd(dates,ddates)
+            #print dates,ddates
+        
+            if mval != 'no':
+                dfile = ddum[mval]
+                print 'Found DD match!', dfile
+                mdfiles[cname] = dfile
+            else:
+                mdfiles = None
+                return mdfiles
+
+        
+    return mdfiles
+
+def find_snd_match(config):
+    rdum =[]
+    with open(config['radar_files']) as f: 
+    #    dum.append(foo(f.readline()))
+    #    dum.append(foo(f.readline()))
+
+        for line in f:
+            dat = (line)
+            rdum.append(foo(dat))
+
+    slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
     sdates=[]
     for v,sname in enumerate(slist):
 
@@ -112,44 +150,28 @@ def find_dd_match(config):
 #            print base
         radcdate=np.str(base[13:13+9])
 
-        dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config.sdate_format)
+        dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['sdate_format'])
         sdates.append(dates)
 
-    radlist=[]
+    msfiles = {}
 
-mdfiles = {}
-msfiels = {}
     for v,cname in enumerate(rdum):
 #            print cname
         base = os.path.basename(cname)
-        radcdate=np.str(base[config.doff:config.doff+15])
-        dates=datetime.datetime.strptime(radcdate,config.rdate_format)
+        radcdate=np.str(base[config['doff']:config['doff']+15])
+        dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
         #print dates, etime,stime
-        if (dates <= config.etime) and (dates >= config.stime):
+        if (dates >= config['etime']) and (dates <= config['stime']):
             #print cname
-            mval = match_dd(dates,ddates)
-            #print dates,ddates
-        
-            if mval != 'no':
-                dfile = dlist[mval]
-                print 'Found DD match!', dfile
-                
-
             #now find a sounding match
             mv = match_snd(dates,sdates)
             if mv != 'no':
-                print slist[mv]
-                snd = SkewT.Sounding(slist[mv])
-                radar.add_sounding_object(snd) # this will add the sounding object to the radar object
-                            # and then will take the heights and temps
-                radar.interp_sounding()
-            radar.calc_pol_analysis()
-            if radar.date is 'None':
-                radar.date = date
-            radlist.append(radar)
+#                print 'sounding match',slist[mv]
+                msfiles[cname] = slist[mv]
+            else:
+                return None
         
-    return radlist
-
+    return msfiles
 
 
 def foo(s1):
@@ -168,41 +190,80 @@ def get_time(time_parse,filename,dformat):
     return date
 
 
+def hasNumbers(inputString):
+     return any(char.isdigit() for char in inputString)
+
 #######################################################################
 #######change the parameters below to run different cases #############
 #######################################################################
-
+configfile = sys.argv[1:]
 config = {}
-with open("polarris_config.txt") as f:
+print sys.argv[1:]
+
+with open(configfile[0]) as f:
     for line in f:
         #print line
         if not line.startswith("#"):
             key, val, comment = line.split('==')
-            config[(key.replace(" ", ""))] = val.replace(" ", "")
+            vval = val.replace(" ","")
+            numck = hasNumbers(vval)
+            if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys':
+                numck = False
+            if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
+                vval = vval.strip("''")
+            #print numck
+            #print vval,key
+            if key.replace(" ", "") == 'image_dir':
+                numck = True
 
-if config.dd_on == True:
-    
+            if numck is True or vval == 'None' or vval == 'True' or vval == 'False':
+                try:
+                    config[(key.replace(" ", ""))] = eval(vval)
+                except:
+                    if "datetime" in vval:
+                        config[(key.replace(" ", ""))] = vval
+            else:
+                config[(key.replace(" ", ""))] = vval
+            
+
+            
 
 
-dat1 = run_exper(radar_files,exper,mphys,date,time_parse,wdate_format,yp,plot_on=plot_single,flags=flags,image_dir=image_dir)
+            
+#print config['dd_on']
+if config['dd_on'] == True:
+    dmatch = find_dd_match(config)
+#    print 'dmatch',dmatch
+else:
+    dmatch = None
 
-if plot_int == 1:
+if config['snd_on'] == True:
+    smatch = find_snd_match(config)
+else:
+    smatch = None
+
+#print 'smatch',smatch
+
+dat1 = run_exper(config, dmatch = dmatch, smatch=smatch,interactive = False)
+
+if config['plot_int'] == 1:
     #######Make plots of Integrated CFADS 
-    plot_driver.plot_cfad_int(dat1,typ='dz',image_dir = image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_cfad_int(dat1,typ='dr',image_dir = image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_cfad_int(dat1,typ='kd',image_dir = image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_cfad_int(dat1,typ='w',image_dir = image_dir,ptype=ptype,extra=ext)
+    plot_driver.plot_cfad_int(dat1,config,typ='dz')
+    plot_driver.plot_cfad_int(dat1,config,typ='dr')
+    plot_driver.plot_cfad_int(dat1,config,typ='kd')
+    if dat1['runw'] is True:
+        plot_driver.plot_cfad_int(dat1,config,typ='w')
     
-
     #######Now HID##############
-    plot_driver.plot_hid_int(dat1,typ='hid',image_dir=image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_hid_prof_int(dat1,typ='hid',image_dir=image_dir,ptype=ptype,extra=ext)
+    plot_driver.plot_hid_int(dat1,config,typ='hid')
+    plot_driver.plot_hid_prof_int(dat1,config,typ='hid')
 
     ########Now 2D histograms######
-    plot_driver.plot_joint_int(dat1,typ='zzdr',image_dir=image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_joint_int(dat1,typ='zkdp',image_dir=image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_joint_int(dat1,typ='zw',image_dir=image_dir,ptype=ptype,extra=ext)
-    plot_driver.plot_joint_int(dat1,typ='wr',image_dir=image_dir,ptype=ptype,extra=ext)
-    ########Updraft Width##########
-    plot_driver.plot_upwidth_int(dat1,image_dir=image_dir,ptype=ptype,extra=ext)
-
+    plot_driver.plot_joint_int(dat1,config,typ='zzdr')
+    plot_driver.plot_joint_int(dat1,config,typ='zkdp')
+    if dat1['runw'] is True:
+        plot_driver.plot_joint_int(dat1,config,typ='zw')
+        ########Updraft Width##########
+        plot_driver.plot_upwidth_int(dat1,config)
+        if dat1['runrr'] is True:
+            plot_driver.plot_joint_int(dat1,config,typ='wr')
