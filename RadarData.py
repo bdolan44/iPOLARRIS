@@ -65,6 +65,7 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.dformat = dformat
         self.band = band
         self.data = data
+        self.t_name = temp
         if ddata is not None:
             self.check_size(ddata)
         self.z_thresh=z_thresh
@@ -208,7 +209,7 @@ class RadarData(RadarConfig.RadarConfig):
         # if want to pass a dictionary already
         for k in self.data.variables.keys():
 #            print k, np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
-            if k != 'TIME':
+            if k != 'TIME' and k != self.t_name:
 #                print k
 #                print np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
                 try:
@@ -1893,7 +1894,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         data = self.data[self.w_name].data
         if thresh_dz == True:
-            data[self.data[self.dz_name].data < -900.0]=np.nan
+            data[self.data[self.dz_name].data < self.z_thresh]=np.nan
         for iz, z in enumerate(self.data[self.z_name].data):
             values_above = np.where(data[iz,...] >= thresh)[0]
             num_above = len(values_above)
