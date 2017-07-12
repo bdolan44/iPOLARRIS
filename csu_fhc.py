@@ -117,7 +117,7 @@ def csu_fhc_summer(weights=DEFAULT_WEIGHTS, method='hybrid',
 
     #Finish up
     mu = np.array(test_list)
-    print np.shape(mu)
+#    print np.shape(mu)
     
     if verbose:
         print mu.shape
