@@ -261,7 +261,7 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None)
     hold = deepcopy(data)
 
     if mask is not None:
-        print 'maskind HID data'
+#        print 'maskind HID data'
         hold[mask] = -1
 
     multiple = np.int(z_resolution/delz)

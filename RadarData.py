@@ -390,7 +390,7 @@ class RadarData(RadarConfig.RadarConfig):
         maxarg = np.argmax(hist)
 
         offset = edges[maxarg]+dbin
-        print hist, edges
+#        print hist, edges
         self.zdr_offset = deepcopy(offset)
         if np.abs(offset) >= thresh:
             self.zdr_correct()
@@ -1124,7 +1124,8 @@ class RadarData(RadarConfig.RadarConfig):
         "6 panel CAPPI plot showing all the polarimetric variables and HID"
         
         # first, get the appropriate z index from the z that's wanted in altitude
-        z_ind = self.get_ind(z,self.data[self.z_name].data[0])
+        z_ind = self.get_ind(z,self.data[self.z_name].data)
+        
         #print xlim, 'In cappi_multiplot'
         if xlim is None:
             xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
@@ -1242,7 +1243,7 @@ class RadarData(RadarConfig.RadarConfig):
             zskip = skip/110.
         else:
             skip = int(np.round(resz/self.dz))
-            zskip = skip
+            zskip = 1
             
         #print skip,xskip, zskip
         #print skip
@@ -1263,6 +1264,7 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
 #        print xmini,xmaxi,y_ind,zmini,zmaxi
+        
         try:
             if self.y_name == 'latitude':
 #                print y_ind
@@ -1271,6 +1273,7 @@ class RadarData(RadarConfig.RadarConfig):
                 udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind+1)).data)
                 wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind+1)).data)
             else:
+#                print np.shape(xdat), np.shape(zdat)
                 xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
                 zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).data)
                 udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
@@ -1280,7 +1283,7 @@ class RadarData(RadarConfig.RadarConfig):
 #            print 'uh-oh, exception'
             xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).data)
             zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).data)
-     #       print np.shape(xdat),np.shape(zdat),np.shape(self.data[self.u_name].data)
+#            print np.shape(xdat),np.shape(zdat),np.shape(self.data[self.u_name].data)
             udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
             wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
         
@@ -1325,12 +1328,12 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             tsi = self.get_ind(ts,np.array(self.date))
 
-        print 'xlim',xlim
+#        print 'xlim',xlim
         if xlim is None:
             xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
         else:
             if self.x_name == 'longitude':
-                print xlim
+#                print xlim
                 xmini = self.get_ind(xlim[0],self.data[self.x_name].data[0,:])
                 xmaxi = self.get_ind(xlim[1],self.data[self.x_name].data[0,:])
             else:
@@ -1345,7 +1348,7 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 ymini, ymaxi = ylim
 
-        print xskip,yskip
+#        print xskip,yskip
 
         if z is None:
             z_ind = int(len(self.data[self.z_name].data[0])/2.0)
@@ -1524,7 +1527,7 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 pc = ax.pcolormesh(bins, self.data[self.z_name].data[::multiple], cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
 
-        print np.shape(cfad_ma)
+#        print np.shape(cfad_ma)
 
         cb = fig.colorbar(pc, ax=ax)
         cb.set_label('Frequency (%)')

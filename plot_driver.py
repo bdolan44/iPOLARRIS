@@ -53,7 +53,7 @@ def plot_hid_int(dat1,config,typ='hid',n1 = None):
 
     plt.tight_layout()
     plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=config['image_dir'],h=typ.upper(),s=n1,t=config['ptype']),dpi=200)
-    plt.clf()
+#    plt.clf()
     
 def plot_hid_prof_int(dat1,config,typ='hid',n1 = None,n2 = None):
     fig, ax = plt.subplots(1,1,figsize=(12,8))
