@@ -205,7 +205,9 @@ class RadarData(RadarConfig.RadarConfig):
                                    weakechothres=weakechothres, backgrndradius=backgrndradius,
                                    maxConvRadius=maxConvRadius,minsize=minsize,
                                    startslope=startslope, maxsize=maxsize)
-        rpt = np.tile(raintype,(40,1,1))
+        nlevs = np.shape(self.data[self.z_name].data)[0]
+#        print nlevs
+        rpt = np.tile(raintype,(nlevs,1,1))
         self.raintype= rpt        
         self.def_convstrat()
     #############################################################################################################
