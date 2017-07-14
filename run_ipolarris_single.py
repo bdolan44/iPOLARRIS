@@ -123,11 +123,10 @@ def find_dd_match(config):
         
             if mval != 'no':
                 dfile = ddum[mval]
-                print 'Found DD match!', dfile
+                #print 'Found DD match!', dfile
                 mdfiles[cname] = dfile
             else:
-                mdfiles = None
-                return mdfiles
+                mdfiles[cname] = None
 
         
     return mdfiles
@@ -198,7 +197,7 @@ def hasNumbers(inputString):
 #######################################################################
 configfile = sys.argv[1:]
 config = {}
-print sys.argv[1:]
+#print sys.argv[1:]
 
 with open(configfile[0]) as f:
     for line in f:
@@ -248,6 +247,33 @@ dat1 = run_exper(config, dmatch = dmatch, smatch=smatch,interactive = False)
 
 if config['plot_int'] == 1:
     #######Make plots of Integrated CFADS 
+    if config['plot_cs'] == 1:
+    
+        holde = config['extra']
+        config['extra'] = 'convective_{h}'.format(h=holde)
+        
+        plot_driver.plot_cfad_int(dat1,config,typ='dzc')
+        plot_driver.plot_cfad_int(dat1,config,typ='drc')
+        plot_driver.plot_cfad_int(dat1,config,typ='kdc')
+        plot_driver.plot_hid_int(dat1,config,typ='hidc')
+
+        if dat1['runw'] is True:
+            plot_driver.plot_cfad_int(dat1,config,typ='wc')
+        config['extra'] = holde
+
+        holde = config['extra']
+        config['extra'] = 'stratiform_{h}'.format(h=holde)
+        plot_driver.plot_cfad_int(dat1,config,typ='dzs')
+        plot_driver.plot_cfad_int(dat1,config,typ='drs')
+        plot_driver.plot_cfad_int(dat1,config,typ='kds')
+        plot_driver.plot_hid_int(dat1,config,typ='hids')
+
+        if dat1['runw'] is True:
+            plot_driver.plot_cfad_int(dat1,config,typ='ws')
+        config['extra'] = holde
+
+
+
     plot_driver.plot_cfad_int(dat1,config,typ='dz')
     plot_driver.plot_cfad_int(dat1,config,typ='dr')
     plot_driver.plot_cfad_int(dat1,config,typ='kd')

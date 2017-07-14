@@ -70,7 +70,7 @@ def csu_fhc_summer(weights=DEFAULT_WEIGHTS, method='hybrid',
     
     """
 
-    print 'Using temp in HID:',use_temp
+#    print 'Using temp in HID:',use_temp
     if dz is None:
         print 'FHC fail, no reflectivity field'
         return None

@@ -63,7 +63,7 @@ def _get_ab_incides(hts, above=None, below=None):
 
 ########################
 def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,tspan=None, pick=None, norm=True,ret_z=0,ret_bin = 0,z_resolution=1.0,z_ind = 0,
-        thresh=-900.0):
+        thresh=-900.0,mask = None):
 # pick a variable and do a CFAD for the cell
 
     if value_bins is None : # set a default if nothing is there
@@ -74,7 +74,11 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
     if hts is None:
         print 'Please provide Nominal heights'
         return
+    hold = deepcopy(data)
 
+    if mask is not None:
+        hold[mask] = np.nan
+        
     nbins = value_bins.shape[0]
     bot_index, top_index = _get_ab_incides(hts,above=above, below=below)
 
@@ -89,7 +93,7 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
 
     for ivl, vl in enumerate(looped):
 
-        dum1 = data.reshape(data.shape[z_ind],-1)
+        dum1 = hold.reshape(hold.shape[z_ind],-1)
         dum2 = dum1[vl:vl+multiple,...]
         dum2[dum2<thresh]=np.nan
         dum3 = np.where(np.isfinite(dum2))
@@ -99,6 +103,8 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
             lev_hist = 100.0*lev_hist/np.sum(lev_hist)
         if np.max(lev_hist) > 0:
             cfad_out[ivl, :] = lev_hist
+
+
     if ret_z == 1 and ret_bin == 1:    
         return cfad_out,hts[looped],value_bins
     elif ret_z == 1 and ret_bin == 0:
@@ -111,17 +117,24 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
 #############################################################################################################
 
 def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.0, above=2.0, below=15.0, bins=None, 
-        log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,**kwargs):
+        log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
 
     if hts is None:
         print 'please provide nominal heights to cfad_plot'
         return
     if data is not None:
+#         hold = deepcopy(data)
+#         if mask is not None:
+#             data[mask] = -1
         cfad, reshts, vbins =GF.cfad(data, hts, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,tspan=tspan,
-                z_ind = 0,ret_z = 1,ret_bin=1)
+                z_ind = 0,ret_z = 1,ret_bin=1,mask= mask)
     elif cfad is not None:
         if bins == None:
-            vbins = np.arange(np.nanmin(data),np.nanmax(data),nbins)
+            try:
+                vbins = np.arange(np.nanmin(data),np.nanmax(data),nbins)
+            except:
+                vbins = np.arange(0,10,nbins)
+                bins = np.arange(0,10,nbins)
         else:
             vbins = bins[:-1]
         reshts = hts
@@ -146,7 +159,11 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
     if cont is True:
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
-        pc = ax.contourf(bins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
+        try:
+            pc = ax.contourf(bins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
+        except Exception, e:
+            print 'Can not plot {v} with exception {e}'.format(v=var,e=e)
+            return fig, ax
     else:
 
         if levels is not None:
@@ -235,12 +252,17 @@ def plot_2dhist(hist,edge,ax=None,cbon = True,rconf = None):
 #############################################################################################################
 #############################################################################################################
 
-def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0):
+def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None):
     # vertical HID_cdf with bar plots I think
     delz = hts[1]-hts[0]
     if np.mod(z_resolution, delz) != 0:
             print 'Need even multiple of vertical resolution: {d.1f}'.format(d = delz)
             return
+    hold = deepcopy(data)
+
+    if mask is not None:
+        print 'maskind HID data'
+        hold[mask] = -1
 
     multiple = np.int(z_resolution/delz)
 
@@ -248,7 +270,7 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0):
     all_vols = []
     for sp in range(len(species)):
         #print sp
-        htsn, tdat = GF.vertical_hid_volume(data,hts,delz,[sp+1], z_resolution=z_resolution, pick=pick,z_ind=0) # need the +1
+        htsn, tdat = GF.vertical_hid_volume(hold,hts,delz,[sp+1], z_resolution=z_resolution, pick=pick,z_ind=0) # need the +1
         all_vols.append(tdat)
         
 

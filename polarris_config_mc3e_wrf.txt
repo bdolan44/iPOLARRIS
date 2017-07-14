@@ -33,6 +33,12 @@ rdadd == 19                           ==#number of characteric in timestamp on r
 time_parse==[11,19]              ==#more time formatting.
 etime == datetime.datetime(2011,5,23,1,0)      ==#end of analysis time of interest
 stime == datetime.datetime(2011,5,24,23,0)    ==#start time of analysis of interest
+cs_z == 2.0                         ==#Level to determine Convective / stratiform designation.
+zconv == 40                         ==#Zconv threshold in raintyping algorithm.
+conv_types == ['ISO_CONV_CORE','CONVECTIVE','ISO_CS_CORE']      ==#Which Powell et al. types to consider in convective CFADS
+strat_types == ['WEAK_ECHO','STRATIFORM','ISO_CONV_FRINGE']     ==#Which Powell et al. types to consider in stratiform CFADS
+mixed_types == ['UNCERTAIN']                                    ==#Which types to not include in either convective or stratiform but will be considered in totals).
+zdr_offset == 0                    ==#Add any Zdr offset here. Value will be SUBTRACTED from the zdr values.
 #
 #######Set up some variables related to the observations ###################
 ### Dual Doppler stuff
@@ -56,8 +62,9 @@ alt == 0.327                          ==#Altitude of the radar
 #
 ############Select the types of plots to see on the output##########################
 plot_int == True                      ==#Turn on plotting of integrated parameters over the whole time frame
+plot_cs == True                       ==#Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
-cfad_mpanel_flag==False,  ==#4 panel CFADs of Dbz, Zdr, Kdp and W
+cfad_mpanel_flag==False  ==#4 panel CFADs of Dbz, Zdr, Kdp and W
 hid_cfad_flag==True                   ==# HID CFAD
 joint_flag==False                     ==#Z vs. Zdr
 cfad_individ_flag==False              ==#Make separate images for dbz, Zdr, Kdp, W and Rho
