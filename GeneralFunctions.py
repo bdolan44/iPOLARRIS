@@ -185,6 +185,10 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
             #print rconf.print_title(tm=tspan)
             ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
     #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
+        else:
+            ax.set_xlabel('{n}'.format(n=var))
+            #print rconf.print_title(tm=tspan)
+            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
 #        except:
 #            pass
 
@@ -279,11 +283,14 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None)
 #9        print np.shape(all_vols)
     # shape is 10,16, which is nspecies x nheights
     # need to do cdf on each level
+    all_vols[all_vols == np.nan] = 0.0
     for iz in range(all_vols.shape[1]):
         # loop thru the vertical
-        level_cum_vol = np.cumsum(all_vols[:, iz])
+#        print all_vols[:,iz]
+        level_cum_vol = np.cumsum((all_vols[:, iz]))
+#        print level_cum_vol
         all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
-
+        print all_cdf[:,iz],iz
     return htsn,all_cdf
 
 #############################################################################################################
@@ -370,7 +377,14 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
         #print data[0,:]
 #        print vl, rconf.hid_colors[1],data[0,i]
         ax.barh(vl, data[0, i], left = 0., edgecolor = 'none', color = rconf.hid_colors[1]) 
+
+
         for spec in range(1, len(rconf.species)): # now looping thru the species to make bar plot
+#             print rconf.hid_colors[spec+1]
+            print data[spec-1,i]
+#             print spec
+            if data[spec-1,i] == np.nan:
+                print 'shoot'
             ax.barh(vl, data[spec, i], left = data[spec-1, i], \
             color = rconf.hid_colors[spec+1], edgecolor = 'none')
     ax.set_xlim(0,100)

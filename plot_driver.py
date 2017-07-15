@@ -294,7 +294,30 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
     axf[0].set_ylim(0,18)
     axf[1].set_ylim(0,18)
 
-    diff_cfad = cfad1_all - cfad2_all
+    if len(dat1['hts'][0]) != len(dat2['hts'][0]):
+        hvals = [dat1['hts'][0],dat2['hts'][0]]
+        vals = np.array([cfad1_all, cfad2_all])
+
+        lens = [len(dat1['hts'][0]),len(dat2['hts'][0])]
+        sz = np.max(lens)
+        arg = np.argmax(lens)
+        cfad_new1=np.zeros_like(vals[arg])
+        cfad_new2=np.zeros_like(vals[arg])
+    #    print np.shape(vals[arg]),np.shape(cfad_new2)
+
+        for i,h in enumerate(hvals[arg]):
+            close_h = np.argmin(np.abs(h-hvals[0][:]))
+            cfad_new1[i,:] = vals[0][close_h,:]
+        
+            close_h = np.argmin(np.abs(h-hvals[1][:]))
+            cfad_new2[i,:] = vals[1][close_h,:]
+        hts = hvals[arg]
+        diff_cfad = cfad_new1-cfad_new2
+    else:
+        diff_cfad = cfad1_all - cfad2_all
+        hts = dat1['hts'][0]
+
+
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
     maxa = np.nanmax(np.abs(diff_cfad))
     levels=np.linspace(-maxa,maxa,50)
@@ -305,15 +328,17 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
     if typ == 'w':
         axf[2].set_xlabel(dat1['rconf'].names['{tp}var'.format(tp=typ.upper())],fontsize = 18)
     else:
-        axf[2].set_xlabel(dat1['rconf'].names['{tp}'.format(tp=typ.upper())],fontsize = 18)
-
+        try:
+            axf[2].set_xlabel(dat1['rconf'].names['{tp}'.format(tp=typ.upper())],fontsize = 18)
+        except:
+            axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
     axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
 
     plt.savefig('{id}CFAD_{tp}_{s}_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra'],tp=typ.upper()),dpi=200)
-    plt.clf()
+#    plt.clf()
 
 def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     dat1cnt = np.shape(dat1['hts'])[0]
