@@ -97,7 +97,7 @@ def find_dd_match(config):
         base = os.path.basename(dname)
 
         radcdate=np.str(base[config['ddoff']:config['ddoff']+config['ddadd']])
-        #print radcdate
+#        print radcdate, dname
         #ddate_format='%Y%m%d_%H%M'
         if eval(config['ad']) != '':
 #            print radcdate
@@ -114,6 +114,7 @@ def find_dd_match(config):
         #print cname
         base = os.path.basename(cname)
         radcdate=np.str(base[config['doff']:config['doff']+15])
+#        print radcdate
         dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
         #print dates, etime,stime
         if (dates >= config['etime']) and (dates <= config['stime']):
@@ -374,7 +375,7 @@ else:
     plot_driver.plot_joint_comp(dat1,dat2,config,typ='zzdr')
     plot_driver.plot_joint_comp(dat1,dat2,config,typ='zkdp')
     plot_driver.plot_joint_comp(dat1,dat2,config,typ='zw')
-    plot_driver.plot_joint_comp(dat1,dat2,config,typ='wr')
+#    plot_driver.plot_joint_comp(dat1,dat2,config,typ='wr')
 
     ########Updraft Width##########
     plot_driver.plot_upwidth(dat1,dat2,config)

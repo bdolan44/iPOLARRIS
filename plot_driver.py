@@ -55,7 +55,7 @@ def plot_hid_int(dat1,config,typ='hid',n1 = None):
 
     plt.tight_layout()
     plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=config['image_dir'],h=typ.upper(),s=n1,t=config['ptype']),dpi=200)
-#    plt.clf()
+    plt.clf()
     
 def plot_hid_prof_int(dat1,config,typ='hid',n1 = None,n2 = None):
     fig, ax = plt.subplots(1,1,figsize=(12,8))
@@ -171,13 +171,13 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         cb6 = axf[0].contourf(dat1['edgzzdr'][0][1][:-1],dat1['edgzzdr'][0][0][:-1],np.nansum(dat1['histzzdr'],axis=0))
         axf[0].set_xlabel('Zdr')
         axf[0].set_ylabel('dBZ')
-        axf[0].set_title('{e} {m} {x}'.format(e=dat1['rconf'].exper,x=extra,m=dat1['rconf'].mphys))
+        axf[0].set_title('{e} {m} {x}'.format(e=dat1['rconf'].exper,x=config['extra'],m=dat1['rconf'].mphys))
         plt.colorbar(cb6,ax=axf[0])
 
         cb6 = axf[1].contourf(dat2['edgzzdr'][0][1][:-1],dat2['edgzzdr'][0][0][:-1],np.nansum(dat2['histzzdr'],axis=0))
         axf[1].set_xlabel('Zdr')
         axf[1].set_ylabel('dBZ')
-        axf[1].set_title('{e} {m} {x}'.format(e=dat2['rconf'].exper,x=extra,m=dat2['rconf'].mphys))
+        axf[1].set_title('{e} {m} {x}'.format(e=dat2['rconf'].exper,x=config['extra'],m=dat2['rconf'].mphys))
         plt.colorbar(cb6,ax=axf[1])
 
         diffdat = np.nansum(dat1['histzzdr'],axis=0)-np.nansum(dat2['histzzdr'],axis=0)
@@ -195,7 +195,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         cb6 = axf[0].contourf(dat1['edgkdz'][0][1][:-1],dat1['edgkdz'][0][0][:-1],np.nansum(dat1['histkdz'],axis=0))
         axf[0].set_xlabel('Kdp')
         axf[0].set_ylabel('dBZ')
-        axf[0].set_title('{p}{e} {m} {x}'.format(e=dat1['rconf'].exper,x=config['extra'],m=dat1['rconf'].mphys))
+        axf[0].set_title('{e} {m} {x}'.format(e=dat1['rconf'].exper,x=config['extra'],m=dat1['rconf'].mphys))
         plt.colorbar(cb6,ax=ax[0])
 
         cb6 = axf[1].contourf(dat2['edgkdz'][0][1][:-1],dat2['edgkdz'][0][0][:-1],np.nansum(dat2['histkdz'],axis=0))
@@ -321,7 +321,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
     maxa = np.nanmax(np.abs(diff_cfad))
     levels=np.linspace(-maxa,maxa,50)
-    cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],dat1['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
+    cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
 
     plt.colorbar(cb,ax=axf[2])
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
@@ -338,7 +338,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
 
     plt.savefig('{id}CFAD_{tp}_{s}_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra'],tp=typ.upper()),dpi=200)
-#    plt.clf()
+    plt.clf()
 
 def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     dat1cnt = np.shape(dat1['hts'])[0]
@@ -383,34 +383,92 @@ def plot_hid_profile(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
     tw_graup_vert2 = np.nanmean(dat2['graup_vert'],axis=0)
     tw_hail_vert2 = np.nanmean(dat2['hail_vert'],axis=0)
     tw_snow_vert2 = np.nanmean(dat2['snow_vert'],axis=0)
-    hts = dat1['hidhts'][0]
+    hts1 = dat1['hidhts'][0]
+    hts2 = dat2['hidhts'][0]
 
     lw=3
-    axf[0].plot(tw_water_vert1,hts,color='blue',label='Water',lw=lw)
-    axf[0].plot(tw_graup_vert1,hts,color='green',label='Graupel',lw=lw)
-    axf[0].plot(tw_hail_vert1,hts,color='red',label='Hail',lw=lw)
-    axf[0].plot(tw_snow_vert1,hts,color='goldenrod',label='Snow',lw=lw)
+    axf[0].plot(tw_water_vert1,hts1,color='blue',label='Water',lw=lw)
+    axf[0].plot(tw_graup_vert1,hts1,color='green',label='Graupel',lw=lw)
+    axf[0].plot(tw_hail_vert1,hts1,color='red',label='Hail',lw=lw)
+    axf[0].plot(tw_snow_vert1,hts1,color='goldenrod',label='Snow',lw=lw)
     axf[0].set_title('{e1} Hydromeor Freq.'.format(e1=n1),fontsize=20)
     axf[0].set_xlabel('Frequency',fontsize=18)
     axf[0].legend(loc='best',fontsize=18)
     axf[0].set_ylabel('Height (km)',fontsize=18)
     axf[0].set_ylim(0,20)
 
-    axf[1].plot(tw_water_vert2,hts,color='blue',label='Water',lw=lw)
-    axf[1].plot(tw_graup_vert2,hts,color='green',label='Graupel',lw=lw)
-    axf[1].plot(tw_hail_vert2,hts,color='red',label='Hail',lw=lw)
-    axf[1].plot(tw_snow_vert2,hts,color='goldenrod',label='Snow',lw=lw)
+    axf[1].plot(tw_water_vert2,hts2,color='blue',label='Water',lw=lw)
+    axf[1].plot(tw_graup_vert2,hts2,color='green',label='Graupel',lw=lw)
+    axf[1].plot(tw_hail_vert2,hts2,color='red',label='Hail',lw=lw)
+    axf[1].plot(tw_snow_vert2,hts2,color='goldenrod',label='Snow',lw=lw)
     axf[1].set_title('{e1} Hydromeor Freq.'.format(e1=n2),fontsize=20)
     axf[1].set_xlabel('Frequency',fontsize=18)
     axf[1].legend(loc='best',fontsize=18)
     axf[1].set_ylabel('Height (km)',fontsize=18)
     axf[1].set_ylim(0,20)
 
-    diff_water = tw_water_vert1-tw_water_vert2
-    diff_graup = tw_graup_vert1-tw_graup_vert2
-    diff_hail = tw_hail_vert1-tw_hail_vert2
-    diff_snow = tw_snow_vert1-tw_snow_vert2
-    
+    if len(dat1['hts'][0]) != len(dat2['hts'][0]):
+        hvals = [dat1['hts'][0],dat2['hts'][0]]
+        wvals = np.array([tw_water_vert1,tw_water_vert2])
+        gvals = np.array([tw_graup_vert1,tw_graup_vert2])
+        hailvals = np.array([tw_hail_vert1,tw_hail_vert2])
+        svals = np.array([tw_snow_vert1,tw_snow_vert2])
+
+        lens = [len(dat1['hts'][0]),len(dat2['hts'][0])]
+        sz = np.max(lens)
+        arg = np.argmax(lens)
+        wvals_new1=np.zeros_like(wvals[arg])
+        wvals_new2=np.zeros_like(wvals[arg])
+
+        gvals_new1=np.zeros_like(gvals[arg])
+        gvals_new2=np.zeros_like(gvals[arg])
+
+        hailvals_new1=np.zeros_like(hailvals[arg])
+        hailvals_new2=np.zeros_like(hailvals[arg])
+
+        svals_new1=np.zeros_like(svals[arg])
+        svals_new2=np.zeros_like(svals[arg])
+
+    #    print np.shape(vals[arg]),np.shape(cfad_new2)
+
+        for i,h in enumerate(hvals[arg]):
+            close_h = np.argmin(np.abs(h-hvals[0][:]))
+            wvals_new1[i] = wvals[0][close_h]
+        
+            close_h = np.argmin(np.abs(h-hvals[1][:]))
+            wvals_new2[i] = wvals[1][close_h]
+            
+            close_h = np.argmin(np.abs(h-hvals[0][:]))
+            gvals_new1[i] = gvals[0][close_h]
+        
+            close_h = np.argmin(np.abs(h-hvals[1][:]))
+            gvals_new2[i] = gvals[1][close_h]
+            
+            close_h = np.argmin(np.abs(h-hvals[0][:]))
+            hailvals_new1[i] = hailvals[0][close_h]
+        
+            close_h = np.argmin(np.abs(h-hvals[1][:]))
+            hailvals_new2[i] = hailvals[1][close_h]
+
+            close_h = np.argmin(np.abs(h-hvals[0][:]))
+            svals_new1[i] = svals[0][close_h]
+        
+            close_h = np.argmin(np.abs(h-hvals[1][:]))
+            svals_new2[i] = svals[1][close_h]
+
+        hts = hvals[arg]
+        diff_water = wvals_new1-wvals_new2
+        diff_graup = gvals_new1-gvals_new2
+        diff_hail = hailvals_new1-hailvals_new2
+        diff_snow = svals_new1-svals_new2
+    else:
+        diff_water = tw_water_vert1-tw_water_vert2
+        diff_graup = tw_graup_vert1-tw_graup_vert2
+        diff_hail = tw_hail_vert1-tw_hail_vert2
+        diff_snow = tw_snow_vert1-tw_snow_vert2
+        hts = dat1['hts'][0]
+
+
 
     axf[2].plot(diff_water,hts,color='blue',label='Water',lw=lw)
     axf[2].plot(diff_graup,hts,color='green',label='Graupel',lw=lw)
