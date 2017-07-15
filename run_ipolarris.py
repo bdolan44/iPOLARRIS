@@ -42,7 +42,7 @@ warnings.filterwarnings('ignore')
 import GeneralFunctions as GF
 import sys
 
-
+import dill as pickle
 
 def match_dd(rdate,ddates):
     dum=abs(rdate-np.array(ddates))
@@ -379,4 +379,7 @@ else:
     ########Updraft Width##########
     plot_driver.plot_upwidth(dat1,dat2,config)
 
+
+    pickle.dump(dat1, open( "{e}_{x}.p".format(e=config['exper'],x=config['extra']), "wb" ) )
+    pickle.dump(dat2, open( "{e}_{x}.p".format(e=config1['exper'],x=config1['extra']), "wb" ) )
 
