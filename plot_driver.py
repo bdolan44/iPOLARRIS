@@ -24,7 +24,8 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
 
     dat1cnt = np.shape(dat1['hts'])[0]
 
-    cfad1_all = np.sum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt
+    cfad1_all = np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt
+    print dat1['hts'][0]
 
     if typ == 'w' or typ == 'wc' or typ == 'ws':
         fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=ax,cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
@@ -45,8 +46,9 @@ def plot_hid_int(dat1,config,typ='hid',n1 = None):
     if n1 is None:
         n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
 
+    print dat1cnt, dat1['hts']
     fig, ax = plt.subplots(1,1,figsize=(12,8))
-    fig, ax = GF.plot_hid_cdf(np.nansum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt,dat1['hidhts'][0],ax=ax,rconf=dat1['rconf'])
+    fig, ax = GF.plot_hid_cdf(np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt,dat1['hidhts'][0],ax=ax,rconf=dat1['rconf'])
     ax.set_title(n1)
 
     ax.set_ylim(0,18)
@@ -271,6 +273,8 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
 
     dat1cnt = np.shape(dat1['hts'])[0]
     dat2cnt = np.shape(dat2['hts'])[0]
+#     if dat1['hts'] != dat2['hts']:
+#         
 
     cfad1_all = np.sum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt
     cfad2_all = np.sum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt
@@ -292,7 +296,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
 
     diff_cfad = cfad1_all - cfad2_all
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-    maxa = np.nammax(np.abs(diff_cfad))
+    maxa = np.nanmax(np.abs(diff_cfad))
     levels=np.linspace(-maxa,maxa,50)
     cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],dat1['hts'][0],cfad_ma,levels,cmap='bwr',extend='both')
 
