@@ -354,6 +354,14 @@ def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
 
     fig, ax = plt.subplots(1,2,figsize=(18,8))
     axf = ax.flatten()
+    
+    ht1sum = np.nansum(dat1['{t}cfad'.format(t=typ)],axis=0)
+    dat1cnt = np.nanmax(ht1sum,axis=0)/100.
+
+    ht2sum = np.nansum(dat2['{t}cfad'.format(t=typ)],axis=0)
+    dat2cnt = np.nanmax(ht2sum,axis=0)/100.
+    
+    
     fig, ax = GF.plot_hid_cdf(np.nansum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt,dat1['hidhts'][0],ax=axf[0],rconf=dat1['rconf'])
     axf[0].set_title(n1)
     fig, ax = GF.plot_hid_cdf(np.nansum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt,dat2['hidhts'][0],ax=axf[1],rconf=dat2['rconf'])

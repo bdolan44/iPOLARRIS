@@ -209,7 +209,7 @@ with open(configfile[0]) as f:
             key, val, comment = line.split('==')
             vval = val.replace(" ","")
             numck = hasNumbers(vval)
-            if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys':
+            if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys' or key.replace(" ","") == 'extra':
                 numck = False
             if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
                 vval = vval.strip("''")

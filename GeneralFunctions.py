@@ -256,6 +256,7 @@ def plot_2dhist(hist,edge,ax=None,cbon = True,rconf = None):
 #############################################################################################################
 #############################################################################################################
 
+
 def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None):
     # vertical HID_cdf with bar plots I think
     delz = hts[1]-hts[0]
@@ -289,11 +290,16 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None)
     for iz in range(all_vols.shape[1]):
         # loop thru the vertical
 #        print all_vols[:,iz]
+        print iz
         level_cum_vol = np.cumsum((all_vols[:, iz]))
-        all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
-    all_cdf[np.isnan(all_cdf)] = 0.0
+#        if level_cum_vol[-1] != 0:
+        all_cdf[:, iz] = 100.0*level_cum_vol/np.nanmax(level_cum_vol)
+#        else:
+#            all_cdf[:, iz] = 100.0*level_cum_vol/1.
+
+#    all_cdf[np.isnan(all_cdf)] = 0.0
 #    print np.max(all_cdf)
-    return htsn,all_cdf
+    return htsn,all_cdf#, all_vols
 
 #############################################################################################################
 
@@ -315,10 +321,9 @@ def vertical_hid_volume(data,hts, delz,hid_nums, z_resolution=1.0, above=None, b
     htsn = hts[looped]
     #print looped,multiple
     for vi,vl in enumerate(looped):
-        dum1 = data.reshape(data.shape[z_ind],-1)
-        dum2 = dum1[vl:vl+multiple,...]
+        
+        lev_hid = data[vl:vl+multiple,...]
         #print hid_nums,np.shape(dum2)
-        lev_hid = np.ravel(dum2) # go to vl+multiple cuz not inclusive
 #        print np.shape(lev_hid),np.max(lev_hid)
         #print 'lev_hid',np.shape(lev_hid)
 #            print hid_nums, np.shape(lev_hid)
@@ -385,8 +390,8 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
 #             print rconf.hid_colors[spec+1]
 #            print data[spec-1,i]
 #            print spec, data[spec,i], data[spec-1,i]
-#            if data[spec-1,i] == np.nan:
-#                print 'shoot'
+            if data[spec-1,i] == np.nan:
+                print 'shoot'
             ax.barh(vl, data[spec, i], left = data[spec-1, i], \
             color = rconf.hid_colors[spec+1], edgecolor = 'none')
     ax.set_xlim(0,100)
