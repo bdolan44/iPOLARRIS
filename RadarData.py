@@ -1783,6 +1783,7 @@ class RadarData(RadarConfig.RadarConfig):
         for iz in range(all_vols.shape[1]):
             # loop thru the vertical
             level_cum_vol = np.cumsum(all_vols[:, iz])
+#            print level_cum_vol
             all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
 
         return all_cdf

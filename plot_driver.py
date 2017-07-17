@@ -146,13 +146,13 @@ def plot_upwidth(dat1,dat2,config,n1= None,n2=None):
     axf[0].set_ylim(20,-60)
     axf[0].set_xlabel('Updraft Width (km$^2$)')
     axf[0].set_ylabel('Temperature (deg C)')
-    axf[0].set_title('n1')
+    axf[0].set_title('{n}'.format(n=n1))
 
     axf[1].plot(np.nanmean(dat2['warea'],axis=0),dat2['wareat'][0],color='k',lw=5)
     axf[1].set_ylim(20,-60)
     axf[1].set_xlabel('Updraft Width (km$^2$)')
     axf[1].set_ylabel('Temperature (deg C)')
-    axf[1].set_title('n2')
+    axf[1].set_title('{n}'.format(n=n2))
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
@@ -265,13 +265,15 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         plt.savefig('{d}{e1}_{e2}_wr_comp_{x}.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
 
-def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
+def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
     fig, ax = plt.subplots(1,3,figsize=(18,8))
     axf = ax.flatten()
     if n1 is None:
         n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
     if n2 is None:
         n2 = '{e}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,t=config['extra'])
+    if n3 is None:
+        n3 = '{e}{m1}-{x}{m2}_{t}'.format(e=dat1['rconf'].exper,x=dat2['rconf'].exper,m1=dat1['rconf'].mphys,m2=dat2['rconf'].mphys,t=config['extra'])
 
     dat1cnt = np.shape(dat1['hts'])[0]
     dat2cnt = np.shape(dat2['hts'])[0]
@@ -290,8 +292,8 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
         fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=axf[0],cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
 
         fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = dat2['hts'][0],  bins = dat2['{t}bins'.format(t=typ)],ax=axf[1],cfad_on = 0,rconf = dat2['rconf'],tspan = dat2['time'],maxval=20,cont=True,levels = True)
-    axf[0].set_title(n1)
-    axf[2].set_title(n2)
+    axf[0].set_title('{n}'.format(n=n1))
+    axf[2].set_title('{n}'.format(n=n2))
 
     axf[0].set_ylim(0,18)
     axf[1].set_ylim(0,18)
@@ -334,7 +336,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
             axf[2].set_xlabel(dat1['rconf'].names['{tp}'.format(tp=typ.upper())],fontsize = 18)
         except:
             axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
-    axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
+    axf[2].set_title('{v}'.format(v=n3))
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
@@ -346,9 +348,9 @@ def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     dat1cnt = np.shape(dat1['hts'])[0]
     dat2cnt = np.shape(dat2['hts'])[0]
     if n1 is None:
-        n1 = '{e}_{k}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,k=typ)
+        n1 = '{e}_{k}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,k=typ,t=dat1['rconf'].extra)
     if n2 is None:
-        n2 = '{e}_{k}_{x}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,k=typ)
+        n2 = '{e}_{k}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,k=typ,t=dat1['rconf'].extra)
 
     fig, ax = plt.subplots(1,2,figsize=(18,8))
     axf = ax.flatten()
@@ -482,7 +484,7 @@ def plot_hid_profile(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
     axf[2].set_ylabel('Height (km)',fontsize=18)
     axf[2].set_ylim(0,20)
 
-    plt.savefig('{d}{e1}_{e2}_hid_vert_compare_{x}.{t}'.format(d=config['image_dir'],e2=dat1['rconf'].exper,e1=dat2['rconf'].exper,x=config['extra'],t=config['ptype']),dpi=300)
+    plt.savefig('{d}{e1}_{e2}_hid_vert_compare_{x}.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,x=config['extra'],t=config['ptype']),dpi=300)
     plt.clf() 
 
 

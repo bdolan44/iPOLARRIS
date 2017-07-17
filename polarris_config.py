@@ -37,11 +37,11 @@ def get_data(config, tm, rfile, dmatch,smatch):
                                               mixed_types = config['mixed_types'])
                                               
     if dmatch is not None:
-#         wvardum = np.zeros_like(rdata.data[rdata.dz_name].data)
-#         wvardum = np.ma.masked_equal(wvardum,0)
-#         rdata.data[rdata.w_name].data = wvardum
-#         rdata.wvar = wvardum
-        rdata.w_name = config['wname']
+         wvardum = np.zeros_like(rdata.data[rdata.dz_name].data)
+         wvardum = np.ma.masked_equal(wvardum,0)
+         rdata.data[rdata.w_name].data = wvardum
+         rdata.wvar = wvardum
+         rdata.w_name = config['wname']
 
     if smatch is not None:
         print 'Smatch',smatch
