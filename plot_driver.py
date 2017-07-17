@@ -146,11 +146,13 @@ def plot_upwidth(dat1,dat2,config,n1= None,n2=None):
     axf[0].set_ylim(20,-60)
     axf[0].set_xlabel('Updraft Width (km$^2$)')
     axf[0].set_ylabel('Temperature (deg C)')
+    axf[0].set_title('n1')
 
     axf[1].plot(np.nanmean(dat2['warea'],axis=0),dat2['wareat'][0],color='k',lw=5)
     axf[1].set_ylim(20,-60)
     axf[1].set_xlabel('Updraft Width (km$^2$)')
     axf[1].set_ylabel('Temperature (deg C)')
+    axf[1].set_title('n2')
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
@@ -269,7 +271,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
     if n1 is None:
         n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
     if n2 is None:
-        n1 = '{e}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,t=config['extra'])
+        n2 = '{e}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,t=config['extra'])
 
     dat1cnt = np.shape(dat1['hts'])[0]
     dat2cnt = np.shape(dat2['hts'])[0]
@@ -319,8 +321,8 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None):
 
 
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-    maxa = np.nanmax(np.abs(diff_cfad))
-    levels=np.linspace(-maxa,maxa,50)
+    maxa = np.nanpercentile(np.abs(diff_cfad),98)
+    levels=np.linspace(-1*maxa,maxa,50)
     cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
 
     plt.colorbar(cb,ax=axf[2])
@@ -344,15 +346,15 @@ def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     dat1cnt = np.shape(dat1['hts'])[0]
     dat2cnt = np.shape(dat2['hts'])[0]
     if n1 is None:
-        n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
+        n1 = '{e}_{k}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,k=typ)
     if n2 is None:
-        n2 = '{e}_{x}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys)
+        n2 = '{e}_{k}_{x}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,k=typ)
 
     fig, ax = plt.subplots(1,2,figsize=(18,8))
     axf = ax.flatten()
-    fig, ax = GF.plot_hid_cdf(np.nansum(dat1['hidcfad'],axis=0)/dat1cnt,dat1['hidhts'][0],ax=axf[0],rconf=dat1['rconf'])
+    fig, ax = GF.plot_hid_cdf(np.nansum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt,dat1['hidhts'][0],ax=axf[0],rconf=dat1['rconf'])
     axf[0].set_title(n1)
-    fig, ax = GF.plot_hid_cdf(np.nansum(dat2['hidcfad'],axis=0)/dat2cnt,dat2['hidhts'][0],ax=axf[1],rconf=dat2['rconf'])
+    fig, ax = GF.plot_hid_cdf(np.nansum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt,dat2['hidhts'][0],ax=axf[1],rconf=dat2['rconf'])
     axf[1].set_title(n2)
 
     axf[0].set_ylim(0,18)
