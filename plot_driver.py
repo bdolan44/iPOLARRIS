@@ -283,6 +283,9 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
     cfad1_all = np.sum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt
     cfad2_all = np.sum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt
 
+    print np.nanmax(cfad1_all)
+    print np.nanmax(cfad2_all)
+    
     if typ == 'w':
         fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=axf[0],cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
 
@@ -316,15 +319,17 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
             close_h = np.argmin(np.abs(h-hvals[1][:]))
             cfad_new2[i,:] = vals[1][close_h,:]
         hts = hvals[arg]
+        print 'calc new CFADs', np.nanmax(cfad_new1), np.nanmax(cfad_new2),  dat1cnt, dat2cnt
         diff_cfad = cfad_new1-cfad_new2
     else:
         diff_cfad = cfad1_all - cfad2_all
         hts = dat1['hts'][0]
 
-
+    
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
-    maxa = np.nanpercentile(np.abs(diff_cfad),98)
+    maxa = np.nanpercentile(np.abs(cfad_ma),98)
     levels=np.linspace(-1*maxa,maxa,50)
+    print typ, maxa
     cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
 
     plt.colorbar(cb,ax=axf[2])
@@ -348,9 +353,9 @@ def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     dat1cnt = np.shape(dat1['hts'])[0]
     dat2cnt = np.shape(dat2['hts'])[0]
     if n1 is None:
-        n1 = '{e}_{k}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,k=typ,t=dat1['rconf'].extra)
+        n1 = '{e}_{k}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,k=typ,t=config['extra'])
     if n2 is None:
-        n2 = '{e}_{k}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,k=typ,t=dat1['rconf'].extra)
+        n2 = '{e}_{k}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,k=typ,t=config['extra'])
 
     fig, ax = plt.subplots(1,2,figsize=(18,8))
     axf = ax.flatten()

@@ -290,7 +290,7 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None)
     for iz in range(all_vols.shape[1]):
         # loop thru the vertical
 #        print all_vols[:,iz]
-        print iz
+#        print iz
         level_cum_vol = np.cumsum((all_vols[:, iz]))
 #        if level_cum_vol[-1] != 0:
         all_cdf[:, iz] = 100.0*level_cum_vol/np.nanmax(level_cum_vol)
