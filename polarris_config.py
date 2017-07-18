@@ -38,9 +38,9 @@ def get_data(config, tm, rfile, dmatch,smatch):
                                               
     if dmatch is not None:
          wvardum = np.zeros_like(rdata.data[rdata.dz_name].data)
-         wvardum = np.ma.masked_equal(wvardum,0)
-         rdata.data[rdata.w_name].data = wvardum
-         rdata.wvar = wvardum
+#          wvardum = np.ma.masked_equal(wvardum,0)
+#          rdata.data[rdata.w_name].data = wvardum
+#          rdata.wvar = wvardum
          rdata.w_name = config['wname']
 
     if smatch is not None:
@@ -225,16 +225,19 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
 #        if config['wname']  == True:
     
         if config['wname'] in rdat.data.variables.keys():
+            print '{c} is good!'.format(c=config['wname'])
+            print np.nanmax(rdat.data[rdat.w_name].data)
             wcfad, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config['wbins'],
-                                ret_z=1,ret_bin = 1,thresh=config['zthresh'])
+                                ret_z=1,ret_bin = 1,thresh=,thresh=-100)
+            print np.nanmax(wcfad)
             wcfad_a.append(wcfad)
 
             wcfadc, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,mask = whconv,hts = rdat.data[rdat.z_name][:].data,value_bins = config['wbins'],
-                                ret_z=1,ret_bin = 1,thresh=config['zthresh'])
+                                ret_z=1,ret_bin = 1,thresh=,thresh=-100)
             wcfadc_a.append(wcfadc)
 
             wcfads, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,mask = whstrat,hts = rdat.data[rdat.z_name][:].data,value_bins = config['wbins'],
-                                ret_z=1,ret_bin = 1,thresh=config['zthresh'])
+                                ret_z=1,ret_bin = 1,thresh=-100)
             wcfads_a.append(wcfads)
 
             wbins_a.append(wbins)
@@ -298,7 +301,6 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
         
         
         if config['wname'] in rdat.data.variables.keys():
-        
 #            print np.shape(rdat.T)
             tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.z_name].data,thresh=config['wthresh'], temps=config['trange'],\
                 z_ind=0,tcoord = True,temp = rdat.T[:,0,0])

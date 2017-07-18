@@ -296,7 +296,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
 
         fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = dat2['hts'][0],  bins = dat2['{t}bins'.format(t=typ)],ax=axf[1],cfad_on = 0,rconf = dat2['rconf'],tspan = dat2['time'],maxval=20,cont=True,levels = True)
     axf[0].set_title('{n}'.format(n=n1))
-    axf[2].set_title('{n}'.format(n=n2))
+    axf[1].set_title('{n}'.format(n=n2))
 
     axf[0].set_ylim(0,18)
     axf[1].set_ylim(0,18)
