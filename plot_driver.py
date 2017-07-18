@@ -25,7 +25,7 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
     dat1cnt = np.shape(dat1['hts'])[0]
 
     cfad1_all = np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt
-    print dat1['hts'][0]
+#    print dat1['hts'][0]
 
     if typ == 'w' or typ == 'wc' or typ == 'ws':
         fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=ax,cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
@@ -46,7 +46,7 @@ def plot_hid_int(dat1,config,typ='hid',n1 = None):
     if n1 is None:
         n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
 
-    print dat1cnt, dat1['hts']
+#    print dat1cnt, dat1['hts']
     fig, ax = plt.subplots(1,1,figsize=(12,8))
     fig, ax = GF.plot_hid_cdf(np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt,dat1['hidhts'][0],ax=ax,rconf=dat1['rconf'])
     ax.set_title(n1)
@@ -283,8 +283,8 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
     cfad1_all = np.sum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt
     cfad2_all = np.sum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt
 
-    print np.nanmax(cfad1_all)
-    print np.nanmax(cfad2_all)
+#     print np.nanmax(cfad1_all)
+#     print np.nanmax(cfad2_all)
     
     if typ == 'w':
         fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=axf[0],cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
@@ -319,7 +319,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
             close_h = np.argmin(np.abs(h-hvals[1][:]))
             cfad_new2[i,:] = vals[1][close_h,:]
         hts = hvals[arg]
-        print 'calc new CFADs', np.nanmax(cfad_new1), np.nanmax(cfad_new2),  dat1cnt, dat2cnt
+#        print 'calc new CFADs', np.nanmax(cfad_new1), np.nanmax(cfad_new2),  dat1cnt, dat2cnt
         diff_cfad = cfad_new1-cfad_new2
     else:
         diff_cfad = cfad1_all - cfad2_all
@@ -329,7 +329,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
     maxa = np.nanpercentile(np.abs(cfad_ma),98)
     levels=np.linspace(-1*maxa,maxa,50)
-    print typ, maxa
+#    print typ, maxa
     cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
 
     plt.colorbar(cb,ax=axf[2])
