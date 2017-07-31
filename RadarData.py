@@ -1455,7 +1455,11 @@ class RadarData(RadarConfig.RadarConfig):
             #print ts,te,'ts,te'
             v = self.data[self.z_name].data[vl]
             v2 = self.data[self.z_name].data[vl+multiple]
-            dum = (self.data[var].sel(z=slice(v,v2)).data)
+            print 'ln 1458', v, v2
+            try:
+                dum = (self.data[var].sel(z=slice(v,v2)).data)
+            except:
+                dum = (self.data[var].sel(z=slice(v,v2+1)).data)
             #print np.max(dum)
 #            dum2 = np.ma.masked_less(dum,-900.0)
             dum2 = np.where(np.isfinite(dum))
