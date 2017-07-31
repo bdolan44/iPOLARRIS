@@ -1030,6 +1030,8 @@ class RadarData(RadarConfig.RadarConfig):
         try:
             data = np.squeeze(self.data[var].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
         except:
+#            print 'ln1033',z_ind,ymini,ymaxi,xmini,xmaxi,var
+#            print np.shape(self.data[var].data)
             data = np.squeeze(self.data[var].data[z_ind,ymini:ymaxi,xmini:xmaxi])
         if len(np.shape(data)) > 2:
 #            print 'data shape is wrong!',np.shape(data)

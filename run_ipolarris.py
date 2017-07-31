@@ -276,7 +276,7 @@ if not sys.argv[2:]:
         if dat1['runw'] is True:
             plot_driver.plot_joint_int(dat1,config,typ='zw')
             ########Updraft Width##########
-            plot_driver.plot_upwidth_int(dat1)
+            plot_driver.plot_upwidth_int(dat1,config)
             if dat1['runrr'] is True:
                 plot_driver.plot_joint_int(dat1,config,typ='wr')
 

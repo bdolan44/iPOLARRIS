@@ -384,7 +384,7 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
         #print data[0,:]
 #        print vl, rconf.hid_colors[1],data[0,i]
         ax.barh(vl, data[0, i], left = 0., edgecolor = 'none', color = rconf.hid_colors[1]) 
-        print vl
+#        print vl
 
         for spec in range(1, len(rconf.species)): # now looping thru the species to make bar plot
 #             print rconf.hid_colors[spec+1]

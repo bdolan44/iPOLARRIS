@@ -654,14 +654,14 @@ def make_single_pplots(rdat,flags,config,y=None):
         axf[2].set_xlabel('W')
         axf[2].set_ylabel('dBZ')
 
-        zr_wrf,edr = rdat.hist2d(varx='RRB',vary=rdat.w_name,binsx=rrbins,binsy=config['wbins'],xthr=0.00000)
+        zr_wrf,edr = rdat.hist2d(varx='RRB',vary=rdat.w_name,binsx=config['rrbins'],binsy=config['wbins'],xthr=0.00000)
         cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3],cbon=True)
         axf[3].set_title(title_string)
         axf[3].set_xlabel('W')
         axf[3].set_ylabel('RRB')
         axf[3].set_ylim(0,50)
         
-        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts[0],r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
         
 
@@ -708,12 +708,12 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.clf()
         
     if flags['qr_cappi'] == True:
-        rdat.cappi_multiplot(z=config['z'],ts=ts[0],xlim=config['xlim'],ylim=config['ylim'],varlist=config['mix_vars'])
+        rdat.cappi_multiplot(z=config['z'],ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
         plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
         plt.clf()
         
     if flags['qr_rhi'] == True:
-        rdat.xsec_multiplot(ts=ts[0],y=config['y'],xlim=config['xlim'],varlist=config['mix_vars'])
+        rdat.xsec_multiplot(ts=rdat.date,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
         plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
         
