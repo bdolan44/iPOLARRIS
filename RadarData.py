@@ -1406,12 +1406,26 @@ class RadarData(RadarConfig.RadarConfig):
             fig, ax = plt.subplots(1,1)
         else:
             fig = ax.get_figure()
-#        print xmini,xmaxi,ymini,ymaxi
+        print xmini,xmaxi,ymini,ymaxi
 
-        xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-        ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-        udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-        vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+
+        try:
+            xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+        except:
+        
+            xmaxi = self.get_ind(xmaxi,self.data[self.x_name].data)
+            xmini = self.get_ind(xmaxi,self.data[self.x_name].data)
+            ymaxi = self.get_ind(ymaxi,self.data[self.y_name].data)
+            ymini = self.get_ind(ymaxi,self.data[self.y_name].data)
+
+            xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+
         if thresh_dz == True:
             dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
             #print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
@@ -1506,13 +1520,11 @@ class RadarData(RadarConfig.RadarConfig):
             #print ts,te,'ts,te'
             v = self.data[self.z_name].data[vl]
             v2 = self.data[self.z_name].data[vl+multiple]
-            print 'ln 1458', v, v2,np.shape(self.data[var].data)
             try:
                 dum = (self.data[var].sel(z=slice(v,v2)).data)
             except:
                 v = self.get_ind(vl,self.data[self.z_name].data)
                 v2 = self.get_ind(vl+multiple,self.data[self.z_name].data)
-                print 'ln 1458', v, v2,np.shape(self.data[var].data)
 
                 dum = (self.data[var].sel(z=slice(v,v2+1)).data)
             #print np.max(dum)
