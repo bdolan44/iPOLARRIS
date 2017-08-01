@@ -44,17 +44,17 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
 def plot_hid_int(dat1,config,typ='hid',n1 = None):
     dat1cnt = np.shape(dat1['hts'])[0]
     if n1 is None:
-        n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
+        n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
 
 #    print dat1cnt, dat1['hts']
-    fig, ax = plt.subplots(1,1,figsize=(12,8))
-    fig, ax = GF.plot_hid_cdf(np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt,dat1['hidhts'][0],ax=ax,rconf=dat1['rconf'])
+#    fig, ax = plt.subplots(1,1,figsize=(12,8))
+    fig, ax = GF.plot_hid_cdf(np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt,dat1['hidhts'][0],rconf=dat1['rconf'])
     ax.set_title(n1)
 
     ax.set_ylim(0,18)
 
     plt.tight_layout()
-    plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=config['image_dir'],h=typ.upper(),s=n1,t=config['ptype']),dpi=200)
+    plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=config['image_dir'],h=typ.upper(),s=n1,t=config['ptype']),bbox_inches='tight', pad_inches=0.01,dpi=200)
     plt.clf()
     
 def plot_hid_prof_int(dat1,config,typ='hid',n1 = None,n2 = None):
@@ -372,6 +372,9 @@ def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     fig, ax = GF.plot_hid_cdf(np.nansum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt,dat2['hidhts'][0],ax=axf[1],rconf=dat2['rconf'])
     axf[1].set_title(n2)
 
+    #        self.HID_barplot_colorbar(fig)  # call separate HID colorbar function for bar plots
+
+
     axf[0].set_ylim(0,18)
     axf[1].set_ylim(0,18)
 
@@ -620,7 +623,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
-        rdat.cfad_plot(rdat.rho_name,ax = ax,bins=config['rhbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
+        rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         plt.tight_layout()
         plt.savefig('{d}{p}_CFAD_RHO_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
@@ -686,13 +689,14 @@ def make_single_pplots(rdat,flags,config,y=None):
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
-        rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'])
+        rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = [8,8],varlist = eval(config['cappi_vars']),vectors = config['vectors'],contours = config['cappi_contours'])
+#        plt.tight_layout()
         plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
         plt.clf()
         
     if flags['all_xsec']== True:
         #y=-12.5
-        rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=config['vectors'],res = [15,2],xlim=config['xlim'])    
+        rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=config['vectors'],res = [8,2],xlim=config['xlim'],varlist=eval(config['rhi_vars']))    
         plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
         

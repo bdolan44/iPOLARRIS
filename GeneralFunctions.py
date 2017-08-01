@@ -179,9 +179,20 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
     ax.set_ylabel('Height (km MSL)')
 #        try:
     if rconf is not None:
-        if var in rconf.names.keys():
+        if var == 'DRC' or var == 'DRS':
+            varn = rconf.zdr_name
+        elif var == 'DZC' or var == 'DZS':
+            varn = rconf.dz_name
+        elif var == 'KDC' or var == 'KDS':
+            varn = rconf.kdp_name
+        elif var == 'WSvar' or var == 'WCvar':
+            varn = rconf.w_name
+        else:
+            varn = var
+#        print 'ln192',varn
+        if varn in rconf.names.keys():
             
-            ax.set_xlabel('{n} {u}'.format(n=rconf.names[var], u=rconf.units[var]))
+            ax.set_xlabel('{n} {u}'.format(n=rconf.names[varn], u=rconf.units[varn]))
             #print rconf.print_title(tm=tspan)
 #            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
     #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
@@ -195,7 +206,6 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
     return fig, ax
 
 
-#############################################################################################################
 
 #############################################################################################################
 
@@ -376,7 +386,7 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
     else:
         fig = ax.get_figure()   
 
-    fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
+    fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.8, bottom = 0.1)
 
     for i, vl in enumerate(hts):
         #print vl,i
@@ -398,9 +408,22 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
     ax.set_xlabel('Cumulative frequency (%)')
     ax.set_ylabel('Height (km MSL)')
     # now have to do a custom colorbar?
+    GF.HID_barplot_colorbar(rconf,fig)  # call separate HID colorbar function for bar plots
 
     return fig, ax 
 
+#############################################################################################################
+def HID_barplot_colorbar(rconf, figure, location = [0.98, 0.1, 0.03, 0.8]):
+
+    scalarMap = plt.cm.ScalarMappable(norm=rconf.normhid,cmap=rconf.hid_cmap)
+    axcb = figure.add_axes(location) # x pos, y pos, x width, y width
+    cb = mpl.colorbar.ColorbarBase(axcb, cmap=rconf.hid_cmap, norm=rconf.normhid, boundaries=rconf.boundshid,\
+            orientation = 'vertical')
+    cb.set_ticks(np.arange(0,11))
+        # need to add a blank at the beginning of species to align labels correctly
+    labs = np.concatenate((np.array(['']), np.array(rconf.species)))
+    cb.set_ticklabels(labs)
+    return cb
 
 
 #############################################################################################################

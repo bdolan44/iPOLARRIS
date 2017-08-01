@@ -29,7 +29,7 @@ def get_data(config, tm, rfile, dmatch,smatch):
     rdata = RadarData.RadarData(rfile,tm,ddata = dmatch,dz = config['dz_name'],zdr=config['dr_name'],
                                               kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                               u=config['uname'],v=config['vname'],w=config['wname'],x=config['xname'],
-                                              rr=config['rr_name'],band = config['band'],
+                                              rr=config['rr_name'],band = config['band'],vr = config['vr_name'],
                                               y=config['yname'],z=config['zname'],lat=config['lat'], lon=config['lon'],
                                               exper=config['exper'],mphys=config['mphys'],radar_name = config['radarname'],
                                               z_thresh=config['zthresh'],cs_z = config['cs_z'],zconv=config['zconv'],
@@ -174,6 +174,11 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
             plot_driver.make_single_pplots(rdat,flags,config)
 
         
+        if config['comb_vicr'] == True:
+            whvi = np.where(rdat.hid == 6)
+            rdat.hid[whvi] = 3
+        
+        
         bad = np.less(rdat.data[rdat.dz_name].data,config['zthresh'])
         rdat.data[rdat.dz_name].data[bad]=np.nan
     
@@ -225,8 +230,8 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
 #        if config['wname']  == True:
     
         if config['wname'] in rdat.data.variables.keys():
-            print '{c} is good!'.format(c=config['wname'])
-            print np.nanmax(rdat.data[rdat.w_name].data)
+#            print '{c} is good!'.format(c=config['wname'])
+#            print np.nanmax(rdat.data[rdat.w_name].data)
             wcfad, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config['wbins'],
                                 ret_z=1,ret_bin = 1,thresh=-100)
             print np.nanmax(wcfad)
@@ -304,9 +309,10 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
 #            print np.shape(rdat.T)
             tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.z_name].data,thresh=config['wthresh'], temps=config['trange'],\
                 z_ind=0,tcoord = True,temp = rdat.T[:,0,0])
+                
             warea_wrf = m_warea_wrf*rdat.dx*rdat.dy/rdat.ntimes
             if rdat.data[rdat.x_name].units == "[deg]":
-                ware_wrf=warea_wrf*110.*110.
+                warea_wrf=warea_wrf*110.*110.
 
 
             warea.append(warea_wrf)

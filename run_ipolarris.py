@@ -209,7 +209,7 @@ with open(configfile[0]) as f:
             key, val, comment = line.split('==')
             vval = val.replace(" ","")
             numck = hasNumbers(vval)
-            if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys' or key.replace(" ","") == 'extra':
+            if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys' or key.replace(" ","") == 'vr_name' or key.replace(" ","") == 'vdop_name' or key.replace(" ","") =='u_name' or key.replace(" ","") =='v_name':
                 numck = False
             if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
                 vval = vval.strip("''")
@@ -226,7 +226,8 @@ with open(configfile[0]) as f:
                         config[(key.replace(" ", ""))] = vval
             else:
                 config[(key.replace(" ", ""))] = vval
-        
+                        
+
 #print config['dd_on']
 if config['dd_on'] == True:
     dmatch = find_dd_match(config)
@@ -247,18 +248,24 @@ if not sys.argv[2:]:
     if config['plot_int'] == 1:
         #######Make plots of Integrated CFADS 
         if config['plot_cs'] == 1:
-    
+            hold = config['extra']
+            config['extra']='{e}_convective'.format(e=hold)
             plot_driver.plot_cfad_int(dat1,config,typ='dzc')
             plot_driver.plot_cfad_int(dat1,config,typ='drc')
             plot_driver.plot_cfad_int(dat1,config,typ='kdc')
             if dat1['runw'] is True:
                 plot_driver.plot_cfad_int(dat1,config,typ='wc')
+            config['extra']=hold
+
+            hold = config['extra']
+            config['extra']='{e}_stratiform'.format(e=hold)
 
             plot_driver.plot_cfad_int(dat1,config,typ='dzs')
             plot_driver.plot_cfad_int(dat1,config,typ='drs')
             plot_driver.plot_cfad_int(dat1,config,typ='kds')
             if dat1['runw'] is True:
                 plot_driver.plot_cfad_int(dat1,config,typ='ws')
+            config['extra']=hold
 
         plot_driver.plot_cfad_int(dat1,config,typ='dz')
         plot_driver.plot_cfad_int(dat1,config,typ='dr')
@@ -268,6 +275,17 @@ if not sys.argv[2:]:
     
         #######Now HID##############
         plot_driver.plot_hid_int(dat1,config,typ='hid')
+        if config['plot_cs'] == 1:
+            hold = config['extra']
+            config['extra']='{e}_convective'.format(e=hold)
+            plot_driver.plot_hid_int(dat1,config,typ='hidc')
+            config['extra']=hold
+
+            hold = config['extra']
+            config['extra']='{e}_stratiform'.format(e=hold)
+            plot_driver.plot_hid_int(dat1,config,typ='hids')
+            config['extra']=hold
+
         plot_driver.plot_hid_prof_int(dat1,config,typ='hid')
 
         ########Now 2D histograms######
@@ -292,7 +310,7 @@ else:
                 key, val, comment = line.split('==')
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys' or key.replace(" ", "") == 'extra':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys' or key.replace(" ","") == 'vr_name' or key.replace(" ","") == 'vdop_name' or key.replace(" ","") =='u_name' or key.replace(" ","") =='v_name':
                     numck = False
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
@@ -309,6 +327,7 @@ else:
                             config1[(key.replace(" ", ""))] = vval
                 else:
                     config1[(key.replace(" ", ""))] = vval
+            
     #print config['dd_on']
     if config1['dd_on'] == True:
         dmatch1 = find_dd_match(config1)
