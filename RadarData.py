@@ -1423,6 +1423,7 @@ class RadarData(RadarConfig.RadarConfig):
 
             z_ind = self.get_ind(z_ind,self.data[self.z_name].data)
 
+            print xmini,xmaxi,ymini,ymaxi,z_ind
 
             xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
