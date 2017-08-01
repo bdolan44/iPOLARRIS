@@ -1510,6 +1510,10 @@ class RadarData(RadarConfig.RadarConfig):
             try:
                 dum = (self.data[var].sel(z=slice(v,v2)).data)
             except:
+                v = self.get_ind(vl,self.data[self.z_name].data)
+                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data)
+                print 'ln 1458', v, v2,np.shape(self.data[var].data)
+
                 dum = (self.data[var].sel(z=slice(v,v2+1)).data)
             #print np.max(dum)
 #            dum2 = np.ma.masked_less(dum,-900.0)
