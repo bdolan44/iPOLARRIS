@@ -1506,7 +1506,7 @@ class RadarData(RadarConfig.RadarConfig):
             #print ts,te,'ts,te'
             v = self.data[self.z_name].data[vl]
             v2 = self.data[self.z_name].data[vl+multiple]
-#            print 'ln 1458', v, v2
+            print 'ln 1458', v, v2,np.shape(self.data[var].data)
             try:
                 dum = (self.data[var].sel(z=slice(v,v2)).data)
             except:
