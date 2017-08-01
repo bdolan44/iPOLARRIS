@@ -1421,6 +1421,9 @@ class RadarData(RadarConfig.RadarConfig):
             ymaxi = self.get_ind(ymaxi,self.data[self.y_name].data)
             ymini = self.get_ind(ymaxi,self.data[self.y_name].data)
 
+            z_ind = self.get_ind(z_ind,self.data[self.z_name].data)
+
+
             xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
