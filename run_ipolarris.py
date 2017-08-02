@@ -213,6 +213,8 @@ with open(configfile[0]) as f:
                 numck = False
             if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
                 vval = vval.strip("''")
+                numck = False
+
             #print numck
             #print vval,key
             if key.replace(" ", "") == 'image_dir':
@@ -241,6 +243,7 @@ else:
     smatch = None
 
 #print 'smatch',smatch
+print config['radar_files']
 
 dat1 = run_exper(config, dmatch = dmatch, smatch=smatch,interactive = False)
 
@@ -288,15 +291,17 @@ if not sys.argv[2:]:
 
         plot_driver.plot_hid_prof_int(dat1,config,typ='hid')
 
-        ########Now 2D histograms######
-        plot_driver.plot_joint_int(dat1,config,typ='zzdr')
-        plot_driver.plot_joint_int(dat1,config,typ='zkdp')
-        if dat1['runw'] is True:
-            plot_driver.plot_joint_int(dat1,config,typ='zw')
-            ########Updraft Width##########
-            plot_driver.plot_upwidth_int(dat1,config)
-            if dat1['runrr'] is True:
-                plot_driver.plot_joint_int(dat1,config,typ='wr')
+        if config['joint_flag'] == True:
+
+            ########Now 2D histograms######
+            plot_driver.plot_joint_int(dat1,config,typ='zzdr')
+            plot_driver.plot_joint_int(dat1,config,typ='zkdp')
+            if dat1['runw'] is True:
+                plot_driver.plot_joint_int(dat1,config,typ='zw')
+                ########Updraft Width##########
+                plot_driver.plot_upwidth_int(dat1,config)
+                if dat1['runrr'] is True:
+                    plot_driver.plot_joint_int(dat1,config,typ='wr')
 
 else:
     configfile1 = sys.argv[2:]
@@ -314,6 +319,8 @@ else:
                     numck = False
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
+                    numck = False
+
                 #print numck
                 #print vval,key
                 if key.replace(" ", "") == 'image_dir':
@@ -353,51 +360,54 @@ else:
     plot_driver.plot_cfad_compare(dat1,dat2,config,typ='kd')
     plot_driver.plot_cfad_compare(dat1,dat2,config,typ='w')
 
-    
-    ########Make plots of CFAD trios (dat1 , dat2 , difference)##############
-    hold = config['extra']
-    config['extra']='{e}_convective'.format(e=hold)
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='dzc')
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='drc')
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='kdc')
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='wc')
-    config['extra']=hold
+    if config['plot_cs'] == True:
+        ########Make plots of CFAD trios (dat1 , dat2 , difference)##############
+        hold = config['extra']
+        config['extra']='{e}_convective'.format(e=hold)
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='dzc')
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='drc')
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='kdc')
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='wc')
+        config['extra']=hold
 
-    ########Make plots of CFAD trios (dat1 , dat2 , difference)##############
-    hold = config['extra']
-    config['extra']='{e}_stratiform'.format(e=hold)
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='dzs')
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='drs')
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='kds')
-    plot_driver.plot_cfad_compare(dat1,dat2,config,typ='ws')
-    config['extra']=hold
+        ########Make plots of CFAD trios (dat1 , dat2 , difference)##############
+        hold = config['extra']
+        config['extra']='{e}_stratiform'.format(e=hold)
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='dzs')
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='drs')
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='kds')
+        plot_driver.plot_cfad_compare(dat1,dat2,config,typ='ws')
+        config['extra']=hold
 
 
     #########Now HID##############
     plot_driver.plot_hid_2panel(dat1,dat2,config,typ='hid')
     plot_driver.plot_hid_profile(dat1,dat2,config,typ='hid')
+    
+    if config['plot_cs'] == True:
+        hold = config['extra']
+        config['extra']='{e}_convective'.format(e=hold)
+        plot_driver.plot_hid_2panel(dat1,dat2,config,typ='hidc')
+        plot_driver.plot_hid_profile(dat1,dat2,config,typ='hidc')
+        config['extra']=hold
 
-    hold = config['extra']
-    config['extra']='{e}_convective'.format(e=hold)
-    plot_driver.plot_hid_2panel(dat1,dat2,config,typ='hidc')
-    plot_driver.plot_hid_profile(dat1,dat2,config,typ='hidc')
-    config['extra']=hold
+        hold = config['extra']
+        config['extra']='{e}_stratiform'.format(e=hold)
+        plot_driver.plot_hid_2panel(dat1,dat2,config,typ='hids')
+        plot_driver.plot_hid_profile(dat1,dat2,config,typ='hids')
+        config['extra']=hold
 
-    hold = config['extra']
-    config['extra']='{e}_stratiform'.format(e=hold)
-    plot_driver.plot_hid_2panel(dat1,dat2,config,typ='hids')
-    plot_driver.plot_hid_profile(dat1,dat2,config,typ='hids')
-    config['extra']=hold
-
-    # 
-    ########Now 2D histograms######
-    plot_driver.plot_joint_comp(dat1,dat2,config,typ='zzdr')
-    plot_driver.plot_joint_comp(dat1,dat2,config,typ='zkdp')
-    plot_driver.plot_joint_comp(dat1,dat2,config,typ='zw')
-#    plot_driver.plot_joint_comp(dat1,dat2,config,typ='wr')
+    if config['joint_flag'] == True:
+        # 
+        ########Now 2D histograms######
+        plot_driver.plot_joint_comp(dat1,dat2,config,typ='zzdr')
+        plot_driver.plot_joint_comp(dat1,dat2,config,typ='zkdp')
+        plot_driver.plot_joint_comp(dat1,dat2,config,typ='zw')
+    #    plot_driver.plot_joint_comp(dat1,dat2,config,typ='wr')
 
     ########Updraft Width##########
-    plot_driver.plot_upwidth(dat1,dat2,config)
+    if config['upwidth_flag'] == True:
+        plot_driver.plot_upwidth(dat1,dat2,config)
 
 
     pickle.dump(dat1, open( "{e}_{x}.p".format(e=config['exper'],x=config['extra']), "wb" ) )
