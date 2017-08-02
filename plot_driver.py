@@ -689,7 +689,7 @@ def make_single_pplots(rdat,flags,config,y=None):
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
-        rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = [8,8],varlist = eval(config['cappi_vars']),vectors = config['vectors'],contours = config['cappi_contours'])
+        rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = [8,8],varlist = eval(config['cappi_vars']),vectors = config['vectors'],contours = eval(config['cappi_contours']))
 #        plt.tight_layout()
         plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
         plt.clf()
