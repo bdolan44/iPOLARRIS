@@ -1524,14 +1524,14 @@ class RadarData(RadarConfig.RadarConfig):
             #print ts,te,'ts,te'
             v = self.data[self.z_name].data[vl]
             v2 = self.data[self.z_name].data[vl+multiple]
-            print v, v2, 'line1527'
+#            print v, v2, 'line1527'
             try:
                 dum = (self.data[var].sel(z=slice(v,v2)).data)
             except:
-                v = self.get_ind(vl,self.data[self.z_name].data[looped])
-                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data[looped])
-                print v,v2
-                dum = (self.data[var].sel(z=slice(v,v2)).data)
+                v = self.get_ind(vl,self.data[self.z_name].data)
+                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data])
+#                print v,v2
+                dum = (self.data[var].sel(z=slice(vl,vl+multiple)).data)
             #print np.max(dum)
 #            dum2 = np.ma.masked_less(dum,-900.0)
             dum2 = np.where(np.isfinite(dum))
