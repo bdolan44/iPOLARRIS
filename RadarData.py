@@ -1406,7 +1406,7 @@ class RadarData(RadarConfig.RadarConfig):
             fig, ax = plt.subplots(1,1)
         else:
             fig = ax.get_figure()
-        print xmini,xmaxi,ymini,ymaxi
+#        print xmini,xmaxi,ymini,ymaxi
 
 
         try:
@@ -1517,9 +1517,6 @@ class RadarData(RadarConfig.RadarConfig):
             mask = np.where(self.raintype > 100)
 
         # if left blank, check the whole thing
-        print looped
-
-        print self.data[self.z_name].data[looped]
         for ivl, vl in enumerate(looped[:-1]):
             #print ivl, vl
 #             try:

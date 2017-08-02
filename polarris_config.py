@@ -78,6 +78,7 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
 
     dum =[]
     with open(eval(config['radar_files'])) as f: 
+        print config['radar_files']
         for line in f:
             dat = (line)
             dum.append(foo(dat))
