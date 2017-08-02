@@ -129,14 +129,14 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
         cfad, reshts, vbins =GF.cfad(data, hts, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,tspan=tspan,
                 z_ind = 0,ret_z = 1,ret_bin=1,mask= mask)
     elif cfad is not None:
-        if bins == None:
+        if bins is not None:
+            vbins = bins[:-1]
+        else:
             try:
                 vbins = np.arange(np.nanmin(data),np.nanmax(data),nbins)
             except:
                 vbins = np.arange(0,10,nbins)
                 bins = np.arange(0,10,nbins)
-        else:
-            vbins = bins[:-1]
         reshts = hts
     else:
         print 'please specify data or cfad'
