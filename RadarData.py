@@ -1076,7 +1076,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         if contour is not None:
             if contour == 'CS':
-                print 'contours!'
+#                print 'contours!'
                 csvals = deepcopy((self.data[var]))
                 mask = np.where(self.raintype == 2)
                 strat = np.where(self.raintype == 1)
@@ -1429,7 +1429,7 @@ class RadarData(RadarConfig.RadarConfig):
             ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
+#            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
         if thresh_dz == True:
             dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
             #print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
@@ -1528,8 +1528,8 @@ class RadarData(RadarConfig.RadarConfig):
             try:
                 dum = (self.data[var].sel(z=slice(v,v2)).data)
             except:
-                v = self.get_ind(vl,self.data[self.z_name].data)
-                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data])
+#                v = self.get_ind(vl,self.data[self.z_name].data)
+#                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data])
 #                print v,v2
                 dum = (self.data[var].sel(z=slice(vl,vl+multiple)).data)
             #print np.max(dum)
