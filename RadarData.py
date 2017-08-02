@@ -1409,27 +1409,27 @@ class RadarData(RadarConfig.RadarConfig):
         print xmini,xmaxi,ymini,ymaxi
 
 
-        try:
-            xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-        except:
-        
-            xmaxi = self.get_ind(xmaxi,self.data[self.x_name].data)
-            xmini = self.get_ind(xmaxi,self.data[self.x_name].data)
-            ymaxi = self.get_ind(ymaxi,self.data[self.y_name].data)
-            ymini = self.get_ind(ymaxi,self.data[self.y_name].data)
-
-            z_ind = self.get_ind(z_ind,self.data[self.z_name].data)
-
-            print xmini,xmaxi,ymini,ymaxi,z_ind
-
-            xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
+#         try:
+        xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+        ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+        udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+        vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+#         except:
+#         
+#             xmaxi = self.get_ind(xmaxi,self.data[self.x_name].data)
+#             xmini = self.get_ind(xmaxi,self.data[self.x_name].data)
+#             ymaxi = self.get_ind(ymaxi,self.data[self.y_name].data)
+#             ymini = self.get_ind(ymaxi,self.data[self.y_name].data)
+# 
+#             z_ind = self.get_ind(z_ind,self.data[self.z_name].data)
+# 
+# #            print xmini,xmaxi,ymini,ymaxi,z_ind
+# 
+#             xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+#             ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+#             udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+#             vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+#             print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
         if thresh_dz == True:
             dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
             #print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
