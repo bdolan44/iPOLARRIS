@@ -77,7 +77,7 @@ def get_time(tp,te,filename,dformat):
 def run_exper(config, dmatch = None, smatch=None,interactive=False):
 
     dum =[]
-    with open(config['radar_files']) as f: 
+    with open(eval(config['radar_files'])) as f: 
         for line in f:
             dat = (line)
             dum.append(foo(dat))

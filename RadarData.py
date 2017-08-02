@@ -1414,7 +1414,7 @@ class RadarData(RadarConfig.RadarConfig):
             ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
             vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-         except:
+        except:
 #         
 #             xmaxi = self.get_ind(xmaxi,self.data[self.x_name].data)
 #             xmini = self.get_ind(xmaxi,self.data[self.x_name].data)
@@ -1517,6 +1517,9 @@ class RadarData(RadarConfig.RadarConfig):
             mask = np.where(self.raintype > 100)
 
         # if left blank, check the whole thing
+        print looped
+
+        print self.data[self.z_name].data[looped]
         for ivl, vl in enumerate(looped[:-1]):
             #print ivl, vl
 #             try:
@@ -1527,8 +1530,8 @@ class RadarData(RadarConfig.RadarConfig):
             try:
                 dum = (self.data[var].sel(z=slice(v,v2)).data)
             except:
-                v = self.get_ind(vl,self.data[self.z_name].data)
-                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data)
+                v = self.get_ind(vl,self.data[self.z_name].data[looped])
+                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data[looped])
 
                 dum = (self.data[var].sel(z=slice(v,v2+1)).data)
             #print np.max(dum)
