@@ -794,123 +794,128 @@ class RadarData(RadarConfig.RadarConfig):
         # first, get the appropriate y index from the y that's wanted
         ts=self.date
         tsi = 0
-        if y is None:
-            y_ind = int(len(self.data[self.y_name].data)/2.0)
-        else:
-            if self.y_name == 'latitude':
-                y_ind = self.get_ind(y,self.data[self.y_name].data)
-            else:
-                y_ind = y
 
-        if xlim is None:
-            xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
-        else:
-            if self.x_name == 'longitude':
-                xmini = self.get_ind(xlim[0],self.data[self.x_name].data[0,:])
-                xmaxi = self.get_ind(xlim[1],self.data[self.x_name].data[0,:])
-                xmin = xlim[0]
-                xmax = xlim[1]
-            else:
-                xmini, xmaxi = xlim
-                xmin , xmax = xlim
-                
-        if zlim is None:
-            zmin, zmax = self.data[self.z_name].data.min(), self.data[self.z_name].data.max()
-            zmini = self.get_ind(zmin,self.data[self.z_name].data)
-            zmaxi = self.get_ind(zmax,self.data[self.z_name].data)
-        else:
-            zmin, zmax = zlim
-                    # If ax is not given, open a fig and ax object. This is not advisable
         if ax is None:
             fig, ax = plt.subplots()
         else:
-        # ax has been passed in, do nothing to ax, but need to get the parent fig
+            # ax has been passed in, do nothing to ax, but need to get the parent fig
             fig = ax.get_figure()
 
-        # now actually doing the plotting
+        if var in self.data.variables.keys():
+            if y is None:
+                y_ind = int(len(self.data[self.y_name].data)/2.0)
+            else:
+                if self.y_name == 'latitude':
+                    y_ind = self.get_ind(y,self.data[self.y_name].data)
+                else:
+                    y_ind = y
 
-        #print self.data[self.x_name].shape, self.data[self.z_name].shape, self.data[var][:,y_ind,:].shape
-        #print self.data[self.z_name]
-    
-        #print xmini,xmaxi,zmini,zmaxi
-        # if this variable is already included in the defaults, then this is straightforward
-       #print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
-#        print zmini,zmaxi,y_ind,xmini,xmaxi
-        if self.y_name == 'latitude':
-            data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),y=slice(y_ind,y_ind+1),x=slice(xmini,xmaxi)).data)
-        else:
-            data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),y=slice(y_ind,y_ind),x=slice(xmini,xmaxi)).data)
+            if xlim is None:
+                xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
+            else:
+                if self.x_name == 'longitude':
+                    xmini = self.get_ind(xlim[0],self.data[self.x_name].data[0,:])
+                    xmaxi = self.get_ind(xlim[1],self.data[self.x_name].data[0,:])
+                    xmin = xlim[0]
+                    xmax = xlim[1]
+                else:
+                    xmini, xmaxi = xlim
+                    xmin , xmax = xlim
 
-#         if np.shape(data) > 2:
-#             data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi)).data)
-            
+            if zlim is None:
+                zmin, zmax = self.data[self.z_name].data.min(), self.data[self.z_name].data.max()
+                zmini = self.get_ind(zmin,self.data[self.z_name].data)
+                zmaxi = self.get_ind(zmax,self.data[self.z_name].data)
+            else:
+                zmin, zmax = zlim
+                        # If ax is not given, open a fig and ax object. This is not advisable
 
-        try:
-            xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
-        except:
-            xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)))
-#        print zmini,zmaxi
-        
-        zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
-        
-        data = np.ma.masked_less(data,-900.0)
-        data = np.ma.masked_where(~np.isfinite(data),data)
-#        print np.shape(data)
-        #print np.shape(data),np.shape(xdat),np.shape(zdat)
-        #print np.shape(xdat),np.shape(zdat)
-#        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
-        if var in self.lims.keys():
-            range_lim = self.lims[var][1] - self.lims[var][0]
+            # now actually doing the plotting
 
-            dummy = ax.pcolormesh(xdat,zdat, data,
-                vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
-        else:
-            dat = self.data[var].data
-            data[data<-900.0]=np.nan
-            range_lim  = np.nanmax(dat) - np.nanmin(dat)
-            dummy = ax.pcolormesh(xdat,zdat, data,
-                vmin = np.nanmin(dat), vmax = np.nanmax(dat), **kwargs)
-        if range_lim < 1:
-            cb_format = '%.2f'
-        if range_lim >= 1:
-            cb_format = '%.1f'
-        if range_lim >= 10:
-            cb_format = '%d'
+            #print self.data[self.x_name].shape, self.data[self.z_name].shape, self.data[var][:,y_ind,:].shape
+            #print self.data[self.z_name]
+
+            #print xmini,xmaxi,zmini,zmaxi
+            # if this variable is already included in the defaults, then this is straightforward
+           #print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
+    #        print zmini,zmaxi,y_ind,xmini,xmaxi
+            if self.y_name == 'latitude':
+                data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),y=slice(y_ind,y_ind+1),x=slice(xmini,xmaxi)).data)
+            else:
+                data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),y=slice(y_ind,y_ind),x=slice(xmini,xmaxi)).data)
+
+    #         if np.shape(data) > 2:
+    #             data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi)).data)
 
 
-
-        cb = fig.colorbar(dummy, ax=ax, fraction=0.03, format=cb_format, pad=cbpad)
-        if var in self.lims.keys():
-            cb.set_label(' '.join([self.names[var], self.units[var]]).strip())
-            if var != 'w' and var != self.vr_name:
-                cb.set_ticks(np.arange(self.lims[var][0], self.lims[var][1]+self.delta[var], self.delta[var]))
-                cb.set_ticklabels(self.ticklabels[var])
-        else:
-            cb.set_label(var)
-
-
-        
-        ###### this sets the limits #######
-#        print zmin, zmax
-        if self.x_name == 'longitude':
-            ax.axis([xmin, xmax, zmin, zmax])
-#            ax.set_xlabel('Longitude')
-        else:
-            ax.axis([xmin, xmax, zmin, zmax])
-            ax.set_xlabel('Distance E of radar (km)')
-        ax.set_ylabel('Altitude (km MSL)')
-
-
-        if vectors:
             try:
-                #print zlim
-                self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
-            except Exception, e:
-                print 'Error trying to plot xsec vectors: {}'.format(e)
+                xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
+            except:
+                xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)))
+    #        print zmini,zmaxi
 
-        if title_flag:
-            ax.set_title('%s %s Cross Section' %(ts, self.radar_name), fontsize = 14)
+            zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
 
+            data = np.ma.masked_less(data,-900.0)
+            data = np.ma.masked_where(~np.isfinite(data),data)
+    #        print np.shape(data)
+            #print np.shape(data),np.shape(xdat),np.shape(zdat)
+            #print np.shape(xdat),np.shape(zdat)
+    #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
+            if var in self.lims.keys():
+                range_lim = self.lims[var][1] - self.lims[var][0]
+
+                dummy = ax.pcolormesh(xdat,zdat, data,
+                    vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
+            else:
+                dat = self.data[var].data
+                data[data<-900.0]=np.nan
+                range_lim  = np.nanmax(dat) - np.nanmin(dat)
+                dummy = ax.pcolormesh(xdat,zdat, data,
+                    vmin = np.nanmin(dat), vmax = np.nanmax(dat), **kwargs)
+            if range_lim < 1:
+                cb_format = '%.2f'
+            if range_lim >= 1:
+                cb_format = '%.1f'
+            if range_lim >= 10:
+                cb_format = '%d'
+
+
+
+            cb = fig.colorbar(dummy, ax=ax, fraction=0.03, format=cb_format, pad=cbpad)
+            if var in self.lims.keys():
+                cb.set_label(' '.join([self.names[var], self.units[var]]).strip())
+                if var != 'w' and var != self.vr_name:
+                    cb.set_ticks(np.arange(self.lims[var][0], self.lims[var][1]+self.delta[var], self.delta[var]))
+                    cb.set_ticklabels(self.ticklabels[var])
+            else:
+                cb.set_label(var)
+
+
+
+            ###### this sets the limits #######
+    #        print zmin, zmax
+            if self.x_name == 'longitude':
+                ax.axis([xmin, xmax, zmin, zmax])
+    #            ax.set_xlabel('Longitude')
+            else:
+                ax.axis([xmin, xmax, zmin, zmax])
+                ax.set_xlabel('Distance E of radar (km)')
+            ax.set_ylabel('Altitude (km MSL)')
+
+
+            if vectors:
+                try:
+                    #print zlim
+                    self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
+                except Exception, e:
+                    print 'Error trying to plot xsec vectors: {}'.format(e)
+
+            if title_flag:
+                ax.set_title('%s %s Cross Section' %(ts, self.radar_name), fontsize = 14)
+        else:
+            print 'No data for this variable!'
+            dummy = fig
         return dummy
 
 #############################################################################################################
@@ -1083,9 +1088,16 @@ class RadarData(RadarConfig.RadarConfig):
                 csvals.data[:] = 0
                 csvals.data[mask]=2
                 csvals.data[strat] = 1
-                cs = np.squeeze(csvals.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi),z=slice(z_ind,z_ind+1)).data)
-                ax.contour(xdat,ydat,cs,levels = [1,2],colors=['red','blue'],linewidths = [2],alpha = 0.8)
-                
+#                print z_ind, z_ind+1
+                #Note: CS is the same at every level so we don't need to slice along z at the exact vert height....
+                try:
+                    cs = np.squeeze(csvals.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi),z=slice(z_ind,z_ind+1)).data)
+                    ax.contour(xdat, ydat, cs, levels=[1, 2], colors=['red', 'blue'], linewidths=[2], alpha=0.8)
+                except:
+                    cs = np.squeeze(csvals.sel(x=slice(xmini, xmaxi), y=slice(ymini, ymaxi), z=slice(z_ind,z_ind)).data)
+                    ax.contour(xdat,ydat,cs,levels = [1,2],colors=['red','blue'],linewidths = [2],alpha = 0.8)
+
+
 
         if range_lim < 1:
             cb_format = '%.2f'
@@ -1303,47 +1315,51 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
 #        print 'ln 1274', xmini,xmaxi,y_ind,zmini,zmaxi,skip,xlim,y
-        
-        
-        try:
-            if self.y_name == 'latitude':
-                udat= np.squeeze(np.squeeze(self.data[self.u_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1),z=slice(zmini,zmaxi)).data)
-                wdat= np.squeeze(np.squeeze(self.data[self.w_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1),z=slice(zmini,zmaxi)).data)
+        if self.u_name in self.data.variables.keys():
 
-                xdat= np.squeeze(np.squeeze(self.data[self.x_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)).data)
-                zdat= np.squeeze(np.squeeze(self.data[self.z_name]).sel(z=slice(zmini,zmaxi)).data)
+            try:
+                if self.y_name == 'latitude':
+                    udat= np.squeeze(np.squeeze(self.data[self.u_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1),z=slice(zmini,zmaxi)).data)
+                    wdat= np.squeeze(np.squeeze(self.data[self.w_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1),z=slice(zmini,zmaxi)).data)
 
-            else:
-#                print np.shape(xdat), np.shape(zdat)
-                xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
+                    xdat= np.squeeze(np.squeeze(self.data[self.x_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)).data)
+                    zdat= np.squeeze(np.squeeze(self.data[self.z_name]).sel(z=slice(zmini,zmaxi)).data)
+
+                else:
+    #                print np.shape(xdat), np.shape(zdat)
+                    xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
+                    zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).data)
+                    udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
+                    wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
+
+            except:
+#                print 'uh-oh, exception'
+                xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).data)
                 zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).data)
+    #            print np.shape(xdat),np.shape(zdat),np.shape(self.data[self.u_name].data)
                 udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
                 wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
 
-        except:
-            print 'uh-oh, exception'
-            xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).data)
-            zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).data)
-#            print np.shape(xdat),np.shape(zdat),np.shape(self.data[self.u_name].data)
-            udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
-            wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y_ind,y_ind)).data)
-        
-     #   print 'vect shp',np.shape(udat),np.shape(wdat),np.shape(xdat),np.shape(zdat)
-#        print xskip
-#        print np.shape(xdat),np.shape(zdat),np.shape(udat),np.shape(wdat)
-#        print ht_offset, xskip
-        if self.y_name == 'latitude':
-            q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
-                udat[::zskip, ::xskip], wdat[::zskip, ::xskip], \
-                    scale=60, scale_units='inches', pivot='middle', width=0.0025, headwidth=6, **kwargs)
+         #   print 'vect shp',np.shape(udat),np.shape(wdat),np.shape(xdat),np.shape(zdat)
+    #        print xskip
+    #        print np.shape(xdat),np.shape(zdat),np.shape(udat),np.shape(wdat)
+    #        print ht_offset, xskip
+ #           print np.shape(xdat),np.shape(udat)
+            if self.y_name == 'latitude':
+                q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
+                    udat[::zskip, ::xskip], wdat[::zskip, ::xskip], \
+                        scale=60, scale_units='inches', pivot='middle', width=0.0025, headwidth=6, **kwargs)
+            else:
+                q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
+                    udat[::zskip, ::xskip], wdat[::zskip, ::xskip], \
+                        scale=30, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
+
+            qk = ax.quiverkey(q_handle, 0.85, 0.85, 20, r'20 $\frac{m}{s}$',coordinates='axes', \
+                        fontproperties={'weight':'bold','size':14})
         else:
-            q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
-                udat[::zskip, ::xskip], wdat[::zskip, ::xskip], \
-                    scale=30, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
-
-        qk = ax.quiverkey(q_handle, 0.85, 0.85, 20, r'20 $\frac{m}{s}$',coordinates='axes', \
-                    fontproperties={'weight':'bold','size':14})        
-
+            print 'No vectors. No {t}'.format(t=self.u_name)
+            q_handle = fig
+            return q_handle
         return q_handle
 
 #############################################################################################################
@@ -1408,56 +1424,68 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 #        print xmini,xmaxi,ymini,ymaxi
 
+        if self.u_name in self.data.variables.keys():
+            try:
+                xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).data))
+                ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi+1)).data))
+                udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+                vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+            except:
+    #
+    #             xmaxi = self.get_ind(xmaxi,self.data[self.x_name].data)
+    #             xmini = self.get_ind(xmaxi,self.data[self.x_name].data)
+    #             ymaxi = self.get_ind(ymaxi,self.data[self.y_name].data)
+    #             ymini = self.get_ind(ymaxi,self.data[self.y_name].data)
+    #
+                z_ind = self.get_ind(z_ind,self.data[self.z_name].data)
+    #
+    # #            print xmini,xmaxi,ymini,ymaxi,z_ind
+    #
+                xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+                ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+                udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+                vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
+    #            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
+            if thresh_dz == True:
+                dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
+                #print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
+                msk = np.less(dzdat,self.z_thresh)
+                vdat= np.ma.masked_where(msk,vdat)
+                udat= np.ma.masked_where(msk,udat)
+                xdat= np.ma.masked_where(msk,xdat)
+                ydat= np.ma.masked_where(msk,ydat)
+                #print type(vdat)
+            #print np.max(vdat)
+            #print 'vect shp',np.shape(udat),np.shape(vdat),np.shape(xdat),np.min(ydat),np.max(ydat)
+#            print type(xdat),type(ydat),type(udat)
+            if xdat.ndim > 1:
+                try:
+                    xdatskip = xdat[::yskip,::xskip]
+                    ydatskip = ydat[::yskip,::xskip]
+                    udatskip = udat[::yskip,::xskip]
+                    vdatskip = vdat[::yskip,::xskip]
+                except:
 
-        try:
-            xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-        except:
-#         
-#             xmaxi = self.get_ind(xmaxi,self.data[self.x_name].data)
-#             xmini = self.get_ind(xmaxi,self.data[self.x_name].data)
-#             ymaxi = self.get_ind(ymaxi,self.data[self.y_name].data)
-#             ymini = self.get_ind(ymaxi,self.data[self.y_name].data)
-# 
-            z_ind = self.get_ind(z_ind,self.data[self.z_name].data)
-# 
-# #            print xmini,xmaxi,ymini,ymaxi,z_ind
-# 
-            xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-            vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
-#            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
-        if thresh_dz == True:
-            dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
-            #print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
-            msk = np.less(dzdat,self.z_thresh)
-            vdat= np.ma.masked_where(msk,vdat)
-            udat= np.ma.masked_where(msk,udat)
-            xdat= np.ma.masked_where(msk,xdat)
-            ydat= np.ma.masked_where(msk,ydat)
-            #print type(vdat)
-        #print np.max(vdat)
-        #print 'vect shp',np.shape(udat),np.shape(vdat),np.shape(xdat),np.min(ydat),np.max(ydat)
-#        print np.shape(xdat),np.shape(ydat),np.shape(udat)
-        try:
+                    xdatskip = xdat[::yskip][::xskip]
+                    ydatskip = ydat[::yskip][::xskip]
+                    udatskip = udat[::yskip][::xskip]
+                    vdatskip = vdat[::yskip][::xskip]
 
-            q_handle = ax.quiver(xdat[::yskip,::xskip], ydat[::yskip,::xskip], \
-                udat[::yskip,::xskip], vdat[::yskip,::xskip], \
+            else:
+                xdatskip = xdat[::xskip]
+                ydatskip = ydat[::yskip]
+                udatskip = udat[::yskip, ::xskip]
+                vdatskip = vdat[::yskip, ::xskip]
+
+
+            q_handle = ax.quiver(xdatskip, ydatskip, \
+                udatskip, vdatskip, \
                     scale=100, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
 
-        except:
-            q_handle = ax.quiver(xdat[::yskip][::xskip], ydat[::yskip][::xskip], \
-                udat[::yskip][::xskip], vdat[::yskip][::xskip], \
-                    scale=100, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
-#        q_handle = ax.quiver(self.data[self.x_name][::skip], self.data[self.y_name][::skip]+ht_offset, \
-#            self.data[self.u_name][z_ind,:,:][::skip, ::skip], self.data[self.v_name][z_ind,:,:][::skip, ::skip], \
-#                scale=100, scale_units='inches', pivot='middle', width=0.002, headwidth=4, **kwargs)
-        qk = ax.quiverkey(q_handle, 0.08, 0.05, 20, r'20 $\frac{m}{s}$',coordinates='axes', \
-                    fontproperties={'weight':'bold','size':14})        
-
+            qk = ax.quiverkey(q_handle, 0.08, 0.05, 20, r'20 $\frac{m}{s}$',coordinates='axes', \
+                        fontproperties={'weight':'bold','size':14})
+        else:
+            return
         return q_handle
 
 #############################################################################################################
@@ -1758,12 +1786,12 @@ class RadarData(RadarConfig.RadarConfig):
             mask= np.where(self.raintype != 2)
             holddat = deepcopy(self.data[self.hid_name].data)
             self.data[self.hid_name].data[mask] = -1
-            print 'in conv'
+#            print 'in conv'
         elif cscfad == 'stratiform':
             mask= np.where(self.raintype != 1)
             holddat = deepcopy(self.data[self.hid_name].data)
             self.data[self.hid_name].data[mask] = -1
-            print 'in strat'
+#            print 'in strat'
         else:
             mask = np.where(self.raintype < 100)
         
