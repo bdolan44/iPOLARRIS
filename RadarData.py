@@ -81,6 +81,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.zconv =zconv
         self.t_name = temp
         self.z_thresh=z_thresh
+        self.badval = -999.0
         self.zind = 1
         self.yind = 2
         self.xind = 3
@@ -273,6 +274,11 @@ class RadarData(RadarConfig.RadarConfig):
                     whbad2 = np.where(np.isnan(self.data[self.dz_name].data))
                     self.data[k].data[whbad2]= np.nan
 #                    self.data[k].data = np.ma.masked_where(self.data[self.dz_name].data < self.z_thresh,self.data[k].data)
+
+                    whbad3 = np.where(np.less_equal(self.data[k].data, self.badval))
+                    self.data[k].data[whbad3] = np.nan
+                    whbad4 = np.where(np.isnan(self.data[k].data))
+                    self.data[k].data[whbad4] = np.nan
                 except:
                     pass
 #                    print np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data), 'wrong shapes!'
@@ -1161,7 +1167,7 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
     def cappi_multiplot(self, z=1.0, xlim=None, ylim=None, ts=None,res = 2, varlist=None, vectors=False,
-        contours = None, **kwargs):
+        contours = None,thresh_dz = False, **kwargs):
         "6 panel CAPPI plot showing all the polarimetric variables and HID"
         
         # first, get the appropriate z index from the z that's wanted in altitude
@@ -1225,7 +1231,7 @@ class RadarData(RadarConfig.RadarConfig):
                 vcont = contours[i]
             else:
                 vcont = None
-            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vectors,res=res,contour=vcont)
+            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vectors,res=res,contour=vcont,thresh_dz =thresh_dz)
         # now do the HID plot, call previously defined functions
         # try:
         #     dummy_hid = self.HID_plot(self.HID_from_scores(self.scores, rank = 1)[z_ind,:,:], 
@@ -1447,13 +1453,17 @@ class RadarData(RadarConfig.RadarConfig):
                 vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
     #            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
             if thresh_dz == True:
-                dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
-                #print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
+                dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
+                print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
                 msk = np.less(dzdat,self.z_thresh)
-                vdat= np.ma.masked_where(msk,vdat)
-                udat= np.ma.masked_where(msk,udat)
-                xdat= np.ma.masked_where(msk,xdat)
-                ydat= np.ma.masked_where(msk,ydat)
+                msk2 =np.where(np.logical_or(udat< -1000.,vdat < -1000.))
+
+                vdat[msk] = np.nan
+                udat[msk] = np.nan
+#                xdat= np.ma.masked_where(msk,xdat)
+                vdat[msk2] = np.nan
+                udat[msk2] = np.nan
+#                ydat= np.ma.masked_where(msk,ydat)
                 #print type(vdat)
             #print np.max(vdat)
             #print 'vect shp',np.shape(udat),np.shape(vdat),np.shape(xdat),np.min(ydat),np.max(ydat)
@@ -1476,7 +1486,7 @@ class RadarData(RadarConfig.RadarConfig):
                 ydatskip = ydat[::yskip]
                 udatskip = udat[::yskip, ::xskip]
                 vdatskip = vdat[::yskip, ::xskip]
-
+#            print np.shape(xdatskip),np.shape(ydatskip),np.shape(udatskip),np.shape(vdatskip)
 
             q_handle = ax.quiver(xdatskip, ydatskip, \
                 udatskip, vdatskip, \
