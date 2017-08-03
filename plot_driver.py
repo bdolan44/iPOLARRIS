@@ -22,7 +22,7 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
     if n1 is None:
         n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
 
-    dat1cnt = np.shape(dat1['hts'])[0]
+    dat1cnt = np.shape(dat1['{t}cfad'.format(t=typ)])[0]
 
     cfad1_all = np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt
 #    print dat1['hts'][0]

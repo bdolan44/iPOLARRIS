@@ -240,7 +240,7 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
 #            print np.nanmax(rdat.data[rdat.w_name].data)
             wcfad, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config['wbins'],
                                 ret_z=1,ret_bin = 1,thresh=-100)
-            print np.nanmax(wcfad)
+#            print np.nanmax(wcfad)
             wcfad_a.append(wcfad)
 
             wcfadc, hts, wbins = GF.cfad(data = rdat.data[rdat.w_name].data,mask = whconv,hts = rdat.data[rdat.z_name][:].data,value_bins = config['wbins'],
