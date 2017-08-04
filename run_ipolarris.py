@@ -406,7 +406,7 @@ else:
     #    plot_driver.plot_joint_comp(dat1,dat2,config,typ='wr')
 
     ########Updraft Width##########
-    if config['upwidth'] == True:
+    if config['up_width'] == True:
         plot_driver.plot_upwidth(dat1,dat2,config)
     pickle.dump(dat2, open( "{e}_{x}.p".format(e=config1['exper'],x=config1['extra']), "wb" ) )
 
