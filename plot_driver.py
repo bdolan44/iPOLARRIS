@@ -281,7 +281,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
         n3 = '{e}{m1}-{x}{m2}_{t}'.format(e=dat1['rconf'].exper,x=dat2['rconf'].exper,m1=dat1['rconf'].mphys,m2=dat2['rconf'].mphys,t=config['extra'])
 
     dat1cnt = np.shape(dat1['{t}cfad'.format(t=typ)])[0]
-    dat2nt = np.shape(dat2['{t}cfad'.format(t=typ)])[0]
+    dat2cnt = np.shape(dat2['{t}cfad'.format(t=typ)])[0]
 #
 
     cfad1_all = np.sum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt
