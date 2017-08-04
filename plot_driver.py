@@ -42,11 +42,16 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
     plt.clf()
 
 def plot_hid_int(dat1,config,typ='hid',n1 = None):
-    dat1cnt = np.shape(dat1['hts'])[0]
+    fig, ax = plt.subplots(1,1,figsize=(12,8))
+    ht1sum = np.nansum(dat1['{t}cfad'.format(t=typ)], axis=0)
+    dat1cnt = np.nanmax(ht1sum, axis=0) / 100.
     if n1 is None:
         n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
 
-#    print dat1cnt, dat1['hts']
+    fig, ax = GF.plot_hid_cdf(np.nansum(dat1['{t}cfad'.format(t=typ)], axis=0) / dat1cnt, dat1['hidhts'][0], ax=ax,
+                              rconf=dat1['rconf'])
+
+    #    print dat1cnt, dat1['hts']
 #    fig, ax = plt.subplots(1,1,figsize=(12,8))
     fig, ax = GF.plot_hid_cdf(np.nansum(np.array(dat1['{t}cfad'.format(t=typ)]),axis=0)/dat1cnt,dat1['hidhts'][0],rconf=dat1['rconf'])
     ax.set_title(n1)
@@ -698,18 +703,20 @@ def make_single_pplots(rdat,flags,config,y=None):
         rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=config['vectors'],res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
         plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
-        
-    if flags['up_width'] == True:
-        tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
-        #print np.max(m_warea_wrf)
-        plt.plot(m_warea_wrf,tmp,color='k',label='Obs',lw=5)
-        plt.ylim(20,-60)
-        plt.xlabel('Updraft Width (km$^2$)')
-        plt.ylabel('Temperature (deg C)')
-        plt.title(title_string)
-        plt.savefig('{d}{p}_upwidth_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
-        plt.clf()
-        
+
+
+    if config['wname'] in rdat.data.variables.keys():
+        if flags['up_width'] == True:
+            tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
+            #print np.max(m_warea_wrf)
+            plt.plot(m_warea_wrf,tmp,color='k',label='Obs',lw=5)
+            plt.ylim(20,-60)
+            plt.xlabel('Updraft Width (km$^2$)')
+            plt.ylabel('Temperature (deg C)')
+            plt.title(title_string)
+            plt.savefig('{d}{p}_upwidth_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
+            plt.clf()
+
     if flags['qr_cappi'] == True:
         rdat.cappi_multiplot(z=config['z'],ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
         plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)

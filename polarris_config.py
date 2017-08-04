@@ -58,6 +58,7 @@ def get_data(config, tm, rfile, dmatch,smatch):
     if config['pol_on'] == True:
         rdata.calc_pol_analysis()
 
+
     return(rdata)
     
 def foo(s1):
@@ -312,6 +313,7 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
         
         
         if config['wname'] in rdat.data.variables.keys():
+#            print 'Ok, have updraft data!', rdat.data.variables.keys()
 #            print np.shape(rdat.T)
             tmp, m_warea_wrf = GF.updraft_width_profile(rdat.data[rdat.w_name].data,rdat.data[rdat.z_name].data,thresh=config['wthresh'], temps=config['trange'],\
                 z_ind=0,tcoord = True,temp = rdat.T[:,0,0])
