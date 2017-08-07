@@ -413,7 +413,7 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
     return fig, ax 
 
 #############################################################################################################
-def HID_barplot_colorbar(rconf, figure, location = [0.98, 0.1, 0.03, 0.8]):
+def HID_barplot_colorbar(rconf, figure, location = [0.99, 0.1, 0.03, 0.8]):
 
     scalarMap = plt.cm.ScalarMappable(norm=rconf.normhid,cmap=rconf.hid_cmap)
     axcb = figure.add_axes(location) # x pos, y pos, x width, y width
