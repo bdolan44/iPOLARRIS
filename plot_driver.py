@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from polarris_config import get_data
 import RadarData
 import GeneralFunctions as GF
-
+from matplotlib import colors
 
 def plot_cfad_int(dat1,config,typ='dz',n1=None):
     fig, ax = plt.subplots(1,1,figsize=(12,8))
@@ -138,6 +138,136 @@ def plot_upwidth_int(dat1,config,n1= None):
         plt.ylabel('Temperature (deg C)')
         plt.savefig('{d}{e1}_upwidth_int_{x}.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
+
+def plot_uppercent_compare(dat1,dat2,config,n1= None,n2=None):
+    fig, ax = plt.subplots(1,1,figsize=(8,8))
+#    axf = ax.flatten()
+    if n1 is None:
+        n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
+    if n2 is None:
+        n2 = '{e}_{x}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys)
+
+    ax.plot(np.nanmean(dat1['w99'],axis=0),dat1['wperht'][0],lw=5,color='red',label='{e} 99th'.format(e=dat1['rconf'].exper))
+    ax.plot(np.nanmean(dat1['w90'],axis=0),dat1['wperht'][0],lw=5,color='black',label='{e} 90th'.format(e=dat1['rconf'].exper))
+    ax.plot(np.nanmean(dat1['w50'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='{e} 50th'.format(e=dat1['rconf'].exper))
+    ax.set_xlabel('Vertical Wind Percentiles (m s$^{-1}$)')
+    ax.set_ylabel('Height (km)')
+    ax.set_title('{n} {n1}'.format(n=n1,n1=n2))
+
+    ax.plot(np.nanmean(dat2['w99'],axis=0),dat2['wperht'][0],lw=5,color='red',label='{e} 99th'.format(e=dat2['rconf']),ls='--'.format(e=dat2['rconf'].exper))
+    ax.plot(np.nanmean(dat2['w90'],axis=0),dat2['wperht'][0],lw=5,color='black',label='{e} 90th'.format(e=dat2['rconf']),ls='--'.format(e=dat2['rconf'].exper))
+    ax.plot(np.nanmean(dat2['w50'],axis=0),dat2['wperht'][0],lw=5,color='gold',label='{e} 50th'.format(e=dat2['rconf']),ls='--'.format(e=dat2['rconf'].exper))
+    # ax.set_xlabel('Vertical Wind Percentiles (m s$^{-1}$)')
+    # ax.set_ylabel('Height (km)')
+    # ax.set_title('{n}'.format(n=n2))
+    ax.legend(loc='best')
+    for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+        label.set_fontsize(16)
+
+    plt.tight_layout()
+    st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
+    plt.savefig('{id}{e1}_{e2}_wpercent_compare_{s}_{x}.{t}'.format(id=config['image_dir'],e2=dat1['rconf'].exper,e1=dat2['rconf'].exper,s=st_diff,x=config['extra'],t=config['ptype']),dpi=200)
+    plt.clf()
+
+def plot_uppercent_compare_updn(dat1, dat2, config, n1=None, n2=None):
+
+    fig, ax = plt.subplots(1,3,figsize=(18,6))
+    axf = ax.flatten()
+    if n1 is None:
+        n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
+    if n2 is None:
+        n2 = '{e}_{x}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys)
+
+    axf[0].plot(np.nanmean(dat1['w99u'],axis=0),dat1['wperht'][0],lw=5,color='red',label='99th',ls='-')
+    axf[0].plot(np.nanmean(dat1['w90u'],axis=0),dat1['wperht'][0],lw=5,color='black',label='90th',ls='-')
+    axf[0].plot(np.nanmean(dat1['w50u'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='50th',ls='-')
+    axf[0].plot(np.nanmean(dat1['w99d'],axis=0),dat1['wperht'][0],lw=5,color='red',label='99th',ls='-')
+    axf[0].plot(np.nanmean(dat1['w90d'],axis=0),dat1['wperht'][0],lw=5,color='black',label='90th',ls='-')
+    axf[0].plot(np.nanmean(dat1['w50d'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='50th',ls='-')
+    axf[0].legend(loc='best')
+
+    axf[0].set_xlabel('Up/Down Percentiles (m s$^{-1}$)',fontsize=16)
+
+    axf[0].set_ylabel('Height (km)',fontsize=16)
+    axf[0].set_title('{n}'.format(n=n1),fontsize=16)
+
+    axf[1].plot(np.nanmean(dat2['w99u'],axis=0),dat2['wperht'][0],lw=5,color='red',label='99th',ls='--')
+    axf[1].plot(np.nanmean(dat2['w90u'],axis=0),dat2['wperht'][0],lw=5,color='black',label='90th',ls='--')
+    axf[1].plot(np.nanmean(dat2['w50u'],axis=0),dat2['wperht'][0],lw=5,color='gold',label='50th',ls='--')
+    axf[1].plot(np.nanmean(dat2['w99d'],axis=0),dat2['wperht'][0],lw=5,color='red',ls='--')
+    axf[1].plot(np.nanmean(dat2['w90d'],axis=0),dat2['wperht'][0],lw=5,color='black',ls='--')
+    axf[1].plot(np.nanmean(dat2['w50d'],axis=0),dat2['wperht'][0],lw=5,color='gold',ls='--')
+
+    axf[1].set_xlabel('Up/Down Percentiles (m s$^{-1}$)',fontsize=16)
+    axf[1].set_ylabel('Height (km)',fontsize=16)
+    axf[1].set_title('{n}'.format(n=n2),fontsize=16)
+    axf[1].legend(loc='best')
+
+    axf[2].plot(np.nanmean(dat2['w99u'],axis=0),dat2['wperht'][0],lw=5,color='red',label='99th',ls='--')
+    axf[2].plot(np.nanmean(dat2['w90u'],axis=0),dat2['wperht'][0],lw=5,color='black',label='90th',ls='--')
+    axf[2].plot(np.nanmean(dat2['w50u'],axis=0),dat2['wperht'][0],lw=5,color='gold',label='50th',ls='--')
+    axf[2].plot(np.nanmean(dat2['w99d'],axis=0),dat2['wperht'][0],lw=5,color='red',ls='--')
+    axf[2].plot(np.nanmean(dat2['w90d'],axis=0),dat2['wperht'][0],lw=5,color='black',ls='--')
+    axf[2].plot(np.nanmean(dat2['w50d'],axis=0),dat2['wperht'][0],lw=5,color='gold',ls='--')
+
+    axf[2].plot(np.nanmean(dat1['w99u'],axis=0),dat1['wperht'][0],lw=5,color='red',label='99th',ls='-')
+    axf[2].plot(np.nanmean(dat1['w90u'],axis=0),dat1['wperht'][0],lw=5,color='black',label='90th',ls='-')
+    axf[2].plot(np.nanmean(dat1['w50u'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='50th',ls='-')
+    axf[2].plot(np.nanmean(dat1['w99d'],axis=0),dat1['wperht'][0],lw=5,color='red',ls='-')
+    axf[2].plot(np.nanmean(dat1['w90d'],axis=0),dat1['wperht'][0],lw=5,color='black',ls='-')
+    axf[2].plot(np.nanmean(dat1['w50d'],axis=0),dat1['wperht'][0],lw=5,color='gold',ls='-')
+
+
+    axf[2].set_xlabel('Up/Down Percentiles (m s$^{-1}$)',fontsize=16)
+    axf[2].set_ylabel('Height (km)',fontsize=16)
+    axf[2].set_title('{n} {n2}'.format(n=n1,n2=n2),fontsize=16)
+#    axf[2].legend(loc='best')
+
+
+    for a in axf:
+        for label in (a.get_xticklabels() + a.get_yticklabels()):
+            label.set_fontsize(16)
+
+    plt.tight_layout()
+    st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
+    print st_diff
+#    plt.savefig('test.png')
+    plt.savefig('{id}{s}_updownstats_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra']),dpi=200)
+#
+def plot_uppercent(dat1,config,n1= None):
+    fig, ax = plt.subplots(1,2,figsize=(18,8))
+    axf = ax.flatten()
+    if n1 is None:
+        n1 = '{e}_{x}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys)
+
+    axf[0].plot(np.nanmean(dat1['w99'],axis=0),dat1['wperht'][0],lw=5,color='black',label='99th')
+    axf[0].plot(np.nanmean(dat1['w90'],axis=0),dat1['wperht'][0],lw=5,color='red',label='90th')
+    axf[0].plot(np.nanmean(dat1['w50'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='50th')
+    axf[0].set_xlabel('Vertical Wind Percentiles (m s$^{-1}$)',fontsize=16)
+    axf[0].set_ylabel('Height (km)',fontsize=16)
+    axf[0].set_title('{n}'.format(n=n1),fontsize=20)
+    axf[0].legend(loc='best')
+    axf[1].plot(np.nanmean(dat1['w99u'],axis=0),dat1['wperht'][0],lw=5,color='black',label='99th up')
+    axf[1].plot(np.nanmean(dat1['w90u'],axis=0),dat1['wperht'][0],lw=5,color='red',label='90th up')
+    axf[1].plot(np.nanmean(dat1['w50u'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='50th up')
+    axf[1].plot(np.nanmean(dat1['w99d'],axis=0),dat1['wperht'][0],lw=5,color='black',label='99th down',ls='--')
+    axf[1].plot(np.nanmean(dat1['w90d'],axis=0),dat1['wperht'][0],lw=5,color='red',label='90th down',ls='--')
+    axf[1].plot(np.nanmean(dat1['w50d'],axis=0),dat1['wperht'][0],lw=5,color='gold',label='50th down',ls='--')
+    axf[1].legend(loc='best')
+    axf[1].set_xlabel('Up/Down Percentiles (m s$^{-1}$)',fontsize=16)
+
+    axf[1].set_ylabel('Height (km)',fontsize=16)
+    axf[1].set_title('{n}'.format(n=n1),fontsize=20)
+
+    for a in axf:
+        for label in (a.get_xticklabels() + a.get_yticklabels()):
+            label.set_fontsize(16)
+
+
+    plt.tight_layout()
+    plt.savefig('{id}{e}_vvelstats_{x}.{t}'.format(id=config['image_dir'],e=dat1['rconf'].exper,x=config['extra'],t=config['ptype']),dpi=200)
+#    plt.clf()
+
 
 def plot_upwidth(dat1,dat2,config,n1= None,n2=None):
     fig, ax = plt.subplots(1,2,figsize=(18,8))
@@ -334,24 +464,43 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
     maxa = np.nanpercentile(np.abs(cfad_ma),98)
     levels=np.linspace(-1*maxa,maxa,50)
 #    print typ, maxa
-    cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
+    if typ=='w':
+        maxa = np.around(np.nanpercentile(np.abs(cfad_ma), 96),decimals=1)
+        nor = np.around(np.nanpercentile(np.abs(cfad_ma),93),decimals=1)
+        delt = np.around((maxa+maxa)/50,decimals=2)
+        print maxa,nor,delt
+        levels = np.arange(-1 * maxa, maxa+delt, delt)
+        cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
+
+    else:
+
+        cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
 
     plt.colorbar(cb,ax=axf[2])
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
-    if typ == 'w':
-        axf[2].set_xlabel(dat1['rconf'].names['{tp}var'.format(tp=typ.upper())],fontsize = 18)
+
+    if typ == 'DRC' or typ == 'DRS':
+        varn = config['zdr_name']
+    elif typ == 'DZC' or typ == 'DZS':
+        varn = config['dz_name']
+    elif typ == 'KDC' or typ == 'KDS':
+        varn = config['kdp_name']
+    elif typ == 'WSvar' or typ == 'WCvar':
+        varn = config['wname']
     else:
-        try:
-            axf[2].set_xlabel(dat1['rconf'].names['{tp}'.format(tp=typ.upper())],fontsize = 18)
-        except:
-            axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
+        varn = typ
+
+    try:
+        axf[2].set_xlabel(dat1['rconf'].names[typ],fontsize = 18)
+    except:
+        axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
     axf[2].set_title('{v}'.format(v=n3))
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
 
     plt.savefig('{id}CFAD_{tp}_{s}_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra'],tp=typ.upper()),dpi=200)
-    plt.clf()
+#    plt.clf()
 
 def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
     dat1cnt = np.shape(dat1['hts'])[0]
