@@ -479,20 +479,21 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
     plt.colorbar(cb,ax=axf[2])
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
-    if typ == 'DRC' or typ == 'DRS':
-        varn = config['zdr_name']
-    elif typ == 'DZC' or typ == 'DZS':
-        varn = config['dz_name']
-    elif typ == 'KDC' or typ == 'KDS':
-        varn = config['kdp_name']
-    elif typ == 'WSvar' or typ == 'WCvar':
-        varn = config['wname']
+    if typ == 'drc' or typ == 'drs' or typ == 'dr':
+        varn = 'DR'
+    elif typ == 'dzc' or typ == 'dzs'  or typ == 'dz':
+        varn = 'DZ'
+    elif typ == 'kdc' or typ == 'kds'  or typ == 'kd':
+        varn = 'KD'
+    elif typ == 'wsvar' or typ == 'wsvar'  or typ == 'w':
+        varn = 'Wvar'
     else:
         varn = typ
-
     try:
-        axf[2].set_xlabel(dat1['rconf'].names[typ],fontsize = 18)
+
+        axf[2].set_xlabel('{n} {u}'.format(n=dat1['rconf'].names[varn],u=dat1['rconf'].units[varn]),fontsize = 18)
     except:
+    #     print 'Exception!'
         axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
     axf[2].set_title('{v}'.format(v=n3))
 
