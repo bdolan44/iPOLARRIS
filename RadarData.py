@@ -49,7 +49,7 @@ class RadarData(RadarConfig.RadarConfig):
 
     def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',
-            radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, 
+            radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,
             conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN']): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,
@@ -96,6 +96,8 @@ class RadarData(RadarConfig.RadarConfig):
         self.calc_deltas()
         self.rr_name = rr
         self.mask_dat()
+        if remove_diffatt == True:
+            self.corr_zdr()
         self.raintype()
 #        else:
 #            pass
@@ -260,6 +262,11 @@ class RadarData(RadarConfig.RadarConfig):
         # if want to pass a dictionary already
         self.data = dict
 #############################################################################################################
+    def corr_zdr(self):
+        #whzdr = np.where(np.logical_and(self.data[self.zdr_name].data<-1., self.data[self.kdp_name].data >.0))
+        whzdr = np.where(self.data[self.zdr_name].data<-1.)
+        self.data[self.zdr_name].data[whzdr]= np.nan
+        
 
     def mask_dat(self):    
         # if want to pass a dictionary already
@@ -878,7 +885,7 @@ class RadarData(RadarConfig.RadarConfig):
                 data[data<-900.0]=np.nan
                 range_lim  = np.nanmax(dat) - np.nanmin(dat)
                 dummy = ax.pcolormesh(xdat,zdat, data,
-                    vmin = np.nanmin(dat), vmax = np.nanmax(dat), **kwargs)
+                    vmin = np.nanmin(dat), vmax = np.nanmax(dat),cmap = plt.cm.gist_ncar, **kwargs)
             if range_lim < 1:
                 cb_format = '%.2f'
             if range_lim >= 1:
@@ -1083,7 +1090,7 @@ class RadarData(RadarConfig.RadarConfig):
             dat[dat<-900.0]=np.nan
             range_lim  = np.nanmax(dat) - np.nanmin(dat)
             dummy = ax.pcolormesh(xdat,ydat, data,
-                vmin = np.nanmin(dat), vmax = np.nanmax(dat), **kwargs)
+                vmin = np.nanmin(dat), vmax = np.nanmax(dat), cmap = plt.cm.gist_ncar,**kwargs)
 
         if contour is not None:
             if contour == 'CS':
@@ -1358,7 +1365,7 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
                     udat[::zskip, ::xskip], wdat[::zskip, ::xskip], \
-                        scale=30, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
+                        scale=70, scale_units='inches', pivot='middle', width=0.0025, headwidth=6, **kwargs)
 
             qk = ax.quiverkey(q_handle, 0.85, 0.85, 20, r'20 $\frac{m}{s}$',coordinates='axes', \
                         fontproperties={'weight':'bold','size':14})
@@ -1711,15 +1718,82 @@ class RadarData(RadarConfig.RadarConfig):
 
 
 #############################################################################################################
+    def percentile(self,wup =False,wdown=False,use_frzht=False,frzhgt=None):
 
+        if wup is not False:
+            wdat = deepcopy(self.data[self.w_name].data)
+            wdat[wdat<=0] = np.nan
+            t1=99
+            t2=90
+            t3=50
+        elif wdown is not False:
+            wdat = deepcopy(self.data[self.w_name].data)
+            wdat[wdat>=0] = np.nan
+            t1=1
+            t2=10
+            t3=50
+        else:
+            wdat =deepcopy(self.data[self.w_name].data)
+
+            t1 = 99
+            t2 = 90
+            t3 = 50
+    #    print np.ma.min(np.ma.compressed(winds))
+        # Time to make the percentile lists
+        height = self.data[self.z_name].data
+        percentile_50 = np.zeros([np.size(height)])
+        percentile_90 = np.zeros([np.size(height)])
+        percentile_99 = np.zeros([np.size(height)])
+        mean = np.zeros([np.size(height)])
+    #    print np.shape(winds)
+    #    print np.shape(height)
+        for i,ht in enumerate(height):
+            #summed_z = np.ma.sum(winds[:,i,:,:])
+            try:
+                percentile_90[i]=np.nanpercentile(np.ravel(wdat[i,...]),t2) #use w/ masked arrays
+
+                #percentile_90[i]=np.percentile(winds[:,i,:,:],90)
+                #percentile_90[i]=np.percentile(winds[i],99)
+            except IndexError:
+                percentile_90[i]=np.nan
+            try:
+                percentile_99[i]=np.nanpercentile(np.ravel(wdat[i,...]),t1) #use w/ masked arrays
+                #percentile_99[i]=np.percentile(winds[:,i,:,:],99)
+                #percentile_99[i]=np.percentile(winds[i],99)
+            except IndexError:
+                percentile_99[i]=np.nan
+            try:
+                percentile_50[i]=np.nanpercentile(np.ravel(wdat[i,...]),t3) #use w/ masked arrays
+                #percentile_50[i]=np.percentile(winds[:,i,:,:],50)
+                #percentile_50[i]=np.percentile(winds[i],50)
+            except IndexError:
+                percentile_50[i]=np.nan
+            #mean[i]=np.ma.mean(winds[:,i,:,:]) #use w/ masked arrays
+            #mean[i]=np.mean(winds[:,i,:,:])
+
+        ## This part is only necessary for the mixing ratio stuff ##
+        if use_frzht==True:
+
+            for i,hgt in enumerate(height):
+    #            print np.float(hgt),frzhgt+np.float(1)
+                if np.float(hgt) > frzhgt+np.float(1):
+                    percentile_50[i] = 0
+                    percentile_90[i] = 0
+                    percentile_99[i] = 0
+    #                print percentile_50[i]
+    #    print percentile_50
+
+    #         plt.xlim([-1,1])
+        return percentile_99,percentile_90,percentile_50,height
 
 
 #               ADD some percentile plots   
 #############################################################################################################
 
-    def percentileplots(winds,height,exper,date,ptype,punit,pshort,extra,inst,use_frzht=False,frzhgt=None):
+    def percentileplots(self,ptype='W',punit='m/s',use_frzht=False,frzhgt=None):
     #    print np.ma.min(np.ma.compressed(winds))
         # Time to make the percentile lists
+        height = self.data[self.z_name].data
         percentile_50 = np.zeros([np.size(height)])
         percentile_90 = np.zeros([np.size(height)])
         percentile_99 = np.zeros([np.size(height)])
@@ -1729,19 +1803,20 @@ class RadarData(RadarConfig.RadarConfig):
         for i,ht in enumerate(height):
             #summed_z = np.ma.sum(winds[:,i,:,:])
             try: 
-                percentile_90[i]=np.percentile(np.ma.compressed((winds[i,:,:])),90) #use w/ masked arrays
+                percentile_90[i]=np.nanpercentile(np.ravel(self.data[self.w_name].data[i,...]),90) #use w/ masked arrays
+
                 #percentile_90[i]=np.percentile(winds[:,i,:,:],90)
                 #percentile_90[i]=np.percentile(winds[i],99)
             except IndexError:
                 percentile_90[i]=np.nan
             try:
-                percentile_99[i]=np.percentile(np.ma.compressed((winds[i,:,:])),99) #use w/ masked arrays
+                percentile_99[i]=np.nanpercentile(np.ravel(self.data[self.w_name].data[i,...]),99) #use w/ masked arrays
                 #percentile_99[i]=np.percentile(winds[:,i,:,:],99)
                 #percentile_99[i]=np.percentile(winds[i],99)
             except IndexError:
                 percentile_99[i]=np.nan
             try:
-                percentile_50[i]=np.percentile(np.ma.compressed((winds[i,:,:])),50) #use w/ masked arrays
+                percentile_50[i]=np.nanpercentile(np.ravel(self.data[self.w_name].data[i,...]),50) #use w/ masked arrays
                 #percentile_50[i]=np.percentile(winds[:,i,:,:],50)
                 #percentile_50[i]=np.percentile(winds[i],50)
             except IndexError:
@@ -1772,11 +1847,11 @@ class RadarData(RadarConfig.RadarConfig):
         labs = [l.get_label() for l in lns]
         lgd = plt.legend(lns,labs,bbox_to_anchor=(1.6,0.85),prop={'size':14})
     #         plt.title('MC3E 1 May 2011 90th Percentile, 99th Percentile, \nand Mean of Downward Winds',size=16,y=1.08,x=0.78)
-        plt.title('{c} {dd} 50th, 90th, and 99th Percentile of {p} {e}'.format(c=exper,dd=date,p=ptype,e=extra),size=16,y=1.08,x=0.78)
+        plt.title('{c} {dd} 50th, 90th, and 99th Percentile of {p}'.format(c=self.exper,dd=self.date,p=ptype),size=16,y=1.08,x=0.78)
         #plt.xlabel('Rainrate (mm hr$^-$$^1$)',size=14)
         plt.xlabel('{p} ({u})'.format(p=ptype,u=punit))
         plt.ylabel('Height (km)',size=14)
-        plt.ylim([0,6]) # For qr plots
+        #plt.ylim([0,6]) # For qr plots
     #         plt.xlim([-1,1])
         return plt
 #############################################################################################################
