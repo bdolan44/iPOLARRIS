@@ -250,6 +250,44 @@ dat1 = run_exper(config, dmatch = dmatch, smatch=smatch,interactive = False)
 if not sys.argv[2:]:
     if config['plot_int'] == 1:
         #######Make plots of Integrated CFADS 
+        if config['cfadbytype'] == 1:
+
+            hold = config['extra']
+            config['extra']='{e}_rain'.format(e=hold)
+            plot_driver.plot_cfad_int(dat1,config,typ='dzrn')
+            plot_driver.plot_cfad_int(dat1,config,typ='drrn')
+            plot_driver.plot_cfad_int(dat1,config,typ='kdrn')
+            config['extra']=hold
+
+            hold = config['extra']
+            config['extra']='{e}_crystals'.format(e=hold)
+            plot_driver.plot_cfad_int(dat1,config,typ='dzcr')
+            plot_driver.plot_cfad_int(dat1,config,typ='drcr')
+            plot_driver.plot_cfad_int(dat1,config,typ='kdcr')
+            config['extra']=hold
+
+            hold = config['extra']
+            config['extra']='{e}_aggregates'.format(e=hold)
+            plot_driver.plot_cfad_int(dat1,config,typ='dzag')
+            plot_driver.plot_cfad_int(dat1,config,typ='drag')
+            plot_driver.plot_cfad_int(dat1,config,typ='kdag')
+            config['extra']=hold
+
+            hold = config['extra']
+            config['extra']='{e}_graupel'.format(e=hold)
+            plot_driver.plot_cfad_int(dat1,config,typ='dzgr')
+            plot_driver.plot_cfad_int(dat1,config,typ='drgr')
+            plot_driver.plot_cfad_int(dat1,config,typ='kdgr')
+            config['extra']=hold
+
+            hold = config['extra']
+            config['extra']='{e}_hail'.format(e=hold)
+            plot_driver.plot_cfad_int(dat1,config,typ='dzha')
+            plot_driver.plot_cfad_int(dat1,config,typ='drha')
+            plot_driver.plot_cfad_int(dat1,config,typ='kdha')
+            config['extra']=hold
+
+
         if config['plot_cs'] == 1:
             hold = config['extra']
             config['extra']='{e}_convective'.format(e=hold)
@@ -275,6 +313,7 @@ if not sys.argv[2:]:
         plot_driver.plot_cfad_int(dat1,config,typ='kd')
         if dat1['runw'] is True:
             plot_driver.plot_cfad_int(dat1,config,typ='w')
+            plot_driver.plot_uppercent(dat1,config)
     
         #######Now HID##############
         plot_driver.plot_hid_int(dat1,config,typ='hid')
@@ -408,6 +447,9 @@ else:
     ########Updraft Width##########
     if config['up_width'] == True:
         plot_driver.plot_upwidth(dat1,dat2,config)
+        plot_driver.plot_uppercent_compare(dat1,dat2,config)
+        plot_driver.plot_uppercent_compare_updn(dat1,dat2,config)
+
     pickle.dump(dat2, open( "{e}_{x}.p".format(e=config1['exper'],x=config1['extra']), "wb" ) )
 
 
