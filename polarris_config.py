@@ -32,7 +32,7 @@ def get_data(config, tm, rfile, dmatch,smatch):
                                               rr=config['rr_name'],band = config['band'],vr = config['vr_name'],
                                               y=config['yname'],z=config['zname'],lat=config['lat'], lon=config['lon'],
                                               exper=config['exper'],mphys=config['mphys'],radar_name = config['radarname'],
-                                              z_thresh=config['zthresh'],cs_z = config['cs_z'],zconv=config['zconv'],
+                                              z_thresh=config['zthresh'],cs_z = config['cs_z'],zconv=config['zconv'],remove_diffatt = config['removediffatt'],
                                               zdr_offset=config['zdr_offset'], conv_types = config['conv_types'],strat_types = config['strat_types'],
                                               mixed_types = config['mixed_types'])
                                               
@@ -107,6 +107,26 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
     rhcfads_a=[]
     hidcfads_a=[]
 
+    dzcfadrn_a=[]
+    drcfadrn_a=[]
+    kdcfadrn_a=[]
+
+    dzcfadcr_a=[]
+    drcfadcr_a=[]
+    kdcfadcr_a=[]
+
+    dzcfadag_a=[]
+    drcfadag_a=[]
+    kdcfadag_a=[]
+
+    dzcfadgr_a=[]
+    drcfadgr_a=[]
+    kdcfadgr_a=[]
+
+    dzcfadha_a=[]
+    drcfadha_a=[]
+    kdcfadha_a=[]
+
 
     hts_a=[]
     dzbins_a=[]
@@ -140,6 +160,20 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
     wcfadc_a =[]
     wcfads_a =[]
     wbins_a =[]
+
+    w99_all=[]
+    w90_all=[]
+    w50_all=[]
+    wperht=[]
+
+    w99u_all=[]
+    w90u_all=[]
+    w50u_all=[]
+
+    w99d_all=[]
+    w90d_all=[]
+    w50d_all=[]
+
 
     hid_cfad = []
     hids_cfad = []
@@ -191,8 +225,95 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
     
         whconv= np.where(rdat.raintype != 2)
         whstrat= np.where(rdat.raintype != 1)
+
+        whdz = np.logical_and(rdat.hid != 1,rdat.hid != 2)
+
+        whrn = np.where(np.logical_and(whdz,rdat.hid != 10))
+        whcr = np.where(np.logical_and(rdat.hid != 3, rdat.hid != 6))
+        whag = np.where(rdat.hid != 4)
+        whws = np.where(rdat.hid != 5)
+        whgr = np.where(np.logical_and(rdat.hid != 7, rdat.hid != 8))
+        whha = np.where(rdat.hid !=9)
+
+        dzcfadrn, hts, dzbins = GF.cfad(data=rdat.data[rdat.dz_name].data, mask=whrn,
+                                       hts=rdat.data[rdat.z_name][:].data, value_bins=config['dzbins'],
+                                       ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        dzcfadrn_a.append(dzcfadrn)
+
+        dzcfadcr, hts, dzbins = GF.cfad(data=rdat.data[rdat.dz_name].data, mask=whcr,
+                                       hts=rdat.data[rdat.z_name][:].data, value_bins=config['dzbins'],
+                                       ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        dzcfadcr_a.append(dzcfadcr)
+
+        dzcfadag, hts, dzbins = GF.cfad(data=rdat.data[rdat.dz_name].data, mask=whag,
+                                       hts=rdat.data[rdat.z_name][:].data, value_bins=config['dzbins'],
+                                       ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        dzcfadag_a.append(dzcfadag)
+
+        dzcfadgr, hts, dzbins = GF.cfad(data=rdat.data[rdat.dz_name].data, mask=whgr,
+                                       hts=rdat.data[rdat.z_name][:].data, value_bins=config['dzbins'],
+                                       ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        dzcfadgr_a.append(dzcfadgr)
+
+        dzcfadha, hts, dzbins = GF.cfad(data=rdat.data[rdat.dz_name].data, mask=whha,
+                                       hts=rdat.data[rdat.z_name][:].data, value_bins=config['dzbins'],
+                                       ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        dzcfadha_a.append(dzcfadha)
+
+####DR
+        drcfadrn, hts, drbins = GF.cfad(data=rdat.data[rdat.zdr_name].data, mask=whrn,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['drbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        drcfadrn_a.append(drcfadrn)
+
+        drcfadcr, hts, drbins = GF.cfad(data=rdat.data[rdat.zdr_name].data, mask=whcr,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['drbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        drcfadcr_a.append(drcfadcr)
+
+        drcfadag, hts, drbins = GF.cfad(data=rdat.data[rdat.zdr_name].data, mask=whag,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['drbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        drcfadag_a.append(drcfadag)
+
+        drcfadgr, hts, drbins = GF.cfad(data=rdat.data[rdat.zdr_name].data, mask=whgr,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['drbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        drcfadgr_a.append(drcfadgr)
+
+        drcfadha, hts, drbins = GF.cfad(data=rdat.data[rdat.zdr_name].data, mask=whha,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['drbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        drcfadha_a.append(drcfadha)
+
+#####KD
+        kdcfadrn, hts, kdbins = GF.cfad(data=rdat.data[rdat.kdp_name].data, mask=whrn,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['kdbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        kdcfadrn_a.append(kdcfadrn)
+
+        kdcfadcr, hts, kdbins = GF.cfad(data=rdat.data[rdat.kdp_name].data, mask=whcr,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['kdbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        kdcfadcr_a.append(kdcfadcr)
+
+        kdcfadag, hts, kdbins = GF.cfad(data=rdat.data[rdat.kdp_name].data, mask=whag,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['kdbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        kdcfadag_a.append(kdcfadag)
+
+        kdcfadgr, hts, kdbins = GF.cfad(data=rdat.data[rdat.kdp_name].data, mask=whgr,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['kdbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        kdcfadgr_a.append(kdcfadgr)
+
+        kdcfadha, hts, kdbins = GF.cfad(data=rdat.data[rdat.kdp_name].data, mask=whha,
+                                        hts=rdat.data[rdat.z_name][:].data, value_bins=config['kdbins'],
+                                        ret_z=1, ret_bin=1, thresh=config['zthresh'])
+        kdcfadha_a.append(kdcfadha)
+
         dzcfad, hts, dzbins = GF.cfad(data = rdat.data[rdat.dz_name].data,hts = rdat.data[rdat.z_name][:].data,value_bins = config['dzbins'],
-                            ret_z=1,ret_bin = 1,thresh=config['zthresh'])
+                        ret_z=1,ret_bin = 1,thresh=config['zthresh'])
 
         dzcfad_a.append(dzcfad)
         dzbins_a.append(dzbins)
@@ -325,7 +446,24 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
 
             warea.append(warea_wrf)
             wareat.append(tmp)
-        
+
+            w99_per,w90_per,w50_per,perht = rdat.percentile()
+            w99u_per, w90u_per, w50u_per, perht = rdat.percentile(wup=True)
+            w99d_per,w90d_per,w50d_per,perht = rdat.percentile(wdown=True)
+
+            w99_all.append(w99_per)
+            w90_all.append(w90_per)
+            w50_all.append(w50_per)
+            wperht.append(perht)
+
+            w99u_all.append(w99u_per)
+            w90u_all.append(w90u_per)
+            w50u_all.append(w50u_per)
+
+            w99d_all.append(w99d_per)
+            w90d_all.append(w90d_per)
+            w50d_all.append(w50d_per)
+
         rconf = RadarConfig.RadarConfig()
         rconf.date = times_a
         rconf.mphys = rdat.mphys
@@ -354,6 +492,26 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
           'kdscfad':kdcfads_a,
           'wscfad':wcfads_a,
 
+          'dzrncfad': dzcfadrn_a,
+          'drrncfad': drcfadrn_a,
+          'kdrncfad': kdcfadrn_a,
+
+          'dzcrcfad': dzcfadcr_a,
+          'drcrcfad': drcfadcr_a,
+          'kdcrcfad': kdcfadcr_a,
+
+          'dzagcfad': dzcfadag_a,
+          'dragcfad': drcfadag_a,
+          'kdagcfad': kdcfadag_a,
+
+          'dzgrcfad': dzcfadgr_a,
+          'drgrcfad': drcfadgr_a,
+          'kdgrcfad': kdcfadgr_a,
+
+          'dzhacfad': dzcfadha_a,
+          'drhacfad': drcfadha_a,
+          'kdhacfad': kdcfadha_a,
+
           'hts':hts_a,
           'histzzdr':histzzdr_a,
           'edgzzdr':edg_a,
@@ -379,6 +537,16 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
           'drcbins':drbins,
           'kdcbins':kdbins,
           'wcbins':wbins,
+           'w99':w99_all,
+           'w90':w90_all,
+           'w50':w50_all,
+           'wperht':wperht,
+           'w99u': w99u_all,
+           'w90u': w90u_all,
+           'w50u': w50u_all,
+           'w99d': w99d_all,
+           'w90d': w90d_all,
+           'w50d': w50d_all,
 
           'dzsbins':dzbins,
           'drsbins':drbins,
