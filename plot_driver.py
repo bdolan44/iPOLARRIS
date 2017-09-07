@@ -15,9 +15,10 @@ from polarris_config import get_data
 import RadarData
 import GeneralFunctions as GF
 from matplotlib import colors
+plt.style.use('presentation')
 
 def plot_cfad_int(dat1,config,typ='dz',n1=None):
-    fig, ax = plt.subplots(1,1,figsize=(12,8))
+    fig, ax = plt.subplots(1,1,figsize=(8,6))
 #    axf = ax.flatten()
     if n1 is None:
         n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
@@ -31,7 +32,7 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
         fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=ax,cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
 
     else:
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=ax,cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ[0:2])],ax=ax,cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
     ax.set_title(n1)
 
     ax.set_ylim(0,18)
@@ -42,7 +43,7 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
     plt.clf()
 
 def plot_hid_int(dat1,config,typ='hid',n1 = None):
-    fig, ax = plt.subplots(1,1,figsize=(12,8))
+    fig, ax = plt.subplots(1,1,figsize=(8,6))
     ht1sum = np.nansum(dat1['{t}cfad'.format(t=typ)], axis=0)
     dat1cnt = np.nanmax(ht1sum, axis=0) / 100.
     if n1 is None:
