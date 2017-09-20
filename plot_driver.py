@@ -17,6 +17,21 @@ import GeneralFunctions as GF
 from matplotlib import colors
 plt.style.use('presentation')
 
+def label_subplots(fig, xoff = 0.0, yoff = 0.02, nlabels = None,**kwargs):
+    letters = ['a', 'b', 'c', 'd','e', 'f', 'g', 'h','l', 'm','n','o','p','q','r']
+    figaxes = fig.get_axes()
+    if nlabels is None: nlabels = len(figaxes)
+
+    for fa in range(nlabels):
+        xbox = figaxes[fa].get_position()
+        xmin, ymax = xbox.xmin, xbox.ymax
+    # this is the position I want
+        if letters[fa] != '-':
+            fig.text(xmin+xoff, ymax+yoff, '({})'.format(letters[fa]),**kwargs)
+
+
+
+
 def plot_cfad_int(dat1,config,typ='dz',n1=None):
     fig, ax = plt.subplots(1,1,figsize=(8,6))
 #    axf = ax.flatten()
@@ -60,6 +75,7 @@ def plot_hid_int(dat1,config,typ='hid',n1 = None):
     ax.set_ylim(0,18)
 
     plt.tight_layout()
+    
     plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=config['image_dir'],h=typ.upper(),s=n1,t=config['ptype']),bbox_inches='tight', pad_inches=0.01,dpi=200)
     plt.clf()
     
@@ -844,14 +860,18 @@ def make_single_pplots(rdat,flags,config,y=None):
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
-        rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = config['vectors'],contours = eval(config['cappi_contours']))
+        fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = config['vectors'],contours = eval(config['cappi_contours']))
 #        plt.tight_layout()
+        label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
         plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
         plt.clf()
         
     if flags['all_xsec']== True:
         #y=-12.5
-        rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=config['vectors'],res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+        fig, ax = rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=config['vectors'],res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+        
+        label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
+#        plt.tight_layout()
         plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
 
