@@ -1007,7 +1007,7 @@ class RadarData(RadarConfig.RadarConfig):
         
 ######################### Here is the CAPPI stuff ##############################
 
-    def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=False, cblabel=None, 
+    def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=None, cblabel=None, 
         labels=True, res = 2.0, thresh_dz=False,contour = None,**kwargs):
         "Just make a Constant Altitude Plan Position Indicator plot of a given variable"
 
@@ -1159,7 +1159,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
-        if vectors:
+        if vectors is not None:
 #            try:
                 self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
@@ -1174,7 +1174,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def cappi_multiplot(self, z=1.0, xlim=None, ylim=None, ts=None,res = 2, varlist=None, vectors=False,
+    def cappi_multiplot(self, z=1.0, xlim=None, ylim=None, ts=None,res = 2, varlist=None, vectors=None,
         contours = None,thresh_dz = False, **kwargs):
         "6 panel CAPPI plot showing all the polarimetric variables and HID"
         
@@ -1239,7 +1239,9 @@ class RadarData(RadarConfig.RadarConfig):
                 vcont = contours[i]
             else:
                 vcont = None
-            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vectors,res=res,contour=vcont,thresh_dz =thresh_dz)
+            if vectors is not None:
+                vect = vectors[i]
+            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz)
         # now do the HID plot, call previously defined functions
         # try:
         #     dummy_hid = self.HID_plot(self.HID_from_scores(self.scores, rank = 1)[z_ind,:,:], 
