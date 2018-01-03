@@ -709,7 +709,7 @@ def make_single_pplots(rdat,flags,config,y=None):
 #    print rdat.exper
     te = tspan[1]
 #    print ts, te
-    title_string = '{e} {t} {d1:%Y%m%d-%H%M} {x}'.format(e=rdat.exper,t=rdat.mphys,d1=ts,x=config['extra'])
+    title_string = '{e} {t} {d1:%Y%m%d-%H%M%S} {x}'.format(e=rdat.exper,t=rdat.mphys,d1=ts,x=config['extra'])
     xlim = config['xlim']
     ylim = config['ylim']
     y = config['y']
@@ -726,8 +726,8 @@ def make_single_pplots(rdat,flags,config,y=None):
         rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
         rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         plt.tight_layout()
-#        print "{s:%Y%m%d%H%M}".format(s=ts[0])
-        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,m=rdat.mphys,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+#        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
+        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,m=rdat.mphys,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
 
         if config['plot_cs'] == True:
@@ -742,8 +742,8 @@ def make_single_pplots(rdat,flags,config,y=None):
             extrahold = config['extra']
             config['extra']='{e}_convective'.format(e=extrahold)
             plt.tight_layout()
-    #        print "{s:%Y%m%d%H%M}".format(s=ts[0])
-            plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,m=rdat.mphys,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+    #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
+            plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,m=rdat.mphys,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
             config['extra']=extrahold
             plt.clf()
 
@@ -757,8 +757,8 @@ def make_single_pplots(rdat,flags,config,y=None):
             extrahold = config['extra']
             config['extra']='{e}_stratiform'.format(e=extrahold)
             plt.tight_layout()
-    #        print "{s:%Y%m%d%H%M}".format(s=ts[0])
-            plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,m=rdat.mphys,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+    #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
+            plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,m=rdat.mphys,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
             config['extra']=extrahold
             plt.clf()
 
@@ -771,37 +771,37 @@ def make_single_pplots(rdat,flags,config,y=None):
 
             rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
             plt.tight_layout()
-            plt.savefig('{d}{p}_CFAD_W_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+            plt.savefig('{d}{p}_CFAD_W_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
             plt.clf()
         
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         rdat.cfad_plot(rdat.dz_name,ax = ax,bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
         plt.tight_layout()
-        plt.savefig('{d}{p}_CFAD_dBZ_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_CFAD_dBZ_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
         plt.tight_layout()
-        plt.savefig('{d}{p}_CFAD_Zdr_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_CFAD_Zdr_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-        plt.savefig('{d}{p}_CFAD_Kdp_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_CFAD_Kdp_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.tight_layout()
         plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         plt.tight_layout()
-        plt.savefig('{d}{p}_CFAD_RHO_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_CFAD_RHO_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
         
     if flags['hid_cfad_flag'] == True:
         fig, ax = rdat.plot_hid_cdf()
-        plt.savefig('{d}{p}_CFAD_HID_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_CFAD_HID_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         
         plt.clf()
         
@@ -835,7 +835,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         axf[3].set_ylabel('RRB')
         axf[3].set_ylim(0,50)
         
-        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
         
 
@@ -854,7 +854,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.ylabel('Height (km)')
         plt.title(title_string)
         plt.legend(loc = 'best')
-        plt.savefig('{d}{p}_HID_prof_{s:%Y%m%d%H%M}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_HID_prof_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
         
     if flags['all_cappi']== True:
@@ -863,7 +863,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['vectors']),contours = eval(config['cappi_contours']))
 #        plt.tight_layout()
         label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
-        plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
+        plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
         plt.clf()
         
     if flags['all_xsec']== True:
@@ -872,7 +872,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         
         label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
 #        plt.tight_layout()
-        plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
+        plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
 
 
@@ -885,17 +885,17 @@ def make_single_pplots(rdat,flags,config,y=None):
             plt.xlabel('Updraft Width (km$^2$)')
             plt.ylabel('Temperature (deg C)')
             plt.title(title_string)
-            plt.savefig('{d}{p}_upwidth_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
+            plt.savefig('{d}{p}_upwidth_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
             plt.clf()
 
     if flags['qr_cappi'] == True:
         rdat.cappi_multiplot(z=config['z'],ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
-        plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
+        plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
         plt.clf()
         
     if flags['qr_rhi'] == True:
         rdat.xsec_multiplot(ts=rdat.date,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
-        plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
+        plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
         
 
