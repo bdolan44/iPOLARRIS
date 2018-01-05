@@ -990,6 +990,7 @@ class RadarData(RadarConfig.RadarConfig):
         for i, var in enumerate(sorted(good_vars)):
             if vectors is not None:
                 vect = vectors[i]
+                print 'RadarData ln 992 vectors': vectors,vect
             else:
                 vect = None
             dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
