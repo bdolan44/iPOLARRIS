@@ -987,7 +987,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         # BF 3/30/16: TAKING OUT IMSHOW AND PUTTING IN PCOLORMESH
-        for i, var in enumerate(sorted(good_vars)):
+        for i, var in enumerate(good_vars):
             if vectors is not None:
                 vect = vectors[i]
                 print 'RadarData ln 992 vectors', vectors,vect
