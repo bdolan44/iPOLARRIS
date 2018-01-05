@@ -975,12 +975,12 @@ class RadarData(RadarConfig.RadarConfig):
             ncols = 1
             nrows = deepcopy(nvars)
             figx = 7
-            figy = 3*nrows
+            figy = 4*nrows
         else:
             ncols = 2
             nrows = int(np.ceil(nvars/2))
-            figx = 10
-            figy = 3*nrows
+            figx = 12
+            figy = 4*nrows
         fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax])
         axf = ax.flatten()
@@ -995,8 +995,10 @@ class RadarData(RadarConfig.RadarConfig):
             dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
         # now do the HID plot, call previously defined functions
 
+
+#        fig.tight_layout()
         fig.tight_layout()
-        fig.subplots_adjust(top = 0.95)
+        fig.subplots_adjust(top = 0.94)
 
         fig.suptitle('%s %s Cross Section y = %s' %(ts, self.radar_name,yval), fontsize = 18)
 
@@ -1254,7 +1256,7 @@ class RadarData(RadarConfig.RadarConfig):
         #     pass
 
         fig.tight_layout()
-        fig.subplots_adjust(top = 0.9)
+        fig.subplots_adjust(top = 0.94)
         fig.suptitle('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
                     self.data[self.z_name][z_ind]), fontsize = 18)
 
