@@ -802,7 +802,7 @@ class RadarData(RadarConfig.RadarConfig):
 ########### STARTING WITH CROSS SECTIONS ################
 
     def xsec(self, var, y=None, xlim=None, zlim=None, ts = None,varlist=None, ax=None, title_flag=False, 
-                vectors=False, cblabel=None, res=2.0,cbpad=0.03, **kwargs):
+                vectors=None, cblabel=None, res=2.0,cbpad=0.03, **kwargs):
         "Just one axis cross-section plot of a variable"
         # first, get the appropriate y index from the y that's wanted
         ts=self.date
@@ -866,6 +866,7 @@ class RadarData(RadarConfig.RadarConfig):
             except:
                 xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)))
     #        print zmini,zmaxi
+<<<<<<< HEAD
 
             zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
 
@@ -895,6 +896,37 @@ class RadarData(RadarConfig.RadarConfig):
 
 
 
+=======
+
+            zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
+
+            data = np.ma.masked_less(data,-900.0)
+            data = np.ma.masked_where(~np.isfinite(data),data)
+    #        print np.shape(data)
+            #print np.shape(data),np.shape(xdat),np.shape(zdat)
+            #print np.shape(xdat),np.shape(zdat)
+    #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
+            if var in self.lims.keys():
+                range_lim = self.lims[var][1] - self.lims[var][0]
+
+                dummy = ax.pcolormesh(xdat,zdat, data,
+                    vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
+            else:
+                dat = self.data[var].data
+                data[data<-900.0]=np.nan
+                range_lim  = np.nanmax(dat) - np.nanmin(dat)
+                dummy = ax.pcolormesh(xdat,zdat, data,
+                    vmin = np.nanmin(dat), vmax = np.nanmax(dat),cmap = plt.cm.gist_ncar, **kwargs)
+            if range_lim < 1:
+                cb_format = '%.2f'
+            if range_lim >= 1:
+                cb_format = '%.1f'
+            if range_lim >= 10:
+                cb_format = '%d'
+
+
+
+>>>>>>> 51469221dba6260e102cda2869800a5a82fdab32
             cb = fig.colorbar(dummy, ax=ax, fraction=0.03, format=cb_format, pad=cbpad)
             if var in self.lims.keys():
                 cb.set_label(' '.join([self.names[var], self.units[var]]).strip())
@@ -917,7 +949,11 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_ylabel('Altitude (km MSL)')
 
 
+<<<<<<< HEAD
+            if vectors is not None:
+=======
             if vectors:
+>>>>>>> 51469221dba6260e102cda2869800a5a82fdab32
                 try:
                     #print zlim
                     self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
@@ -933,7 +969,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def xsec_multiplot(self, y=None, xlim=None, zlim=None, ts=None,varlist=None, vectors=False,res=2.0, **kwargs):
+    def xsec_multiplot(self, y=None, xlim=None, zlim=None, ts=None,varlist=None, vectors=None,res=2.0, **kwargs):
         "multipanel cross-section plot showing all available polarimetric variables and HID, if available"
 
     # first, get the appropriate y index from the y that's wanted
@@ -989,7 +1025,11 @@ class RadarData(RadarConfig.RadarConfig):
 
         # BF 3/30/16: TAKING OUT IMSHOW AND PUTTING IN PCOLORMESH
         for i, var in enumerate(sorted(good_vars)):
-            dummy = self.xsec(var, ts=ts, y=y, vectors=vectors, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
+            if vectors is not None:
+                vect = vectors[i]
+            else:
+                vect = None
+            dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
         # now do the HID plot, call previously defined functions
 
         fig.tight_layout()
@@ -1159,8 +1199,15 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
+<<<<<<< HEAD
+#        print vectors
         if vectors is not None:
 #            try:
+#                print 'trying vectors'
+=======
+        if vectors is not None:
+#            try:
+>>>>>>> 51469221dba6260e102cda2869800a5a82fdab32
                 self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
 #                print 'Error trying to plot vectors: {}'.format(e)
