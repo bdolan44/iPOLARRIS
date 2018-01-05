@@ -59,6 +59,7 @@ ad == config['date']+'_'                              ==#Extra characters
 lat == -12.24917                   ==#lat of radar
 lon == 131.04444                   ==#lon of radar
 alt == 0.0                         ==#Altitude of the radar
+removediffatt == True                 ==#Remove differential attenuation by Zdr < -1 and dBZ < 35.
 #
 ############Select the types of plots to see on the output##########################
 plot_int == True                      ==#Turn on plotting of integrated parameters over the whole time frame
@@ -99,6 +100,14 @@ y==10.                                 ==#Lat of the y cross-section for RHI
 #ylim == [35.0,37.5]                     ==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
 z == 2.0                                ==#Height of the CAPPIs
-vectors == True                          ==#Turn on vectors in the plots.
-mix_vars == ['qc','qr','qg','qi','qh']   ==#Mixing ratios from model to plot.
+cvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
+rvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
+skip == 2                                  ==#Number of vectors to skip for the vector plots.
+mix_vars ==['qc','qr','qg','qi','qh',config['rr_name'],config['vr_name'],'HID']   ==#Mixing ratios from model to plot.
+rhi_vars ==['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['wname']] == #Names of vars for RHI plots
+cappi_vars == ['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['vr_name']] == #Names of vars for CAPPI plots
+comb_vicr == True                       ==# Combine VI with CR for plotting.
+cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
+cappi_vectres == 5               ==#Defined the vector skip for cappi plots.
+rhi_vectres == [6,2]             ==#Defines the [x,z] skip for rhi plots
 #

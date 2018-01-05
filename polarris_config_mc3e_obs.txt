@@ -103,7 +103,8 @@ y==10.                                 ==#Lat of the y cross-section for RHI
 #ylim == [35.0,37.5]                     ==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
 z == 2.0                                ==#Height of the CAPPIs
-vectors == True                          ==#Turn on vectors in the plots.
+cvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
+rvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
 skip == 2                                  ==#Number of vectors to skip for the vector plots.
 mix_vars ==['qc','qr','qg','qi','qh',config['rr_name'],config['vr_name'],'HID']   ==#Mixing ratios from model to plot.
 rhi_vars ==['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['wname']] == #Names of vars for RHI plots

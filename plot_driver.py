@@ -860,7 +860,7 @@ def make_single_pplots(rdat,flags,config,y=None):
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
-        fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['vectors']),contours = eval(config['cappi_contours']))
+        fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
 #        plt.tight_layout()
         label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
         plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
@@ -868,7 +868,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         
     if flags['all_xsec']== True:
         #y=-12.5
-        fig, ax = rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=config['vectors'],res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+        fig, ax = rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
         
         label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
 #        plt.tight_layout()
