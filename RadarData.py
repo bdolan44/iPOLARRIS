@@ -802,7 +802,7 @@ class RadarData(RadarConfig.RadarConfig):
 ########### STARTING WITH CROSS SECTIONS ################
 
     def xsec(self, var, y=None, xlim=None, zlim=None, ts = None,varlist=None, ax=None, title_flag=False, 
-                vectors=False, cblabel=None, res=2.0,cbpad=0.03, **kwargs):
+                vectors=None, cblabel=None, res=2.0,cbpad=0.03, **kwargs):
         "Just one axis cross-section plot of a variable"
         # first, get the appropriate y index from the y that's wanted
         ts=self.date
@@ -917,7 +917,7 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_ylabel('Altitude (km MSL)')
 
 
-            if vectors:
+            if vectors is not None:
                 try:
                     #print zlim
                     self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
@@ -933,7 +933,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def xsec_multiplot(self, y=None, xlim=None, zlim=None, ts=None,varlist=None, vectors=False,res=2.0, **kwargs):
+    def xsec_multiplot(self, y=None, xlim=None, zlim=None, ts=None,varlist=None, vectors=None,res=2.0, **kwargs):
         "multipanel cross-section plot showing all available polarimetric variables and HID, if available"
 
     # first, get the appropriate y index from the y that's wanted
@@ -989,7 +989,11 @@ class RadarData(RadarConfig.RadarConfig):
 
         # BF 3/30/16: TAKING OUT IMSHOW AND PUTTING IN PCOLORMESH
         for i, var in enumerate(sorted(good_vars)):
-            dummy = self.xsec(var, ts=ts, y=y, vectors=vectors, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
+            if vectors is not None:
+                vect = vectors[i]
+            else:
+                vect = None
+            dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
         # now do the HID plot, call previously defined functions
 
         fig.tight_layout()
@@ -1159,8 +1163,10 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
+#        print vectors
         if vectors is not None:
 #            try:
+#                print 'trying vectors'
                 self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
 #                print 'Error trying to plot vectors: {}'.format(e)

@@ -1,5 +1,5 @@
 ###############Set up variable names and how to read the data###############
-extra == 'convuncert'                      ==#This will be appended to all output files as an identifier.
+extra == 'upstat'                      ==#This will be appended to all output files as an identifier.
 date == '20060123'                   ==#This is the date of the case
 ptype == 'png'                        ==#This is the type of output images
 image_dir == r'/Users/bdolan/scratch/iPOLARRIS_images_test/' ==   #Image directory (output)
@@ -15,7 +15,9 @@ dr_name == CR                      ==#Name of the differential reflectivity fiel
 kd_name == KD                      ==#Name of the Kdp field
 rh_name == RH                      ==#Name of the RhoHV field
 rr_name == RR                       ==#Name of the Rain rate / precipitation field
-t_name == T                        ==#Name of the temperature field
+vr_name == CV                       ==#name of radial velocity field
+t_name == None                        ==#Name of the temperature field
+vdop_name == None                     ==#name of radial velocity field
 uname == U                         ==#Name of the zonal wind field
 vname == V                         ==#Name of the meridional wind field
 wname == Wvar                         ==#Name of the vertical wind field
@@ -38,7 +40,8 @@ zconv == 40                         ==#Zconv threshold in raintyping algorithm.
 conv_types == ['ISO_CONV_CORE','CONVECTIVE','ISO_CS_CORE']      ==#Which Powell et al. types to consider in convective CFADS
 strat_types == ['WEAK_ECHO','STRATIFORM','ISO_CONV_FRINGE']     ==#Which Powell et al. types to consider in stratiform CFADS
 mixed_types == ['UNCERTAIN']                                    ==#Which types to not include in either convective or stratiform but will be considered in totals).
-zdr_offset == 0.6                    ==#Add any Zdr offset here. Value will be SUBTRACTED from the zdr values.
+zdr_offset == 0.4                    ==#Add any Zdr offset here. Value will be SUBTRACTED from the zdr values.
+removediffatt == False                 ==#Remove differential attenuation by Zdr < -1 and dBZ < 35.
 #
 #######Set up some variables related to the observations ###################
 ### Dual Doppler stuff
@@ -74,13 +77,14 @@ all_xsec==True                        ==# make RHI cross sections for all times.
 up_width==False                       ==# Make a plot of the vertical velocity profile with temperature.
 qr_cappi==False                       ==# Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
 qr_rhi==False                         ==#Make rhis of the mixing ratios (only valid for model)
+cfadbytype==True                      ==#Produce CFADs for specific HID types.
 ks == ['cfad_mpanel_flag','hid_cfad_flag','joint_flag','cfad_individ_flag','hid_prof','all_cappi','all_xsec','up_width','qr_cappi','qr_rhi']       ==#list of flags
-plot_cs == True                       ==#Plot seperate Convective and stratiform CFADs
 #
 #############Set up some plotting configurations #########################
 wbins == np.arange(-25,26,0.5)          ==#Histogram bins for vertical velocity
 dzbins == np.arange(-10,60,1)           ==#Histogram bins for reflectivity
 drbins == np.arange(-2,6,0.05)          ==#Histogram bins for differential reflectivity
+rhbins == np.arange(0.5,1.05,0.05)          ==#Histogram bins for differential reflectivity
 kdbins == np.arange(-2,6,0.05)          ==#Histogram bins for specific differential phase
 rrbins == np.logspace(0.01,100.01,30)   ==#Histogram bins for rain rates
 #
@@ -100,5 +104,12 @@ y==10.                                 ==#Lat of the y cross-section for RHI
 #y==35.7                                 ==#Lat of the y cross-section for RHI
 z == 2.0                                ==#Height of the CAPPIs
 vectors == True                          ==#Turn on vectors in the plots.
-mix_vars == ['qc','qr','qg','qi','qh']   ==#Mixing ratios from model to plot.
+skip == 2                                  ==#Number of vectors to skip for the vector plots.
+mix_vars ==['qc','qr','qg','qi','qh',config['rr_name'],config['vr_name'],'HID']   ==#Mixing ratios from model to plot.
+rhi_vars ==['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['wname']] == #Names of vars for RHI plots
+cappi_vars == ['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['vr_name']] == #Names of vars for CAPPI plots
+comb_vicr == True                       ==# Combine VI with CR for plotting.
+cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
+cappi_vectres == 2               ==#Defined the vector skip for cappi plots.
+rhi_vectres == [6,2]             ==#Defines the [x,z] skip for rhi plots
 #
