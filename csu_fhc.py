@@ -21,8 +21,7 @@ DEFAULT_WEIGHTS = {'DZ': 1.5, 'DR': 0.8, 'KD': 1.0, 'RH': 0.8, 'LD': 0.5,
 
 def hid_beta(x_arr, a, b, m):
     """Beta function calculator"""
-    #print a
-    return 1.0/(1.0 + ( ((x_arr - m)/a)**2)**b)
+    return 1.0/(1.0 + ( ((np.float64(x_arr) - m)/a)**2)**b)
 
 def csu_fhc_summer(weights=DEFAULT_WEIGHTS, method='hybrid',
                    dz=None, zdr=None, ldr=None, kdp=None, rho=None, T=None,
@@ -71,7 +70,7 @@ def csu_fhc_summer(weights=DEFAULT_WEIGHTS, method='hybrid',
     
     """
 
-    print 'Using temp in HID:',use_temp
+#    print 'Using temp in HID:',use_temp
     if dz is None:
         print 'FHC fail, no reflectivity field'
         return None
@@ -89,6 +88,7 @@ def csu_fhc_summer(weights=DEFAULT_WEIGHTS, method='hybrid',
 
     #Check for presence of polarimetric variables
     pol_flag = _get_pol_flag(fhc_vars)
+#    print fhc_vars
 
     #Check for presence of temperature
     if use_temp:
@@ -117,9 +117,12 @@ def csu_fhc_summer(weights=DEFAULT_WEIGHTS, method='hybrid',
 
     #Finish up
     mu = np.array(test_list)
+#    print np.shape(mu)
+    
     if verbose:
         print mu.shape
         print 'mu max: ', mu.max()
+    #print np.nanmax(mu,axis=0),mu[0],np.shape(mu)
     return mu
 
 #########################
@@ -217,18 +220,26 @@ def _get_test_list(fhc_vars, weights, radar_data, sets, varlist, weight_sum,
     #TJL - Check order of if statements
     test_list = []
     for c in range(len(sets['DZ']['m'])):
+#        print 'type:',c,pol_flag
         if 'hybrid' in method: #Hybrid emphasizes Z and T extra HARD
             if pol_flag:
                 test = _calculate_test(fhc_vars, weights, radar_data, sets,
                                        varlist, weight_sum, c)
+#                print test, 'loc1'
                 #if test.max() > 1: #Maximum of test should never be more than 1
                 #    print 'Fail loc 1, test.max() =', test.max()
                 #    return None
             if use_temp:
                 if pol_flag:
                     #*= multiplies by new value and stores in test
-                    test *= hid_beta(radar_data['T'], sets['T']['a'][c],
+                    #print radar_data['T']
+                    mdum = hid_beta(radar_data['T'], sets['T']['a'][c],
                                      sets['T']['b'][c], sets['T']['m'][c])
+#                    test *= hid_beta(radar_data['T'], sets['T']['a'][c],
+#                                     sets['T']['b'][c], sets['T']['m'][c])
+#                    print 'mdum',mdum
+                    test = mdum*test
+#                    print test, 'loc2'#,mdum
                     #print 'in loc 2'
                     #if test.max() > 1: #Maximum of test should never be > 1
                     #    print 'Fail loc 2, test.max() =', test.max()
@@ -240,6 +251,7 @@ def _get_test_list(fhc_vars, weights, radar_data, sets, varlist, weight_sum,
                 if pol_flag or use_temp:
                     test *= hid_beta(radar_data['DZ'], sets['DZ']['a'][c],
                                      sets['DZ']['b'][c], sets['DZ']['m'][c])
+#                    print test, 'loc3'
                     #if test.max() > 1: #Maximum of test should never be > 1
                     #    print 'Fail loc 3, test.max() =', test.max()
                     #    return None

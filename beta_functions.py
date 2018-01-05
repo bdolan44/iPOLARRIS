@@ -101,12 +101,12 @@ def plot_beta_functions(mbf_sets, band, temp_factor, pdir='./', n_types=10):
              'High-Density_Graupel','Hail','Big_Drops']
              #'Large_Hail','SmHail_Rain','LgHail_Rain']
     # DUMMY ARRAYS TO PLOT OVER
-    dz = np.arange(701)/10.
+    dz = -60+np.arange(1401)/10.
     zdr = -2.0 + np.arange(801)/100.
     kdp = -2.0 + np.arange(901)/100.
     ldr = -60.0 + np.arange(5900)/100.
     rho_hv = 0.75 + np.arange(2501)/10000.
-    T = -50. + np.arange(1001)/10.
+    T = -100. + np.arange(2001)/10.
     for i in range(n_types):
         dz_beta = _get_beta_example(dz, mbf_sets, 'Zh_set', i)
         kdp_beta = _get_beta_example(kdp, mbf_sets, 'Kdp_set', i)
