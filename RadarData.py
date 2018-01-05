@@ -1245,6 +1245,8 @@ class RadarData(RadarConfig.RadarConfig):
                 vcont = None
             if vectors is not None:
                 vect = vectors[i]
+            else:
+                vect = None
             dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz)
         # now do the HID plot, call previously defined functions
         # try:
