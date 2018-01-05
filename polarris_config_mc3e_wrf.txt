@@ -1,16 +1,16 @@
 ###############Set up variable names and how to read the data###############
-extra == 'cs'                      ==#This will be appended to all output files as an identifier.
+extra == 'newfix'                      ==#This will be appended to all output files as an identifier.
 date == '201110523'                   ==#This is the date of the case
 ptype == 'png'                        ==#This is the type of output images
-image_dir == r'/Users/bdolan/scratch/iPOLARRIS_images_test/WRF/' ==   #Image directory (output)
-radar_files == r'/Users/bdolan/scratch/gitlab/iPOLARRIS/wrf_mc3e_4ice_20110523.txt'         ==#List of radar files to read in.
+image_dir == r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/POLARRIS_images/' ==   #Image directory (output)
+radar_files == r'/gpfsm/dnb32/bcabell/GSDSU_MASTER_V4Beta/iPOLARRIS/wrf_4ice_mc3e_c.txt'         ==#List of radar files to read in.
 mphys == 4ice                        ==#Type of microphysics used in model
 type ==wrf                         ==#Type of data. 'obs' or 'wrf'
 convert_Tk_Tc == True                ==#Convert Temperature in K to C (True for 'wrf')
 exper == 'MC3E'                       ==#Experiment locations
 radarname == Cband                  ==# name of radar
 band == C                           ==#Radar band. Needs to be capital letter and X, C, or S
-wdate_format == %Y-%m-%d_%H-%M-%S   ==# format of the date/ time in the file name
+wdate_format == %Y-%m-%d_%H:%M:%S   ==# format of the date/ time in the file name
 dz_name == zhh01                      ==#Name of the reflectivity field
 dr_name == zdr01                      ==#Name of the differential reflectivity field
 kd_name == kdp01                      ==#Name of the Kdp field
@@ -61,6 +61,7 @@ ad == ''                              ==#Extra characters
 lat == 36.79616                       ==#Lat of the radar
 lon == -97.450546                     ==#Lon of the radar
 alt == 0.327                          ==#Altitude of the radar
+removediffatt == False                 ==#Remove differential attenuation by Zdr < -1 and dBZ < 35.
 #
 ############Select the types of plots to see on the output##########################
 plot_int == True                      ==#Turn on plotting of integrated parameters over the whole time frame
@@ -69,13 +70,14 @@ plot_cs == True                       ==#Plot seperate Convective and stratiform
 cfad_mpanel_flag==False  ==#4 panel CFADs of Dbz, Zdr, Kdp and W
 hid_cfad_flag==True                   ==# HID CFAD
 joint_flag==False                     ==#Z vs. Zdr
-cfad_individ_flag==False              ==#Make separate images for dbz, Zdr, Kdp, W and Rho
-hid_prof==False                       ==#Profile of HID species with height
+cfad_individ_flag==True              ==#Make separate images for dbz, Zdr, Kdp, W and Rho
+hid_prof==False                      ==#Profile of HID species with height
 all_cappi==True                       ==# make a cappi cross section for all times. change parameters in plot_driver.py
 all_xsec==True                        ==# make RHI cross sections for all times. change parmaters in plot_driver.py
 up_width==False                       ==# Make a plot of the vertical velocity profile with temperature.
-qr_cappi==False                       ==# Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
-qr_rhi==False                         ==#Make rhis of the mixing ratios (only valid for model)
+qr_cappi==True                       ==# Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
+qr_rhi==True                         ==#Make rhis of the mixing ratios (only valid for model)
+cfadbytype==False                      ==# Produce CFADS for a specific HID type.
 ks == ['cfad_mpanel_flag','hid_cfad_flag','joint_flag','cfad_individ_flag','hid_prof','all_cappi','all_xsec','up_width','qr_cappi','qr_rhi']       ==#list of flags
 #
 #############Set up some plotting configurations #########################
@@ -111,4 +113,6 @@ rhi_vars ==['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['
 cappi_vars == ['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['vr_name']] == #Names of vars for CAPPI plots
 comb_vicr == True                       ==# Combine VI with CR for plotting.
 cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
+cappi_vectres == 5               ==#Defined the vector skip for cappi plots.
+rhi_vectres == [8,2]             ==#Defines the [x,z] skip for rhi plots
 #
