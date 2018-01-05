@@ -996,8 +996,7 @@ class RadarData(RadarConfig.RadarConfig):
         # now do the HID plot, call previously defined functions
 
         fig.tight_layout()
-#        fig.subplots_adjust(top = 0.95)
-        fig.subplots_adjust(top = 0.88)
+        fig.subplots_adjust(top = 0.95)
 
         fig.suptitle('%s %s Cross Section y = %s' %(ts, self.radar_name,yval), fontsize = 18)
 
