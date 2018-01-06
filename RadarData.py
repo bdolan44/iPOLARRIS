@@ -976,11 +976,17 @@ class RadarData(RadarConfig.RadarConfig):
             nrows = deepcopy(nvars)
             figx = 7
             figy = 4*nrows
-        else:
+        else if nvars > 3 and nvars < 7:
             ncols = 2
             nrows = int(np.ceil(nvars/2))
             figx = 12
             figy = 4*nrows
+        else:
+            ncols = 2
+            nrows = int(np.ceil(nvars/2))
+            figx=16
+            figy = 4*nrows
+            
         fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax])
         axf = ax.flatten()

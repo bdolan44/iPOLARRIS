@@ -871,7 +871,8 @@ def make_single_pplots(rdat,flags,config,y=None):
         fig, ax = rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
         
         #plt.tight_layout()
-        label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
+        nvars = len(eval(config['rhi_vars']))
+        label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=nvars)
         plt.savefig('{d}{p}_polrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
 
