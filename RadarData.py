@@ -976,7 +976,7 @@ class RadarData(RadarConfig.RadarConfig):
             nrows = deepcopy(nvars)
             figx = 7
             figy = 4*nrows
-        else if nvars > 3 and nvars < 7:
+        elif (nvars > 3 and nvars < 7):
             ncols = 2
             nrows = int(np.ceil(nvars/2))
             figx = 12
