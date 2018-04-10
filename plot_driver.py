@@ -860,11 +860,21 @@ def make_single_pplots(rdat,flags,config,y=None):
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
-        fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
-#        plt.tight_layout()
-        label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
-        plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
-        plt.clf()
+        if config['cappi_multi'] == True:
+            fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
+    #        plt.tight_layout()
+            label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
+            plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
+            plt.clf()
+
+        else:
+            for v in eval(config['cappi_vars']):
+                fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = v,vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
+    #        plt.tight_layout()
+                #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
+                plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
+                plt.clf()
+
         
     if flags['all_xsec']== True:
         #y=-12.5
