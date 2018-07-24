@@ -50,7 +50,7 @@ class RadarData(RadarConfig.RadarConfig):
     def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',
             radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,
-            conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN']): 
+            conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg']): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,
                       z=z, u=u, v=v, w=w,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
@@ -69,6 +69,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.strat_types = strat_types
         self.mixed_types = mixed_types
         self.band = band
+        self.mixr=mixr
         if ddata is not None:
             self.data= data.combine_first(ddata)
         else:
@@ -1016,7 +1017,7 @@ class RadarData(RadarConfig.RadarConfig):
         wh_t = np.where(dum == np.min(dum))
         return wh_t[0][0]
         
-######################### Here is the CAPPI stuff ##############################
+######################### Here is the 4 stuff ##############################
 
     def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=None, cblabel=None, 
         labels=True, res = 2.0, thresh_dz=False,contour = None,**kwargs):
@@ -1172,6 +1173,7 @@ class RadarData(RadarConfig.RadarConfig):
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
 #            try:
+                print 'RadarDAta 1177:', res,z,ax
                 self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
 #                print 'Error trying to plot vectors: {}'.format(e)
@@ -1254,6 +1256,7 @@ class RadarData(RadarConfig.RadarConfig):
                 vect = vectors[i]
             else:
                 vect = None
+            print 'RadarDAta 1258:',axf[i],xlim,ylim,var,vect,res,vcont
             dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz)
         # now do the HID plot, call previously defined functions
         # try:
@@ -1402,7 +1405,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             resx = res[0]
             resy = res[1]
-
+        print 'RadarDAta 1408:',res
 
         if self.data[self.x_name].units == "[deg]":
             xskip = int(np.round(resx/(self.dx*110.)))
@@ -1510,7 +1513,7 @@ class RadarData(RadarConfig.RadarConfig):
                 udatskip = udat[::yskip, ::xskip]
                 vdatskip = vdat[::yskip, ::xskip]
 #            print np.shape(xdatskip),np.shape(ydatskip),np.shape(udatskip),np.shape(vdatskip)
-
+            print 'RadarData 1516:', xskip, yskip,np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat)
             q_handle = ax.quiver(xdatskip, ydatskip, \
                 udatskip, vdatskip, \
                     scale=100, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
@@ -2252,3 +2255,32 @@ class RadarData(RadarConfig.RadarConfig):
         for k in eval(self.mixed_types):
             self.raintype[self.raintype == self.rtypes[k]] =3
 
+
+#############################################################################################################
+
+    def hid_q_compare(self):
+        hidmassq = {}
+        for s in np.unique(self.hid):
+            whtp = np.where(self.hid == s)
+            count = len(whtp)
+            vol = count*self.dx*self.dy
+            mass = {}
+            for q in eval(self.mixr):
+                #print q
+                mass[q]=np.sum(self.data[q].data[whtp])*vol
+            hidmassq[s] = mass
+        self.hidmassq = hidmassq
+        
+    def score_q_corr(self):
+        corr = np.zeros([len(self.scores[:,0,0,0]),len(eval(self.mixr))])
+        #print np.shape(corr)
+        for q,i in enumerate((self.scores[:,0,0,0])):
+            #print q
+            for h,j in enumerate(eval(self.mixr)):
+                #print j
+                #print q,i,h,j
+                whgd = np.where(np.logical_and(np.isfinite(np.ravel(self.scores[q,...])),np.isfinite(np.ravel(self.data[j].data))))
+                corr[q,h] = np.corrcoef(np.ravel(self.scores[q,...])[whgd],np.ravel(self.data[j].data)[whgd])[0,1]
+                #print 'corr!',corr[q,h]
+                #corr[q,h] = np.corrcoef(self.scores[i,...],self.data[j].data)
+        self.scoreqcorr = corr
