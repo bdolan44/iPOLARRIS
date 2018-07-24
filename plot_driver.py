@@ -861,6 +861,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         #z=2.0
         #print xlim
         if config['cappi_multi'] == True:
+            print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
             fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
     #        plt.tight_layout()
             label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
@@ -868,8 +869,9 @@ def make_single_pplots(rdat,flags,config,y=None):
             plt.clf()
 
         else:
-            for v in eval(config['cappi_vars']):
-                fig,ax = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = v,vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
+            for i,v in enumerate(eval(config['cappi_vars'])):
+                print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
+                fig,ax = rdat.cappi(str(v))#,ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'][i],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
     #        plt.tight_layout()
                 #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
                 plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
@@ -878,18 +880,26 @@ def make_single_pplots(rdat,flags,config,y=None):
         
     if flags['all_xsec']== True:
         #y=-12.5
-        fig, ax = rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+        if config['xsec_multi'] == True:
+            fig, ax = rdat.xsec_multiplot(ts=rdat.date,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
         
-        #plt.tight_layout()
-        nvars = len(eval(config['rhi_vars']))
-        if nvars <=6:
-            yof = 0.01
+            #plt.tight_layout()
+            nvars = len(eval(config['rhi_vars']))
+            if nvars <=6:
+                yof = 0.01
+            else:
+                yof=-0.02
+        
+            label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
+            plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],v=nvars,t=config['ptype'],y=config['y']),dpi=300)
+            plt.clf()
         else:
-            yof=-0.02
-        
-        label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
-        plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],v=nvars,t=config['ptype'],y=config['y']),dpi=300)
-        plt.clf()
+            for i,v in enumerate(config['rhi_vars']):
+                fig, ax = rdat.xsect(v,ts=rdat.date,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'][i],xlim=config['xlim'])
+                #plt.tight_layout()
+                plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
+                plt.clf()
+
 
 
     if config['wname'] in rdat.data.variables.keys():
