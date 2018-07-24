@@ -34,7 +34,7 @@ def get_data(config, tm, rfile, dmatch,smatch):
                                               exper=config['exper'],mphys=config['mphys'],radar_name = config['radarname'],
                                               z_thresh=config['zthresh'],cs_z = config['cs_z'],zconv=config['zconv'],remove_diffatt = config['removediffatt'],
                                               zdr_offset=config['zdr_offset'], conv_types = config['conv_types'],strat_types = config['strat_types'],
-                                              mixed_types = config['mixed_types'])
+                                              mixed_types = config['mixed_types'],mixr = config['mixr'])
                                               
     if dmatch is not None:
          wvardum = np.zeros_like(rdata.data[rdata.dz_name].data)
@@ -88,6 +88,11 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
              for line in f:
                 dat = (line)
                 dum.append(foo(dat))
+
+
+    if config['hid_stats'] is True:
+        hidq_mass=[]   
+        hidq_corr=[]
 
     dzcfad_a=[]
     drcfad_a=[]
@@ -470,11 +475,21 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
         rconf.exper = rdat.exper
         rconf.radar_name = rdat.radar_name
         
+        
+        if config['hid_stats'] is True:
+            
+            rdat.hid_q_compare()            
+            hidq_mass.append(rdat.hidmassq)
+            
+            rdat.score_q_corr()
+            hidq_corr.append(rdat.scoreqcorr)
+        
         if interactive is True:
             return rdat
             
         del rdat
-
+    hidstat={'mass':hidq_mass,'corr':hidq_corr}
+    pickle.dump(hidstat, open( "hid_stat_{v}_{p}_{e}.p".format(v=config['mphys'],p=config['exper'],e=config['extra']), "wb" ) )
 
     dat = {'rconf': rconf,
           'dzcfad':dzcfad_a,
