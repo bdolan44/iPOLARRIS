@@ -6,3 +6,4 @@
 *.tar
 *.pyc
 *.p
+*.npy
