@@ -78,6 +78,7 @@ up_width==False                       ==# Make a plot of the vertical velocity p
 qr_cappi==True                       ==# Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
 qr_rhi==True                         ==#Make rhis of the mixing ratios (only valid for model)
 cfadbytype==False                      ==# Produce CFADS for a specific HID type.
+hid_stats == True                       ==#Whether to get HID stats (scores and correlations with mixing ratios)
 ks == ['cfad_mpanel_flag','hid_cfad_flag','joint_flag','cfad_individ_flag','hid_prof','all_cappi','all_xsec','up_width','qr_cappi','qr_rhi']       ==#list of flags
 #
 #############Set up some plotting configurations #########################
