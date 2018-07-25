@@ -73,7 +73,6 @@ hid_cfad_flag==False                   ==# HID CFAD
 joint_flag==False                     ==#Z vs. Zdr
 cfad_individ_flag==False             ==#Make separate images for dbz, Zdr, Kdp, W and Rho
 hid_prof==False                      ==#Profile of HID species with height
-<<<<<<< HEAD
 all_cappi==False                       ==# make a cappi cross section for all times. change parameters in plot_driver.py
 cappi_multi==False		      ==#Set up multi panel CAPPI plots.
 all_xsec==False                       ==# make RHI cross sections for all times. change parmaters in plot_driver.py
