@@ -895,7 +895,7 @@ def make_single_pplots(rdat,flags,config,y=None):
             plt.clf()
         else:
             for i,v in enumerate(config['rhi_vars']):
-                fig, ax = rdat.xsect(v,ts=rdat.date,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'][i],xlim=config['xlim'])
+                fig, ax = rdat.xsec(v,ts=rdat.date,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'][i],xlim=config['xlim'])
                 #plt.tight_layout()
                 plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
                 plt.clf()
