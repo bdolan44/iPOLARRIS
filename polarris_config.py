@@ -84,11 +84,15 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
                 dat = (line)
                 dum.append(foo(dat))
     except:
-        with open(eval(config['radar_files'])) as f:
-             for line in f:
-                dat = (line)
-                dum.append(foo(dat))
-
+		try:
+			with open(eval(config['radar_files'])) as f:
+				 for line in f:
+					dat = (line)
+					dum.append(foo(dat))
+		except NameError as ne:
+			print ne
+			print 'Check that file list is correct and exists. Returning'
+			sys.exit(1)
 
     if config['hid_stats'] is True:
         hidq_mass=[]   
