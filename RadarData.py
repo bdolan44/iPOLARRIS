@@ -851,7 +851,7 @@ class RadarData(RadarConfig.RadarConfig):
 
             #print xmini,xmaxi,zmini,zmaxi
             # if this variable is already included in the defaults, then this is straightforward
-           #print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
+            print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
     #        print zmini,zmaxi,y_ind,xmini,xmaxi
             if self.y_name == 'latitude':
                 data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),y=slice(y_ind,y_ind+1),x=slice(xmini,xmaxi)).data)
@@ -929,6 +929,8 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             print 'No data for this variable!'
             dummy = fig
+        print type(dummy),dummy
+
         return dummy
 
 #############################################################################################################
@@ -1010,7 +1012,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         fig.suptitle('%s %s Cross Section y = %s' %(ts, self.radar_name,yval), fontsize = 18)
 
-        return fig, ax
+        return fig #, ax
 
     def get_ind(self,val,dat):
         dum = np.abs(val - dat)
@@ -1029,7 +1031,13 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         if xlim is None:
-            xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
+#          print 'xlim is also none!'
+            if self.x_name == 'longitude':
+                xmint, xmaxt = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
+                xmini = self.get_ind(xmint,self.data[self.x_name].data[:,0])
+                xmaxi = self.get_ind(xmaxt,self.data[self.x_name].data[:,0])
+            else:
+                xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
             xmin =xmini
             xmax = xmaxi
         else:
@@ -1043,11 +1051,19 @@ class RadarData(RadarConfig.RadarConfig):
                 xmin = xlim[0]
                 xmax = xlim[1]
         if ylim is None:
-            ymini, ymaxi = self.data[self.y_name].data.min(), self.data[self.y_name].data.max()
+ #           print 'ylim is None!'
+            if self.y_name == 'latitude':
+                ymint, ymaxt = self.data[self.y_name].data.min(), self.data[self.y_name].data.max()
+                ymini = self.get_ind(ymint,self.data[self.y_name].data[:,0])
+                ymaxi = self.get_ind(ymaxt,self.data[self.y_name].data[:,0])
+            else:
+                ymini, ymaxi = self.data[self.y_name].data.min(), self.data[self.y_name].data.max()
+            
             ymin = ymini
             ymax = ymaxi
         else:
             if self.y_name == 'latitude':
+                print 'trying to get indices'
                 ymini = self.get_ind(ylim[0],self.data[self.y_name].data[:,0])
                 ymaxi = self.get_ind(ylim[1],self.data[self.y_name].data[:,0])
                 ymin = ylim[0]
@@ -1072,6 +1088,7 @@ class RadarData(RadarConfig.RadarConfig):
         except:
 #            print 'ln1033',z_ind,ymini,ymaxi,xmini,xmaxi,var
 #            print np.shape(self.data[var].data)
+            
             data = np.squeeze(self.data[var].data[z_ind,ymini:ymaxi,xmini:xmaxi])
         if len(np.shape(data)) > 2:
 #            print 'data shape is wrong!',np.shape(data)
@@ -1091,21 +1108,27 @@ class RadarData(RadarConfig.RadarConfig):
 #        data[dzmask] =np.nan
         data = np.ma.masked_where(~np.isfinite(data),data)
 
-
+#        print 'about to do plotting, ln 1113'
         if var in self.lims.keys():
+ #           print 'var:',var
             range_lim = self.lims[var][1] - self.lims[var][0]
-#            print np.shape(data), np.shape(xdat),np.shape(ydat)
+  #          print np.shape(data), np.shape(xdat),np.shape(ydat)
 #            print 'in var',var
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
         else:
+   #         print 'unrecognized var',var
             dat = self.data[var].data
             dat[dat<-900.0]=np.nan
             range_lim  = np.nanmax(dat) - np.nanmin(dat)
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = np.nanmin(dat), vmax = np.nanmax(dat), cmap = plt.cm.gist_ncar,**kwargs)
 
+#        print 'success in plotting. Ln 1126 returned ', type(dummy)
+#        print 'contour is:', contour
+
         if contour is not None:
+#            print 'Contour is not none',contour
             if contour == 'CS':
 #                print 'contours!'
                 csvals = deepcopy((self.data[var]))
@@ -1173,7 +1196,7 @@ class RadarData(RadarConfig.RadarConfig):
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
 #            try:
-                print 'RadarDAta 1177:', res,z,ax
+#                print 'RadarDAta 1177:', res,z,ax
                 self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
 #                print 'Error trying to plot vectors: {}'.format(e)
@@ -1182,7 +1205,7 @@ class RadarData(RadarConfig.RadarConfig):
         if title_flag:
             ax.set_title('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
                     self.data[self.z_name].data[0][z_ind]), fontsize = 14)
-
+#        print type(dummy),dummy
         return dummy
 
 #############################################################################################################
@@ -1273,7 +1296,7 @@ class RadarData(RadarConfig.RadarConfig):
                     self.data[self.z_name][z_ind]), fontsize = 18)
 
 
-        return fig, ax
+        return fig #, ax
 
 
 #############################################################################################################
