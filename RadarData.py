@@ -929,7 +929,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             print 'No data for this variable!'
             dummy = fig
-        print type(dummy),dummy
+#        print type(dummy),dummy
 
         return dummy
 
@@ -999,7 +999,7 @@ class RadarData(RadarConfig.RadarConfig):
         for i, var in enumerate(good_vars):
             if vectors is not None:
                 vect = vectors[i]
-                print 'RadarData ln 992 vectors', vectors,vect
+#                print 'RadarData ln 992 vectors', vectors,vect
             else:
                 vect = None
             dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
@@ -1063,7 +1063,7 @@ class RadarData(RadarConfig.RadarConfig):
             ymax = ymaxi
         else:
             if self.y_name == 'latitude':
-                print 'trying to get indices'
+#                print 'trying to get indices'
                 ymini = self.get_ind(ylim[0],self.data[self.y_name].data[:,0])
                 ymaxi = self.get_ind(ylim[1],self.data[self.y_name].data[:,0])
                 ymin = ylim[0]
@@ -1114,8 +1114,9 @@ class RadarData(RadarConfig.RadarConfig):
             range_lim = self.lims[var][1] - self.lims[var][0]
   #          print np.shape(data), np.shape(xdat),np.shape(ydat)
 #            print 'in var',var
+            #print **kwargs
             dummy = ax.pcolormesh(xdat,ydat, data,
-                vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
+                vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
         else:
    #         print 'unrecognized var',var
             dat = self.data[var].data
@@ -1279,7 +1280,7 @@ class RadarData(RadarConfig.RadarConfig):
                 vect = vectors[i]
             else:
                 vect = None
-            print 'RadarDAta 1258:',axf[i],xlim,ylim,var,vect,res,vcont
+#            print 'RadarDAta 1258:',axf[i],xlim,ylim,var,vect,res,vcont
             dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz)
         # now do the HID plot, call previously defined functions
         # try:

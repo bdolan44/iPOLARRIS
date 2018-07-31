@@ -860,10 +860,11 @@ def make_single_pplots(rdat,flags,config,y=None):
     if flags['all_cappi']== True:
         #z=2.0
         #print xlim
+        #print cappi_multi
         if config['cappi_multi'] == True:
-#            print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
+            #print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
             fig = rdat.cappi_multiplot(ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
-    #        plt.tight_layout()
+            #plt.tight_layout()
 #            print np.shape(fig),type(fig), fig
             label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=6)
             plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
@@ -871,10 +872,11 @@ def make_single_pplots(rdat,flags,config,y=None):
 
         else:
             for i,v in enumerate(eval(config['cappi_vars'])):
-                print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
-                print str(v)
-                fig,ax = rdat.cappi(str(v))#,ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'][i],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
-    #        plt.tight_layout()
+                #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
+                #print str(v)
+#                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
+                fig= rdat.cappi(str(v),ts=rdat.date,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
+                plt.tight_layout()
                 #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
                 plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],z=config['z']),dpi=300)
                 plt.clf()
@@ -892,15 +894,16 @@ def make_single_pplots(rdat,flags,config,y=None):
             else:
                 yof=-0.02
         
+            #plt.tight_layout()
             label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
             plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],v=nvars,t=config['ptype'],y=config['y']),dpi=300)
             plt.clf()
         else:
             for i,v in enumerate(eval(config['rhi_vars'])):
-                print i, v
-                print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
-                fig, ax = rdat.xsec(v,ts=rdat.date,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'][i],xlim=config['xlim'])
-                #plt.tight_layout()
+                #print i, v
+                #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
+                fig = rdat.xsec(v,ts=rdat.date,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'])
+                plt.tight_layout()
                 plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
                 plt.clf()
 
