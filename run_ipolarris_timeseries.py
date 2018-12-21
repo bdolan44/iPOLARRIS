@@ -23,9 +23,18 @@ import GeneralFunctions as GF
 from skewPy import SkewT
 from collections import OrderedDict
 
+import os
+import sys
+
+
 from matplotlib.dates import DateFormatter,HourLocator
 dayFormatter = DateFormatter('%H%M')      # e.g., 12
 hourFormatter = DateFormatter('%H')      # e.g., 12
+
+
+def hasNumbers(inputString):
+     return any(char.isdigit() for char in inputString)
+
 
 
 configfile = sys.argv[1:]
@@ -58,9 +67,10 @@ with open(configfile[0]) as f:
                 config[(key.replace(" ", ""))] = vval
             
 
+text_file = open(config['radar_files'], "r")
+rfiles = text_file.readlines()
 
-
-rvar = xr.open_mfdataset(config['radar_files'],preprocess=lambda ds:ds.drop(['time']),concat_dim='d')
+rvar = xr.open_mfdataset(rfiles)#,preprocess=lambda ds:ds.drop(['time']),concat_dim='d')
 
 lon_0 = 131.04444
 lat_0 = -12.24917
