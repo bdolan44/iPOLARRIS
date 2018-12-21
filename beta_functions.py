@@ -76,7 +76,7 @@ import os
 #Beta function parameters stored in individual CSVs in separate directory
 CSV_DIR = os.sep.join([os.path.dirname(__file__),
                       'beta_function_parameters'])+'/'
-
+print('CSV_DIR',CSV_DIR)
 ################################
 #Helper Functions Below
 ################################
@@ -152,7 +152,7 @@ def get_beta_set(filename, factor=1.0):
 ################################
 
 def get_mbf_sets_summer(use_temp=True, plot_flag=False, n_types=10,
-                        temp_factor=1, band='S', fdir=CSV_DIR, verbose=False,
+                        temp_factor=1, band='S', fdir='./beta_function_parameters/', verbose=False,
                         pdir='./'):
     """
     Define structures to hold the beta function parameters for each input

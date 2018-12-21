@@ -109,7 +109,9 @@ def raintype(refl=None, refl_missing_val=-9999, refl_dx=1, minZdiff=20,
     return raintype, types
   
   #Create missing value mask and turn refl missing values into NaN's
+  #print refl.shape
   mask = np.zeros(refl.shape)
+  #print np.shape(mask),refl_missing_val
   mask[(refl == refl_missing_val)] = 1
   refl[(mask == 1)] = np.nan
 #  print refl_missing_val

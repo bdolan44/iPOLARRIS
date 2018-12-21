@@ -488,14 +488,14 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
             rdat.score_q_corr()
             hidq_corr.append(rdat.scoreqcorr)
         
-        if interactive is True:
-            return rdat
+    if interactive is True:
+        return rdat
             
-        del rdat
+    del rdat
 
-	if config['hid_stats'] is True:
-		hidstat={'mass':hidq_mass,'corr':hidq_corr}
-		pickle.dump(hidstat, open( "hid_stat_{v}_{p}_{e}.p".format(v=config['mphys'],p=config['exper'],e=config['extra']), "wb" ) )
+    if config['hid_stats'] is True:
+        hidstat={'mass':hidq_mass,'corr':hidq_corr}
+        pickle.dump(hidstat, open( "hid_stat_{v}_{p}_{e}.p".format(v=config['mphys'],p=config['exper'],e=config['extra']), "wb" ) )
 
     dat = {'rconf': rconf,
           'dzcfad':dzcfad_a,

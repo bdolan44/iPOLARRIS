@@ -32,8 +32,11 @@ import datetime
 import scipy.ndimage as ndi
 import xarray as xr
 import raintype as rt
+import steiner_houze_yuter_cs as shy
 
+from pyproj import Proj, transform
 
+from tqdm import tqdm
 
 #import analysis_tools as AT
 #import lightning_tools as LT
@@ -48,11 +51,11 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
-            temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',
-            radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,
+            temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',lat_r=None,lon_r=None,
+            radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,lat_0 = 0.0,lon_0=90.0,
             conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg']): 
 
-        super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,
+        super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,lat_0=lat_0,lon_0=lon_0,lat_r=lat_r,lon_r=lon_r,
                       z=z, u=u, v=v, w=w,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
 
         # ********** initialize the data *********************
@@ -70,6 +73,8 @@ class RadarData(RadarConfig.RadarConfig):
         self.mixed_types = mixed_types
         self.band = band
         self.mixr=mixr
+        self.lat_0 = lat_0
+        self.lon_0 = lon_0
         if ddata is not None:
             self.data= data.combine_first(ddata)
         else:
@@ -94,12 +99,18 @@ class RadarData(RadarConfig.RadarConfig):
         except:
             self.nhgts = np.shape(self.data[self.z_name].data)
 #            self.read_data_from_nc(self.radar_file)
+        print 'calculating deltas'
         self.calc_deltas()
         self.rr_name = rr
-        self.mask_dat()
+        #print 'masking data'
+        #self.mask_dat()
         if remove_diffatt == True:
             self.corr_zdr()
-        self.raintype()
+#        self.raintype_calc()
+#        self.calc_pol_analysis()
+        #print 'going to HID'
+#        self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh)
+
 #        else:
 #            pass
 
@@ -174,7 +185,7 @@ class RadarData(RadarConfig.RadarConfig):
 
     #############################################################################################################
 
-    def raintype(self):
+    def raintype_calc(self):
         print 'Setting up default C/S parameters. Can change in RadarData.py'
         minZdiff = 20 
         deepcoszero = 40
@@ -195,26 +206,39 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             dx = self.dx
 #        print dx
-        zlev = self.get_ind(self.cs_z,self.data[self.z_name].data)
+        zlev = self.get_ind(self.cs_z,self.data[self.z_name].values)
 #        print zlev
-        
-        refl = np.squeeze(self.data[self.dz_name].sel(z=slice(zlev,zlev)).data)
-        if len(np.shape(refl)) > 2:
-            refl = np.squeeze(self.data[self.dz_name].sel(z=slice(zlev,zlev+1)).data)
 
-        raintype,self.rtypes = rt.raintype(refl, refl_missing_val=self.data[self.dz_name].data.min(), 
-                                   refl_dx=dx, minZdiff=minZdiff, deepcoszero=deepcoszero,
-                                   shallowconvmin=shallowconvmin,truncZconvthres=truncZconvthres,
-                                   dBZformaxconvradius=dBZformaxconvradius,
-                                   weakechothres=weakechothres, backgrndradius=backgrndradius,
-                                   maxConvRadius=maxConvRadius,minsize=minsize,
-                                   startslope=startslope, maxsize=maxsize)
-        nlevs = np.shape(self.data[self.z_name].data)[0]
-#        print nlevs
-        rpt = np.tile(raintype,(nlevs,1,1))
-        self.raintype= rpt        
-        self.def_convstrat()
-    #############################################################################################################
+        print 'Unfortunatley have to run the raintype per file. Might take a minute....{n}'.format(n=self.data.dims['d'])
+        rntypetot = []
+        for q in range(self.data.dims['d']):        
+        
+            refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=slice(zlev,zlev)).values)
+            #print 'refl shape',np.shape(refl)
+            if len(np.shape(refl)) > 3:
+                refl = np.squeeze(self.data[self.dz_name].sel(z=slice(zlev,zlev+1)).values)
+            #print 'refl shape',np.shape(refl)
+            #print type(refl)
+            refl.setflags(write=1)
+            refl[(np.isnan(refl))] = -99999.9
+            refl_missing_val = -99999.9
+            #print self.data[self.dz_name].min()
+            raintype,self.rtypes = rt.raintype(refl, refl_missing_val=refl_missing_val,
+                                       refl_dx=dx, minZdiff=minZdiff, deepcoszero=deepcoszero,
+                                       shallowconvmin=shallowconvmin,truncZconvthres=truncZconvthres,
+                                       dBZformaxconvradius=dBZformaxconvradius,
+                                       weakechothres=weakechothres, backgrndradius=backgrndradius,
+                                       maxConvRadius=maxConvRadius,minsize=minsize,
+                                       startslope=startslope, maxsize=maxsize)
+            nlevs = np.shape(self.data[self.z_name].data)[0]
+    #        print nlevs
+            rpt = np.tile(raintype,(nlevs,1,1))
+            rntypetot.append(rpt)
+        self.raintype= np.array(rntypetot)
+        #self.def_convstrat()
+        self.add_field((self.data[self.dz_name].dims,self.raintype,), 'RRT')    
+        
+#############################################################################################################
 
     def check_size(self,ddata):
         if self.x_name in self.data:
@@ -274,19 +298,19 @@ class RadarData(RadarConfig.RadarConfig):
         for k in self.data.variables.keys():
 #            print k, np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
             if k != 'TIME' and k != self.t_name:
-#                print k
+                print k
 #                print np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
                 try:
-                    whbad = np.where(np.less_equal(self.data[self.dz_name].data, self.z_thresh))
+                    whbad = np.where(np.less_equal(self.data[self.dz_name].values, self.z_thresh))
                     self.data[k].data[whbad]= np.nan
-                    whbad2 = np.where(np.isnan(self.data[self.dz_name].data))
-                    self.data[k].data[whbad2]= np.nan
+                    whbad2 = np.where(np.isnan(self.data[self.dz_name].values))
+                    self.data[k].values[whbad2]= np.nan
 #                    self.data[k].data = np.ma.masked_where(self.data[self.dz_name].data < self.z_thresh,self.data[k].data)
 
-                    whbad3 = np.where(np.less_equal(self.data[k].data, self.badval))
-                    self.data[k].data[whbad3] = np.nan
-                    whbad4 = np.where(np.isnan(self.data[k].data))
-                    self.data[k].data[whbad4] = np.nan
+                    whbad3 = np.where(np.less_equal(self.data[k].values, self.badval))
+                    self.data[k].values[whbad3] = np.nan
+                    whbad4 = np.where(np.isnan(self.data[k].values))
+                    self.data[k].values[whbad4] = np.nan
                 except:
                     pass
 #                    print np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data), 'wrong shapes!'
@@ -511,7 +535,7 @@ class RadarData(RadarConfig.RadarConfig):
     def calc_pol_analysis(self):
         self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh)
         self.calc_qr_pol()
-        self.calc_rr_pol()
+        self.calc_rr_pol(**kwargs)
 
 
 #############################################################################################################
@@ -521,64 +545,51 @@ class RadarData(RadarConfig.RadarConfig):
 
    # Just a wrapper on the CSU radartools HID function
     def set_hid(self, band=None, use_temp=False, name='HID',zthresh = -9999.0):
-       bad = self.data[self.dz_name].data < self.z_thresh
-#       print type(self.data[self.dz_name])
-
-       
-       if band is None:
+        #        print zthresh
+        #        print self.dz_name
+        #       bad = self.data[self.dz_name].where(self.data[self.dz_name].values<zthresh)
+        #       print type(self.data[self.dz_name])
+        if band is None:
            self.hid_band = self.band
-       else:
+        else:
            self.hid_band = band
-       if use_temp and hasattr(self, 'T'):
-            #print 'using T!'
-            #print self.dz_name
-            #print self.zdr_name
-            #print self.kdp_name
-            #print self.rho_name
-            #print np.ma.max(self.T)
-#             try:
-#                 #msk = self.data[self.dz_name].data.where(self.data[self.dz_name].data < -10)
-# 
-#                 self.data[self.dz_name].data = np.ma.masked_where(self.T.mask,self.data[self.dz_name].data)
-#                 self.data[self.zdr_name].data = np.ma.masked_where(self.T.mask,self.data[self.zdr_name].data)
-#                 self.data[self.kdp_name].data = np.ma.masked_where(self.T.mask,self.data[self.kdp_name].data)
-#                 self.data[self.rho_name].data = np.ma.masked_where(self.T.mask,self.data[self.rho_name].data)
-#             except:
-#                 self.data[self.zdr_name].data = np.ma.masked_where(bad,self.data[self.zdr_name].data)
-#                 self.data[self.kdp_name].data = np.ma.masked_where(bad,self.data[self.kdp_name].data)
-#                 self.data[self.rho_name].data = np.ma.masked_where(bad,self.data[self.rho_name].data)
-# 
-            #print self.hid_band
-#             print self.data[self.dz_name]
-#             print self.data[self.zdr_name]
-#             print self.data[self.kdp_name]
-#             print self.data[self.rho_name]
-#           
-            self.scores = csu_fhc.csu_fhc_summer(dz=self.data[self.dz_name].data, zdr=self.data[self.zdr_name].data, rho=self.data[self.rho_name].data, 
-                                kdp=self.data[self.kdp_name].data, band=self.hid_band, use_temp=True, T=self.T)
-       else:
-           self.scores = csu_fhc.csu_fhc_summer(dz=self.data[self.dz_name].data, zdr=self.data[self.zdr_name].data, rho=self.data[self.rho_name].data, 
-                                kdp=self.data[self.kdp_name].data, band=self.hid_band, use_temp=False) 
+        
+        scores = []
+        for v in tqdm(range(len(self.data[self.dz_name]))):
+            dzhold =self.data[self.dz_name].sel(d=v).values
+            drhold =self.data[self.zdr_name].sel(d=v).values
+            kdhold = self.data[self.kdp_name].sel(d=v).values
+            rhhold = self.data[self.rho_name].sel(d=v).values
+  
+            if use_temp and hasattr(self, 'T'):
+               print 'Using T!'
+               tdum = self.T.sel(d=v)
+            else:
+               tdum = None
 
+            scoresdum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=drhold, rho=rhhold, 
+                                kdp=kdhold, band=self.hid_band, use_temp=True, T=tdum)
+            scores.append(scoresdum)
 
-       self.data[self.dz_name].data[bad] = np.nan
-       dzmask = np.isnan(self.data[self.dz_name].data)
-
-           # set the hid
-       self.hid = np.argmax(self.scores, axis=0)+1
-       try:
-#           print 'Trying to mask HID!'
-           self.hid[dzmask] = -1
-       except:
-           print 'Problem trying to threshold HID'
-       try:
-            scmask = np.isnan(self.scores[0,...])
-#            print 'trying to mask via scores!'
-            self.hid[scmask] =-1
-       except:
-            print 'Cant threshold on scores!'
-#           self.hid=np.ma.masked_where(self.data[self.dz_name].data < self.z_thresh,self.hid)
-       self.add_field((self.data[self.dz_name].dims,self.hid,), name)
+        print "Returned to RadarData"
+#         self.scores=np.array(scores)
+#         #       self.data[self.dz_name].values[bad] = np.nan
+#         #dzmask = self.data[self.dz_name].values <=zthresh
+#            # set the hid
+#         self.hid = np.argmax(self.scores, axis=0)+1
+#         try:
+#         #           print 'Trying to mask HID!'
+#            self.hid[dzmask] = -1
+#         except:
+#            print 'Problem trying to threshold HID'
+#         try:
+#             scmask = np.isnan(self.scores[0,...])
+#         #            print 'trying to mask via scores!'
+#             self.hid[scmask] =-1
+#         except:
+#             print 'Cant threshold on scores!'
+#         #           self.hid=np.ma.masked_where(self.data[self.dz_name].data < self.z_thresh,self.hid)
+#         self.add_field((self.data[self.dz_name].dims,self.hid,), name)
 
 #############################################################################################################
         ###Calculate the mixing ratios and add to the radar object
@@ -651,15 +662,17 @@ class RadarData(RadarConfig.RadarConfig):
         self.add_field((self.data[self.dz_name].dims,qrr,), 'rqr')
 
     
-    def calc_rr_pol(self):
+    def calc_rr_pol(self,band=None):
 
 #        import pydisdrometer as pyd
 #        import pytmatrix as pyt
         import csu_blended_rain_julie
 
     ### This is where I do mixing ratio calculations ### 
-
-        if self.band == 'C' or self.band == 'c':
+        if band == None:
+            band = self.band
+        
+        if band == 'C' or band == 'c':
             if self.expr == 'MC3E':
                 k_c=20.59
                 k_m=0.75
@@ -688,7 +701,7 @@ class RadarData(RadarConfig.RadarConfig):
                 a=azdrk_coeff=41.0249
                 b=bzdrk_coeff=0.882359
                 c=czdrk_coeff=-1.30948
-        elif self.band == 'S' or self. band == 's':
+        elif band == 'S' or band == 's':
             if self.expr == 'MC3E':
                 k_c=35.77975
                 k_m=0.767
@@ -721,10 +734,10 @@ class RadarData(RadarConfig.RadarConfig):
             print 'Sorry, your wavelength has not been run yet! Return to first principles!'
             return
 
-        rr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].data,self.data[self.zdr_name].data,self.data[self.kdp_name].data,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
-                                                      czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band='S',fhc=self.hid)
+        rr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
+                                                      czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band=band,fhc=self.hid)
 
-        self.add_field((self.data[self.dz_name].dims,rr,), 'RRB')
+        self.add_field((self.data[self.dz_name].dims,rr,), 'RRP')
         self.add_field((self.data[self.dz_name].dims,rm,), 'RRM')
 
         return
@@ -2269,15 +2282,28 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
     def def_convstrat(self):
-        
-        for k in eval(self.conv_types):
+        #print self.conv_types,self.strat_types
+        for k in self.conv_types:
             
             self.raintype[self.raintype == self.rtypes[k]] =2
-        for k in eval(self.strat_types):
+        for k in self.strat_types:
             self.raintype[self.raintype == self.rtypes[k]] =1
 
-        for k in eval(self.mixed_types):
+        for k in self.mixed_types:
             self.raintype[self.raintype == self.rtypes[k]] =3
+
+#############################################################################################################
+
+    def calc_timeseries_stats(self,maxrain_height = 3):
+        #First calculate the domain averaged rain rates at a given level.
+        if self.rr_name is not None:
+            rr_timeseries_uncond = rr.mean(dim=['x','y','z'],skipna=True)       
+            
+        
+        else:
+            print 'No Rain field available'
+    
+    
 
 
 #############################################################################################################
@@ -2308,3 +2334,74 @@ class RadarData(RadarConfig.RadarConfig):
                 #print 'corr!',corr[q,h]
                 #corr[q,h] = np.corrcoef(self.scores[i,...],self.data[j].data)
         self.scoreqcorr = corr
+
+#############################################################################################################
+    def get_latlon_fromxy(self):
+    
+        proj = Proj(init='epsg:3857')
+
+        lon_0 = self.lon_0
+        lat_0 = self.lat_0
+        p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=self.lon_0)) 
+        xx, yy = np.meshgrid(self.data[self.x_name], self.data[self.y_name])
+        lons, lats = p(xx*1000.,yy*1000.,inverse=True)
+    
+        self.data['lat'] = ((self.x_name,self.y_name),lats)
+        self.data['lon'] = ((self.x_name,self.y_name),lons)
+        self.lat_name='lat'
+        self.lon_name='lon'
+    
+    #############################################################################################################
+    def calc_cs_shy(self):
+        print 'Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d'])
+        rntypetot = []
+
+        if self.lat_name in self.data.keys():
+            lat = self.data[self.lat_name].values
+            lon = self.data[self.lon_name].values
+        else:
+            self.get_latlon_fromxy()
+            lat = self.data[self.lat_name].values
+            lon = self.data[self.lon_name].values
+
+        for q in tqdm(range(self.data.dims['d'])):
+            #print q     
+            zlev = self.cs_z
+            refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
+            #print 'refl shape',np.shape(refl),type(refl)
+#             if len(np.shape(refl)) >= 3:
+#                 print 'len is 3+'
+#                 refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=slice(zlev,zlev+1)).values)
+            refl.setflags(write=1)
+#             refl[(np.isnan(refl))] = -99999.9
+#             refl_missing_val = -99999.9
+            #print self.data[self.dz_name].min()
+ #            if self.lat_name in self.data.keys():
+#                 lat = self.data[self.lat_name].values
+#                 lon = self.data[self.lon_name].values
+#             else:
+#                 self.get_latlon_fromxy()
+#                 lat = self.data[self.lat].values
+#                 lon = self.data[self.lon].values
+            
+            yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat, lon, 40.0, method='SYH', sm_rad=2,a=8, b=64)
+            cs_arr = np.full(yh_cs.shape, np.nan)
+            #print (np.nanmax(yh_cs),np.nanmax(cs_arr))
+            yh_conv = (yh_cs == 3) | (yh_cs == 4) | (yh_cs == 5)| (yh_cs == 2) | (yh_cs == 1)
+            yh_strat = yh_cs == 0
+
+            cs_arr[yh_conv] = 2
+            cs_arr[yh_strat] = 1
+
+            cs_arr[np.isnan(refl)] =-1
+            nlevs = np.shape(self.data[self.z_name].data)[0]
+    #        print nlevs
+            rpt = np.tile(cs_arr,(nlevs,1,1))
+            #print np.shape(rpt)
+            #print np.nanmax(rpt)
+            rntypetot.append(rpt)
+        #self.def_convstrat()
+        #np.array(rntypetot)[np.isnan(self.data[self.dz_name].values)] =-1
+        self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')      
+
+

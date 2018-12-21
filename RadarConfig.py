@@ -12,7 +12,7 @@ class RadarConfig(object):
     
     def __init__(self, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid = 'HID',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar',vr='VR',mphys='None',exper = 'Case',
-            band = 'C',lat = None,lon= None,tm = None,radar_name = None):
+            band = 'C',lat_0 = 0,lon_0=90.0,lat_r=None,lon_r=None,lat=None,lon=None,tm = None,radar_name = None):
         # ******** first the polarimetric stuff *************
         self.dz_name = dz
         self.zdr_name = zdr
@@ -32,12 +32,17 @@ class RadarConfig(object):
         self.v_name = v
         self.w_name = w
 
-
+        self.lat_name=lat
+        self.lon_name=lon
+        
         ########set up some experiment parameters ############
         self.mphys=mphys
         self.exper=exper
-        self.radar_lat = lat
-        self.radar_lon = lon
+        self.radar_lat = lat_r
+        self.radar_lon = lon_r
+        self.lat_0 = lat_0
+        self.lon_0 = lon_0
+        
         self.band = band
         self.expr =exper
         #print tm
