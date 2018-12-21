@@ -67,16 +67,27 @@ with open(configfile[0]) as f:
                 config[(key.replace(" ", ""))] = vval
             
 
-text_file = open(config['radar_files'], "r")
-rfiles = text_file.readlines()
-
-rvar = xr.open_mfdataset(rfiles)#,preprocess=lambda ds:ds.drop(['time']),concat_dim='d')
+with open(config['radar_files'], 'r') as f:
+    rfiles = f.read().splitlines()
+rvar = xr.open_mfdataset(rfiles,concat_dim='d')#,preprocess=lambda ds:ds.drop(['time']),concat_dim='d')
 
 lon_0 = 131.04444
 lat_0 = -12.24917
 
 lat_r = -12.24917
 lon_r = -131.04444
+
+tm = []
+for d in rfiles:
+    #print d
+    dformat = config['wdate_format']
+    base = os.path.basename(d)
+    radcdate=np.str(base[config['time_parse'][0]:config['time_parse'][1]])
+#    print radcdate
+    date=datetime.datetime.strptime(radcdate,dformat)
+    tm.append(date)
+
+
 
 rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['zdr_name'],
                                               kdp=config['kdp_name'],rho=config['rho_name'],temp=config['t_name'],
