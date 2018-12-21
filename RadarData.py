@@ -2370,7 +2370,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #            print 'q is '
             #print np.shape(self.data[self.z_name].sel(d=q))
-            zlev = np.where(self.data[self.z_name].sel(d=q) == self.cs_z)[0]
+            zlev = np.where(self.data[self.z_name].sel(d=q).values == self.cs_z)[0]
             #print np.shape(self.data[self.dz_name].sel(z=slice(1,2)))
             #print 'zlev',zlev[0]
             refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
@@ -2410,7 +2410,7 @@ class RadarData(RadarConfig.RadarConfig):
             rntypetot.append(rpt)
         #self.def_convstrat()
         #np.array(rntypetot)[np.isnan(self.data[self.dz_name].values)] =-1
-        print 'shapes',np.shape(rntypetot)
+        #print 'shapes',np.shape(rntypetot)
         self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')      
 
 

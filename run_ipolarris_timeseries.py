@@ -101,26 +101,36 @@ rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=confi
                                                
 rdata.calc_cs_shy()
 
-wup50 = rdata[rdata.w_name].where(rdata[rdata.w_name]>0).quantile(.5,dim=['x','y','d'])
-wup90 = rdata[rdata.w_name].where(rdata[rdata.w_name]>0).quantile(.9,dim=['x','y','d'])
-wup99 = rdata[rdata.w_name].where(rdata[rdata.w_name]>0).quantile(.99,dim=['x','y','d'])
+rdata.data[rdata.w_name].load()
+
+wup = rdata.data[rdata.w_name].where(rdata.data[rdata.w_name]>0)
+wup50 = wup.quantile(.5,dim=['x','y','d'])
+wdn = rdata.data[rdata.w_name].where(rdata.data[rdata.w_name]<0)
+wdn.values[wdn.values<-50] = np.nan
 
 
-wdn50 = rdata[rdata.w_name].where(rdata[rdata.w_name]<0).quantile(.5,dim=['x','y','d'])
-wdn90 = rdata[rdata.w_name].where(rdata[rdata.w_name]<0).quantile(.1,dim=['x','y','d'])
-wdn99 = rdata[rdata.w_name].where(rdata[rdata.w_name]<0).quantile(.01,dim=['x','y','d'])                                               
+wup50 = wup.quantile(.5,dim=['x','y','d'])
+wup90 = wup.quantile(.9,dim=['x','y','d'])
+wup99 = wup.quantile(.99,dim=['x','y','d'])
 
-plt.plot(wup50,rdata[rdata.z_name],color='goldenrod',label='50th')
-plt.plot(wup90,rdata[rdata.z_name],color='k',label='90th')
-plt.plot(wup99,rdata[rdata.z_name],color='r',label='99th')
+
+wdn50 = wdn.quantile(.5,dim=['x','y','d'])
+wdn90 = wdn.quantile(.1,dim=['x','y','d'])
+wdn99 = wdn.quantile(.01,dim=['x','y','d'])                                               
+
+zdat = rdata.data[rdata.z_name].sel(d=0).values
+plt.plot(wup50,zdat,color='goldenrod',label='50th')
+plt.plot(wup90,zdat,color='k',label='90th')
+plt.plot(wup99,zdat,color='r',label='99th')
 plt.legend(loc='best')
-plt.plot(wdn50,rdata[rdata.z_name],color='goldenrod')
-plt.plot(wdn90,rdata[rdata.z_name],color='k')
-plt.plot(wdn99,rdata[rdata.z_name],color='r')
+plt.plot(wdn50,zdat,color='goldenrod')
+plt.plot(wdn90,zdat,color='k')
+plt.plot(wdn99,zdat,color='r')
 
 plt.title("TWP-ICE")
 
 plt.xlabel('Vertical Velocity (m/s)')
 plt.ylabel('Height (km)')
 plt.xlim(-10,15)
-plt.savefig('wup_down_wrf.png',dpi=200)
+plt.savefig('UpDnProfiles_{e}_{m}_{x}.png'.format(e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=200)
+

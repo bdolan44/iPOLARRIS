@@ -166,6 +166,7 @@ def conv_strat_latlon(dbz, lat2d, lon2d, CoreThresh=42.0, method='SYH', a=8, b=6
 
 
     # if dbz is a masked array, then just grab the opposite of the mask
+    #print 'steiner',type(dbz)
     if isinstance(dbz, np.ma.masked_array):
 	bad = deepcopy(dbz.mask)
     else:
@@ -188,6 +189,7 @@ def conv_strat_latlon(dbz, lat2d, lon2d, CoreThresh=42.0, method='SYH', a=8, b=6
     # I think we'll start with scipy.ndi.median_filter
 
     # not sure how this is gonna work with nans?
+    #print 'shape sm_rad',sm_rad,np.shape(zlin)
     bkgnd_lin = ndi.median_filter(zlin, size=(sm_rad, sm_rad), mode='nearest')
 #    bkgnd_lin = ndi.gaussian_filter(zlin, (sm_rad, sm_rad))
 
