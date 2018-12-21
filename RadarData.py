@@ -2361,20 +2361,22 @@ class RadarData(RadarConfig.RadarConfig):
 
         for q in tqdm(range(self.data.dims['d'])):
             if self.lat_name in self.data.keys():
-            		lat = self.data[self.lat_name].sel(d=q).values
-            		lon = self.data[self.lon_name].sel(d=q).values
-       	    else:
-            		self.get_latlon_fromxy()
-            		lat = self.data[self.lat_name].values
-            		lon = self.data[self.lon_name].values
+                        lat = self.data[self.lat_name].sel(d=q).values
+                        lon = self.data[self.lon_name].sel(d=q).values
+            else:
+                        self.get_latlon_fromxy()
+                        lat = self.data[self.lat_name].values
+                        lon = self.data[self.lon_name].values
 
 #            print 'q is '
             #print np.shape(self.data[self.z_name].sel(d=q))
-            zlev = np.where(self.data[self.z_name].sel(d=q).values == self.cs_z)[0]
-            #print np.shape(self.data[self.dz_name].sel(z=slice(1,2)))
-            #print 'zlev',zlev[0]
+            zlev = np.where(self.data[self.z_name].sel(d=q).values ==2.25)[0]#self.cs_z)
+            print self.data[self.z_name].sel(d=q).values
+            print np.shape(self.data[self.dz_name])
+            print 'zlev',zlev
             refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
-	    #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
+            print np.shape(refl)
+            #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
             #refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
             #print 'refl shape',np.shape(refl),type(refl)
 #             if len(np.shape(refl)) >= 3:
@@ -2391,7 +2393,7 @@ class RadarData(RadarConfig.RadarConfig):
 #                 self.get_latlon_fromxy()
 #                 lat = self.data[self.lat].values
 #                 lon = self.data[self.lon].values
-            
+            print np.shape(refl),'radar data 2490'
             yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat, lon, 40.0, method='SYH', sm_rad=2,a=8, b=64)
             cs_arr = np.full(yh_cs.shape, np.nan)
             #print (np.nanmax(yh_cs),np.nanmax(cs_arr))
@@ -2410,7 +2412,7 @@ class RadarData(RadarConfig.RadarConfig):
             rntypetot.append(rpt)
         #self.def_convstrat()
         #np.array(rntypetot)[np.isnan(self.data[self.dz_name].values)] =-1
-        #print 'shapes',np.shape(rntypetot)
-        self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')      
+        print 'shapes',np.shape(rntypetot)
+        self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')     
 
 
