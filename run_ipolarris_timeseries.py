@@ -94,7 +94,7 @@ rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=confi
                                               u=config['uname'],v=config['vname'],w=config['wname'],x=config['xname'],
                                               rr=None,band = 'C',vr = 'vr',lat_r=lat_r,lon_r=lon_r,
                                               y=config['yname'],z=config['zname'],lat=config['xname'], lon=config['yname'],lat_0=lat_0,lon_0=lon_0,
-                                              exper=config['exper'],mphys=config['microphys'],radar_name =config['radarname'],
+                                              exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
                                               z_thresh=0,conv_types =  config['conv_types'],
                                                strat_types = config['strat_types'])
                                                

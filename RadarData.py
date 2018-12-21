@@ -555,6 +555,7 @@ class RadarData(RadarConfig.RadarConfig):
            self.hid_band = band
         
         scores = []
+        print "Unfortunately need to run HID by time"
         for v in tqdm(range(len(self.data[self.dz_name]))):
             dzhold =self.data[self.dz_name].sel(d=v).values
             drhold =self.data[self.zdr_name].sel(d=v).values
@@ -571,25 +572,27 @@ class RadarData(RadarConfig.RadarConfig):
                                 kdp=kdhold, band=self.hid_band, use_temp=True, T=tdum)
             scores.append(scoresdum)
 
-        print "Returned to RadarData"
-#         self.scores=np.array(scores)
+#        print "Returned to RadarData"
+        self.scores=np.array(scores)
+        #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
 #         #dzmask = self.data[self.dz_name].values <=zthresh
 #            # set the hid
-#         self.hid = np.argmax(self.scores, axis=0)+1
-#         try:
+        self.hid = np.argmax(self.scores, axis=1)+1
+        print 'hid shape',np.shape(self.hid)
+#        try:
 #         #           print 'Trying to mask HID!'
 #            self.hid[dzmask] = -1
-#         except:
+#        except:
 #            print 'Problem trying to threshold HID'
-#         try:
-#             scmask = np.isnan(self.scores[0,...])
+#        try:
+        scmask = np.isnan(self.scores[:,0,...])
 #         #            print 'trying to mask via scores!'
-#             self.hid[scmask] =-1
-#         except:
+        self.hid[scmask] =-1
+#        except:
 #             print 'Cant threshold on scores!'
 #         #           self.hid=np.ma.masked_where(self.data[self.dz_name].data < self.z_thresh,self.hid)
-#         self.add_field((self.data[self.dz_name].dims,self.hid,), name)
+        self.add_field((self.data[self.dz_name].dims,self.hid,), name)
 
 #############################################################################################################
         ###Calculate the mixing ratios and add to the radar object
@@ -2356,18 +2359,23 @@ class RadarData(RadarConfig.RadarConfig):
         print 'Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d'])
         rntypetot = []
 
-        if self.lat_name in self.data.keys():
-            lat = self.data[self.lat_name].values
-            lon = self.data[self.lon_name].values
-        else:
-            self.get_latlon_fromxy()
-            lat = self.data[self.lat_name].values
-            lon = self.data[self.lon_name].values
-
         for q in tqdm(range(self.data.dims['d'])):
-            #print q     
-            zlev = self.cs_z
-            refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
+            if self.lat_name in self.data.keys():
+            		lat = self.data[self.lat_name].sel(d=q).values
+            		lon = self.data[self.lon_name].sel(d=q).values
+       	    else:
+            		self.get_latlon_fromxy()
+            		lat = self.data[self.lat_name].values
+            		lon = self.data[self.lon_name].values
+
+#            print 'q is '
+            #print np.shape(self.data[self.z_name].sel(d=q))
+            zlev = np.where(self.data[self.z_name].sel(d=q) == self.cs_z)[0]
+            #print np.shape(self.data[self.dz_name].sel(z=slice(1,2)))
+            #print 'zlev',zlev[0]
+            refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
+	    #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
+            #refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
             #print 'refl shape',np.shape(refl),type(refl)
 #             if len(np.shape(refl)) >= 3:
 #                 print 'len is 3+'
@@ -2394,7 +2402,7 @@ class RadarData(RadarConfig.RadarConfig):
             cs_arr[yh_strat] = 1
 
             cs_arr[np.isnan(refl)] =-1
-            nlevs = np.shape(self.data[self.z_name].data)[0]
+            nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
     #        print nlevs
             rpt = np.tile(cs_arr,(nlevs,1,1))
             #print np.shape(rpt)
@@ -2402,6 +2410,7 @@ class RadarData(RadarConfig.RadarConfig):
             rntypetot.append(rpt)
         #self.def_convstrat()
         #np.array(rntypetot)[np.isnan(self.data[self.dz_name].values)] =-1
+        print 'shapes',np.shape(rntypetot)
         self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')      
 
 
