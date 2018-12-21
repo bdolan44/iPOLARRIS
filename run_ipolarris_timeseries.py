@@ -114,7 +114,7 @@ else:
     mask[np.isnan(rdata.data['CSS'].values)]=0
 
 rdata.data['CSS'] = rdata.data['CSS'].where(mask ==1)
-config['image_dir'] ='./'
+#config['image_dir'] ='./'
 #########################################
 
 ################################################################################
@@ -133,6 +133,7 @@ ax.set_ylabel('Rain Rate (mm/hr)')
 ax.set_title('Precipitation Timeseries TWP-ICE')
 plt.tight_layout()
 plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+plt.clf()
 ############################################################################
 
 ################################################################################
@@ -144,6 +145,7 @@ ax.set_xlabel('Vertical velocity m/s')
 ax.set_title('Vertical velocity profiles TWP-ICE')
 plt.tight_layout()
 plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+plt.clf()
 ################################################################################
 
 ################################################################################
@@ -155,7 +157,7 @@ ax.set_xlabel('Reflectivity')
 plt.tight_layout()
 plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
 
-
+plt.clf()
 ################################################################################
 ##Next let's make a reflectivity CFAD
 
@@ -168,3 +170,4 @@ ax.set_ylabel('Height (km)')
 ax.set_title('TWP-ICE CFAD')
 plt.tight_layout()
 plt.savefig('{i}CFAD_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+plt.clf()
