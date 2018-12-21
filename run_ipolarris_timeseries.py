@@ -89,8 +89,8 @@ for d in rfiles:
 
 
 
-rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['zdr_name'],
-                                              kdp=config['kdp_name'],rho=config['rho_name'],temp=config['t_name'],
+rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
+                                              kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                               u=config['uname'],v=config['vname'],w=config['wname'],x=config['xname'],
                                               rr=None,band = 'C',vr = 'vr',lat_r=lat_r,lon_r=lon_r,
                                               y=config['yname'],z=config['zname'],lat=config['xname'], lon=config['yname'],lat_0=lat_0,lon_0=lon_0,
