@@ -32,11 +32,11 @@ zthresh == -10.                       ==#Threshold for good data
 wthresh == 5.                         ==#Threshold for 'updraft' statistics.
 trange == np.arange(20,-60,-5)        ==#Range of thresholds for plotting temperatures.
 doff == 11                             ==#offset for date timestamp in radar filename
-rdadd == 19                           ==#number of characteric in timestamp on radar file.
-time_parse==[11,19]              ==#more time formatting.
+rdadd == 29                           ==#number of characteric in timestamp on radar file.
+time_parse==[11,29]              ==#more time formatting.
 etime == datetime.datetime(2006,1,23,1,0)      ==#end of analysis time of interest
 stime == datetime.datetime(2006,1,24,23,0)    ==#start time of analysis of interest
-cs_z == 2.0                         ==#Level to determine Convective / stratiform designation.
+cs_z == 2.25                         ==#Level to determine Convective / stratiform designation.
 zconv == 40                         ==#Zconv threshold in raintyping algorithm.
 conv_types == ['ISO_CONV_CORE','CONVECTIVE','ISO_CS_CORE']      ==#Which Powell et al. types to consider in convective CFADS
 strat_types == ['WEAK_ECHO','STRATIFORM','ISO_CONV_FRINGE']     ==#Which Powell et al. types to consider in stratiform CFADS

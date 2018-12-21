@@ -67,8 +67,9 @@ with open(configfile[0]) as f:
                 config[(key.replace(" ", ""))] = vval
             
 
-with open(config['radar_files'], 'r') as f:
-    rfiles = f.read().splitlines()
+# with open(config['radar_files'], 'r') as f:
+#     rfiles = f.read().splitlines()
+rfiles= glob.glob('*.nc')
 rvar = xr.open_mfdataset(rfiles,concat_dim='d')#,preprocess=lambda ds:ds.drop(['time']),concat_dim='d')
 
 lon_0 = 131.04444
@@ -92,7 +93,7 @@ for d in rfiles:
 rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
                                               kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                               u=config['uname'],v=config['vname'],w=config['wname'],x=config['xname'],
-                                              rr=None,band = 'C',vr = 'vr',lat_r=lat_r,lon_r=lon_r,
+                                              rr=config['rr_name'],band = 'C',vr = 'vr',lat_r=lat_r,lon_r=lon_r,
                                               y=config['yname'],z=config['zname'],lat=config['xname'], lon=config['yname'],lat_0=lat_0,lon_0=lon_0,
                                               exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
                                               z_thresh=0,conv_types =  config['conv_types'],
@@ -100,37 +101,70 @@ rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=confi
                                                
                                                
 rdata.calc_cs_shy()
+rdata.set_hid()
 
-rdata.data[rdata.w_name].load()
+###Do some quick masking of the data####
+mask = np.zeros([rdata.data.dims['d'],rdata.data.dims['z'],rdata.data.dims['y'],rdata.data.dims['x']])
+whbad = np.logical_or(np.logical_or(np.logical_or(np.logical_or(rdata.data[rdata.dz_name].values>-20.,rdata.data[rdata.kdp_name].values>-10.),rdata.data[rdata.kdp_name].values<10.),rdata.data[rdata.zdr_name].values<10.),rdata.data[rdata.dz_name].values<70.)
 
-wup = rdata.data[rdata.w_name].where(rdata.data[rdata.w_name]>0)
-wup50 = wup.quantile(.5,dim=['x','y','d'])
-wdn = rdata.data[rdata.w_name].where(rdata.data[rdata.w_name]<0)
-wdn.values[wdn.values<-50] = np.nan
+mask[whbad] = 1
+if np.nanmin(rdata.data['CSS'].values)<1.:
+    mask[rdata.data['CSS'].values<=0] = 0
+else:
+    mask[np.isnan(rdata.data['CSS'].values)]=0
+
+rdata.data['CSS'] = rdata.data['CSS'].where(mask ==1)
+config['image_dir'] ='./'
+#########################################
+
+################################################################################
+##################Now you can just start plotting!##############################
+################################################################################
 
 
-wup50 = wup.quantile(.5,dim=['x','y','d'])
-wup90 = wup.quantile(.9,dim=['x','y','d'])
-wup99 = wup.quantile(.99,dim=['x','y','d'])
+################################################################################
+##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
+## The conditional rain rate is achieved by sending threshold = 0.
+fig,ax = plt.subplots(1,1,figsize=(10,10))
+ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0)
+ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=-50,ls='--',typ='uncond')
+
+ax.set_ylabel('Rain Rate (mm/hr)')
+ax.set_title('Precipitation Timeseries TWP-ICE')
+plt.tight_layout()
+plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+############################################################################
+
+################################################################################
+##Next let's make quantile (50,90,99) plots of the vertical velocity. This splits it by up and down, but you can turn split_updn == False
+fig,ax = plt.subplots(1,1,figsize=(10,10))
+ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
+ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
+ax.set_xlabel('Vertical velocity m/s')
+ax.set_title('Vertical velocity profiles TWP-ICE')
+plt.tight_layout()
+plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+################################################################################
+
+################################################################################
+##Next let's make mean vertical profile of reflectivity
+fig,ax = plt.subplots(1,1,figsize=(10,10))
+ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name],ax,split_updn=False,lab='dz',thresh=-50)
+ax.set_title('Vertical profile of reflectivity')
+ax.set_xlabel('Reflectivity')
+plt.tight_layout()
+plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
 
 
-wdn50 = wdn.quantile(.5,dim=['x','y','d'])
-wdn90 = wdn.quantile(.1,dim=['x','y','d'])
-wdn99 = wdn.quantile(.01,dim=['x','y','d'])                                               
+################################################################################
+##Next let's make a reflectivity CFAD
 
-zdat = rdata.data[rdata.z_name].sel(d=0).values
-plt.plot(wup50,zdat,color='goldenrod',label='50th')
-plt.plot(wup90,zdat,color='k',label='90th')
-plt.plot(wup99,zdat,color='r',label='99th')
-plt.legend(loc='best')
-plt.plot(wdn50,zdat,color='goldenrod')
-plt.plot(wdn90,zdat,color='k')
-plt.plot(wdn99,zdat,color='r')
+cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name].sel(d=0),nbins=40)
 
-plt.title("TWP-ICE")
-
-plt.xlabel('Vertical Velocity (m/s)')
-plt.ylabel('Height (km)')
-plt.xlim(-10,15)
-plt.savefig('UpDnProfiles_{e}_{m}_{x}.png'.format(e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=200)
-
+fig,ax = plt.subplots(1,1,figsize=(10,10))
+ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name].sel(d=0).values,vbins,ax,levels=True)
+ax.set_xlabel('Reflectivity')
+ax.set_ylabel('Height (km)')
+ax.set_title('TWP-ICE CFAD')
+plt.tight_layout()
+plt.savefig('{i}CFAD_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)

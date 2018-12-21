@@ -17,6 +17,14 @@ import GeneralFunctions as GF
 from matplotlib import colors
 plt.style.use('presentation')
 
+from matplotlib.dates import DateFormatter,HourLocator
+dayFormatter = DateFormatter('%H%M')      # e.g., 12
+hourFormatter = DateFormatter('%H')      # e.g., 12
+
+from matplotlib.colors import from_levels_and_colors
+
+
+
 def label_subplots(fig, xoff = 0.0, yoff = 0.02, nlabels = None,**kwargs):
     letters = ['a', 'b', 'c', 'd','e', 'f', 'g', 'h','l', 'm','n','o','p','q','r']
     figaxes = fig.get_axes()
@@ -931,5 +939,204 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
         
+def subset_convstrat(data,rdata):
+    stratsub=data.sel(z=slice(2,3)).where(rdata.data['CSS'].sel(z=slice(1,2))==1)
+    convsub=data.sel(z=slice(2,3)).where(rdata.data['CSS'].sel(z=slice(1,2))==2)
+    allsub=data.sel(z=slice(2,3)).where(rdata.data['CSS'].sel(z=slice(1,2))>0)
+    return stratsub,convsub,allsub
+    
+def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ=''):
+    data.values[data.values<-50] = np.nan
+    if cs == True:
+        sdat,cdat,adat = subset_convstrat(data,rdata)
+        print 'plotting'
+        ax.plot(np.array(tm),adat.where(adat>thresh).mean(dim=['z','y','x'],skipna=True),color='k',label='Total {e}'.format(e=typ),ls=ls)
+        ax.plot(np.array(tm),cdat.where(cdat>thresh).mean(dim=['z','y','x'],skipna=True),color='r',label='Conv {e}'.format(e=typ),ls=ls)
+        ax.plot(np.array(tm),sdat.where(sdat>thresh).mean(dim=['z','y','x'],skipna=True),color='b',label='strat {e}'.format(e=typ),ls=ls)
+        ax.legend(loc='best')
 
+    else:
+        ax.plot(np.array(tm),data.where(data>thresh).mean(dim=['z','y','x'],skipna=True),color='k',label='Total')
+
+    ax.xaxis.set_major_formatter(hourFormatter)
+    ax.xaxis.set_major_locator(HourLocator(interval=1))
+    d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+    ax.set_xlabel('Time (UTC)')
+
+    return ax
+
+def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=False,ls = '-',typ=''):
+    if split_updn == True:
+        
+        pdat=data.load()
+        pdat.values[pdat.values<-100] = np.nan
+        
+        wup = pdat.where(pdat.values>0)
+        wdn = pdat.where(pdat.values<0)
+    
+        wup50 = wup.quantile(q2,dim=['x','y','d'])
+        wup90 = wup.quantile(q1,dim=['x','y','d'])
+        wup99 = wup.quantile(q3,dim=['x','y','d'])
+
+
+        wdn50 = wdn.quantile(1-q2,dim=['x','y','d'])
+        wdn90 = wdn.quantile(1-q1,dim=['x','y','d'])
+        wdn99 = wdn.quantile(1-q3,dim=['x','y','d'])                                               
+
+        zdat = z.sel(d=0).values
+        ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
+        ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
+        ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
+        ax.legend(loc='best')
+        ax.plot(wdn50,zdat,color=c2)
+        ax.plot(wdn90,zdat,color=c1)
+        ax.plot(wdn99,zdat,color=c3)
+
+    else:
+        pdat =data.load()
+        pdat.values[pdat.values<-100] = np.nan
+        
+    
+        wup50 = pdat.quantile(q2,dim=['x','y','d'])
+        wup90 = pdat.quantile(q1,dim=['x','y','d'])
+        wup99 = pdat.quantile(q3,dim=['x','y','d'])
+
+        zdat = z.sel(d=0).values
+        ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
+        ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
+        ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
+        ax.legend(loc='best')
+
+    ax.set_ylabel('Height (km)')
+    return ax
+    
+    
+def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=-50):
+    if split_updn == True:
+        
+        pdat=data.load()
+        pdat.values[pdat.values<-100] = np.nan
+        
+        wup = pdat.where(data>0)
+        wdn = pdat.where(data<0)
+    
+        wup50 = wup.mean(dim=['x','y','d'])
+
+        wdn50 = wdn.mean(dim=['x','y','d'])
+
+        zdat = z.sel(d=0).values
+        ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
+        ax.plot(wdn50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
+        ax.legend(loc='best')
+
+    else:
+        pdat =data.load()
+        pdat.values[pdat.values<thresh] = np.nan
+        
+    
+        wup50 = pdat.mean(dim=['x','y','d'])
+        zdat = z.sel(d=0).values
+        ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
+        ax.legend(loc='best')
+
+    ax.set_ylabel('Height (km)')
+    return ax
+    
+def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_z=0,z_resolution=1.0,cscfad = False):
+# pick a variable and do a CFAD for the cell
+    if value_bins is None: # set a default if nothing is there
+        value_bins = np.linspace(rdata.lims[var][0], rdata.lims[var][1], 20)
+        nbins = len(value_bins)
+    else:
+        value_biles = np.arange(0,nbins+1,1)
+        
+    sz=len(zvals.values)
+    print sz,multiple
+    looped = np.arange(0, sz, multiple)
+    cfad_out = np.zeros((sz//multiple, nbins-1))
+
+    for ivl, vl in enumerate(looped[:-1]):
+        v = zvals.values[vl]
+        v2 = zvals.values[vl+multiple]
+        try:
+            dum = (data.sel(z=slice(v,v2)).values)
+        except:
+            dum = (data.sel(z=slice(vl,vl+multiple)).values)
+        dum2 = np.where(np.isfinite(dum))
+        lev_hist, edges = np.histogram(dum[dum2], bins=value_bins, density=True) 
+        lev_hist = 100.0*lev_hist/np.sum(lev_hist)
+        if np.max(lev_hist) > 0:
+            cfad_out[ivl, :] = lev_hist
+
+    if ret_z == 1:
+    
+        return cfad_out,zvals.values[0][looped]
+    else:
+        return cfad_out,value_bins
+
+def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None, 
+        log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
+
+
+    if hts is None:
+        print 'please provide nominal heights to cfad_plot'
+        return
+
+    if log:
+        norm = colors.LogNorm(vmin=1e-5, vmax=1e2)
+    else:
+        norm = None
+
+    # plot the CFAD
+    cfad_ma = np.ma.masked_where(cfad==0, cfad)
+
+    if cont is True:
+        levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
+        cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
+        try:
+            pc = ax.contourf(vbins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
+        except Exception, e:
+            print 'Can not plot {v} with exception {e}'.format(v=var,e=e)
+            return fig, ax
+    else:
+
+        if levels is not None:
+            cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
+            #print cmap
+            pc = ax.pcolormesh(vbins, hts, cfad_ma, norm=norm, cmap=cmap)
+        else:
+            
+#            pc = ax.pcolormesh(vbins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
+            pc = ax.pcolormesh(vbins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
+
+    cb = plt.colorbar(pc, ax=ax)
+    cb.set_label('Frequency (%)')
+    ax.set_ylabel('Height (km MSL)')
+#        try:
+    if rconf is not None:
+        if var == 'DRC' or var == 'DRS':
+            varn = rconf.zdr_name
+        elif var == 'DZC' or var == 'DZS':
+            varn = rconf.dz_name
+        elif var == 'KDC' or var == 'KDS':
+            varn = rconf.kdp_name
+        elif var == 'WSvar' or var == 'WCvar':
+            varn = rconf.w_name
+        else:
+            varn = var
+#        print 'ln192',varn
+        if varn in rconf.names.keys():
+            
+            ax.set_xlabel('{n} {u}'.format(n=rconf.names[varn], u=rconf.units[varn]))
+            #print rconf.print_title(tm=tspan)
+#            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
+    #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
+        else:
+            ax.set_xlabel('{n}'.format(n=var))
+            #print rconf.print_title(tm=tspan)
+#            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
+#        except:
+#            pass
+
+    return ax
 
