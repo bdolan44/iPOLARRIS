@@ -67,9 +67,9 @@ with open(configfile[0]) as f:
                 config[(key.replace(" ", ""))] = vval
             
 
-# with open(config['radar_files'], 'r') as f:
-#     rfiles = f.read().splitlines()
-rfiles= glob.glob('*.nc')
+with open(config['radar_files'], 'r') as f:
+    rfiles = f.read().splitlines()
+#rfiles= glob.glob('*.nc')
 rvar = xr.open_mfdataset(rfiles,concat_dim='d')#,preprocess=lambda ds:ds.drop(['time']),concat_dim='d')
 
 lon_0 = 131.04444
