@@ -74,7 +74,7 @@ def assign_radius(In1, outarray, latarray, lonarray, dist_thresh, box_size, assi
         lat_ind = In1[0][ii]
         lon_ind = In1[1][ii]
         lat1 = latarray[lat_ind, lon_ind]
-        lon1 = lonarray[lon_ind, lon_ind]
+        lon1 = lonarray[lat_ind, lon_ind]
 
     
         i_lat_min = np.max([0, lat_ind-box_size])

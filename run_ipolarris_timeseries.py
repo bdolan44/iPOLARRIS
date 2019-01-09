@@ -121,6 +121,10 @@ rdata.data['CSS'] = rdata.data['CSS'].where(mask ==1)
 ##################Now you can just start plotting!##############################
 ################################################################################
 
+### To see the variables that are available to plot, type:
+
+#rdata.data.keys()
+
 
 ################################################################################
 ##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
