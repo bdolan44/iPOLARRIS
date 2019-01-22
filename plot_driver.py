@@ -1,3 +1,4 @@
+from __future__ import print_function
 import glob
 import os
 import sys
@@ -255,7 +256,7 @@ def plot_uppercent_compare_updn(dat1, dat2, config, n1=None, n2=None):
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
-    print st_diff
+    print (st_diff)
 #    plt.savefig('test.png')
     plt.savefig('{id}{s}_updownstats_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra']),dpi=200)
 #
@@ -493,7 +494,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
         maxa = np.around(np.nanpercentile(np.abs(cfad_ma), 96),decimals=1)
         nor = np.around(np.nanpercentile(np.abs(cfad_ma),93),decimals=1)
         delt = np.around((maxa+maxa)/50,decimals=2)
-        print maxa,nor,delt
+        print( maxa,nor,delt)
         levels = np.arange(-1 * maxa, maxa+delt, delt)
         cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
 
@@ -949,7 +950,7 @@ def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ=''):
     data.values[data.values<-50] = np.nan
     if cs == True:
         sdat,cdat,adat = subset_convstrat(data,rdata)
-        print 'plotting'
+        print ('plotting')
         ax.plot(np.array(tm),adat.where(adat>thresh).mean(dim=['z','y','x'],skipna=True),color='k',label='Total {e}'.format(e=typ),ls=ls)
         ax.plot(np.array(tm),cdat.where(cdat>thresh).mean(dim=['z','y','x'],skipna=True),color='r',label='Conv {e}'.format(e=typ),ls=ls)
         ax.plot(np.array(tm),sdat.where(sdat>thresh).mean(dim=['z','y','x'],skipna=True),color='b',label='strat {e}'.format(e=typ),ls=ls)
@@ -1051,7 +1052,7 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
         value_biles = np.arange(0,nbins+1,1)
         
     sz=len(zvals.values)
-    print sz,multiple
+    print (sz,multiple)
     looped = np.arange(0, sz, multiple)
     cfad_out = np.zeros((sz//multiple, nbins-1))
 
@@ -1079,7 +1080,7 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
 
     if hts is None:
-        print 'please provide nominal heights to cfad_plot'
+        print ('please provide nominal heights to cfad_plot')
         return
 
     if log:
@@ -1095,8 +1096,8 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
             pc = ax.contourf(vbins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
-        except Exception, e:
-            print 'Can not plot {v} with exception {e}'.format(v=var,e=e)
+        except (Exception, e):
+            print( 'Can not plot {v} with exception {e}'.format(v=var,e=e))
             return fig, ax
     else:
 

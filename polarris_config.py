@@ -4,7 +4,7 @@ Written by Brenda Dolan
 May 2017
 bdolan@atmos.colostate.edu
 """
-
+from __future__ import print_function
 import glob
 import os
 import sys
@@ -18,7 +18,7 @@ import numpy as np
 import GeneralFunctions as GF
 import RadarConfig
 import plot_driver
-from skewPy import SkewT
+#from skewPy import SkewT
 
 
 
@@ -44,7 +44,7 @@ def get_data(config, tm, rfile, dmatch,smatch):
          rdata.w_name = config['wname']
 
     if smatch is not None:
-        print 'Smatch',smatch
+        print ('Smatch',smatch)
         snd = SkewT.Sounding(smatch)
         rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
                     # and then will take the heights and temps
@@ -84,15 +84,15 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
                 dat = (line)
                 dum.append(foo(dat))
     except:
-		try:
-			with open(eval(config['radar_files'])) as f:
-				 for line in f:
-					dat = (line)
-					dum.append(foo(dat))
-		except NameError as ne:
-			print ne
-			print 'Check that file list is correct and exists. Returning'
-			sys.exit(1)
+        try:
+            with open(eval(config['radar_files'])) as f:
+                for line in f:
+                    dat = (line)
+                    dum.append(foo(dat))
+        except NameError as ne:
+            print (ne)
+            print ('Check that file list is correct and exists. Returning')
+            sys.exit(1)
 
     if config['hid_stats'] is True:
         hidq_mass=[]   
@@ -191,7 +191,7 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
     runw = False
 
     for d in dum:
-        print d
+        print (d)
     #        dn = 
         tp = config['time_parse'][0]
         te = config['time_parse'][1]
@@ -200,7 +200,7 @@ def run_exper(config, dmatch = None, smatch=None,interactive=False):
         rvar = xr.open_dataset(d,autoclose=True)
 #        print dmatch
         if dmatch is not None:
-            print dmatch[d]
+            print (dmatch[d])
 #            print dmatch.keys()
             if dmatch[d] is not None:
                 ddata = xr.open_dataset(dmatch[d],autoclose=True)

@@ -45,7 +45,7 @@ def Theta(tempk,pres,pref=100000.):
         minpres=pres
 
     if minpres<2000:
-        print "WARNING: P<2000 Pa; did you input a value in hPa?"
+        print ("WARNING: P<2000 Pa; did you input a value in hPa?")
 
     return tempk*(pref/pres)**(Rs_da/Cp_da)
 
@@ -58,7 +58,7 @@ def TempK(theta,pres,pref=100000.):
         minpres=pres
 
     if minpres<2000:
-        print "WARNING: P<2000 Pa; did you input a value in hPa?"
+        print ("WARNING: P<2000 Pa; did you input a value in hPa?")
 
     return theta*(pres/pref)**(Rs_da/Cp_da)
 

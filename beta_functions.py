@@ -67,6 +67,7 @@ conform to Carey and Rutledge (1998).
 25 January 2014: Pythonized (TJL)
 """
 
+from __future__ import print_function
 from __future__ import division
 import numpy as np
 import pandas as pd
@@ -188,7 +189,7 @@ def get_mbf_sets_summer(use_temp=True, plot_flag=False, n_types=10,
 
     me = '-->get_mbf_sets_summer  '
     if verbose:
-        print me+' 10 Category Summer %s-band HID'%band
+        print (me+' 10 Category Summer %s-band HID'%band)
 
 
     #Horizontal Reflectivity (Zh)
@@ -216,11 +217,11 @@ def get_mbf_sets_summer(use_temp=True, plot_flag=False, n_types=10,
         fname = band + '-band_Temperature.csv'
         T_set = get_beta_set(fdir+fname, factor=temp_factor)
         if verbose:
-            print me+'Using Temperature in HID'
+            print (me+'Using Temperature in HID')
     else:
         T_set = None
         if verbose:
-            print me+'No Temperature used in HID'
+            print (me+'No Temperature used in HID')
 
     #Now populate the full mbf_sets dictionary
     mbf_sets = {'Zh_set': Zh_set, 'Zdr_set': Zdr_set, 'Kdp_set': Kdp_set,

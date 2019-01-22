@@ -9,6 +9,7 @@ rev 3 5/2/2016 - added missing value mask to match input reflectivity file
 
 """ 
 
+from __future__ import print_function
 from __future__ import division  #For python2 only. Alternatively, run interpreter with -Q flag. 
 import numpy as np
 import os
@@ -104,7 +105,7 @@ def raintype(refl=None, refl_missing_val=-9999, refl_dx=1, minZdiff=20,
 
   #Check inputs
   if refl is None:
-    print "No reflectivity provided to raintype module.  Exiting ..." 
+    print ("No reflectivity provided to raintype module.  Exiting ..." )
     raintype = None
     return raintype, types
   

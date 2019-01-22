@@ -1,5 +1,6 @@
 # This just houses some general functions
 
+from __future__ import print_function
 import numpy as np
 from copy import deepcopy
 import scipy.ndimage as ND
@@ -34,7 +35,7 @@ def print_exception():
     filename = f.f_code.co_filename
     linecache.checkcache(filename)
     line = linecache.getline(filename, lineno, f.f_globals)
-    print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+    print ('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
 
 def size_filter(input_arr, filter, min_volume = 1, filter_type = '!=', \
@@ -57,22 +58,22 @@ def size_filter(input_arr, filter, min_volume = 1, filter_type = '!=', \
 	#print '%d features'%nfeat
         # now have the HIDs labelled
     for feat in range(1, nfeat+1): # dont do 0
-    	points = np.where(labelarray == feat)
-	npoints = points[0].shape[0]
+        points = np.where(labelarray == feat)
+        npoints = points[0].shape[0]
         if npoints < min_volume:
 #                print 'FILTERING OUT A VOLUME'
-	    small_volumes += 1
+            small_volumes += 1
             labelarray[points] = bad_val # resetting the feature array to 0 if too small
-	    if filter_out: out.mask[points] = True
-	else: big_volumes += 1
+        if filter_out: out.mask[points] = True
+        else: big_volumes += 1
     if verbose:
-	print '%d volumes large enough, %d filtered out'%(big_volumes, small_volumes)
+        print ('%d volumes large enough, %d filtered out'%(big_volumes, small_volumes))
     if filter_out:
-    	if verbose: print 'Returning filtered array'
-	return out
+        if verbose: print ('Returning filtered array')
+        return out
     else: # actually use the labelarray as a filter to modify some other array
-	if verbose: print 'Returning feature array'
-	return labelarray # return the labelarray, mainly for debugging purposes
+        if verbose: print ('Returning feature array')
+        return labelarray # return the labelarray, mainly for debugging purposes
 
 #######################################################################################################################
 
@@ -176,7 +177,7 @@ def hist2d(varx=None, vary=None, binsx=None, binsy=None):
 
 
     else:
-        print 'Need to provide proper variables to the varx and vary keywords'
+        print( 'Need to provide proper variables to the varx and vary keywords')
         return 
 
 #######################################################################################################################

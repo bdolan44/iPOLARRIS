@@ -168,9 +168,9 @@ def conv_strat_latlon(dbz, lat2d, lon2d, CoreThresh=42.0, method='SYH', a=8, b=6
     # if dbz is a masked array, then just grab the opposite of the mask
     #print 'steiner',type(dbz)
     if isinstance(dbz, np.ma.masked_array):
-	bad = deepcopy(dbz.mask)
+        bad = deepcopy(dbz.mask)
     else:
-	bad = dbz == np.nan
+        bad = dbz == np.nan
 
     good = np.logical_not(bad)
 	
@@ -204,10 +204,10 @@ def conv_strat_latlon(dbz, lat2d, lon2d, CoreThresh=42.0, method='SYH', a=8, b=6
 
     #; Next line uses SYH 1995 radius algorithm
     if method == 'SYH':
-	inCon = (bkgnd >= 0.) & (bkgnd < tune_thresh) & (dbz-bkgnd > (bg_diff-(bkgnd**2.)/180.))
+        inCon = (bkgnd >= 0.) & (bkgnd < tune_thresh) & (dbz-bkgnd > (bg_diff-(bkgnd**2.)/180.))
 #; This line uses YH (1998) climatological tuning algorithm
     else:
-	inCon = (bkgnd >= 0.) & (bkgnd < tune_thresh) & (dbz-bkgnd > a*np.cos((np.pi*bkgnd)/(2.*b)))
+        inCon = (bkgnd >= 0.) & (bkgnd < tune_thresh) & (dbz-bkgnd > a*np.cos((np.pi*bkgnd)/(2.*b)))
 
     cc[inCon] = 2
 
@@ -230,23 +230,23 @@ def conv_strat_latlon(dbz, lat2d, lon2d, CoreThresh=42.0, method='SYH', a=8, b=6
 
     In1 = np.where((cc > 0) & (bkgnd <= 25.))
     if len(In1[0]): # if there are any points that satisfy this
-	cs = assign_radius(In1, cs, lat2d, lon2d, 1.0, 10, 1)
+        cs = assign_radius(In1, cs, lat2d, lon2d, 1.0, 10, 1)
 
     In2 = np.where((cc > 0) & (bkgnd > 25.) & (bkgnd <= 32.))
     if len(In2[0]):
-	cs = assign_radius(In2, cs, lat2d, lon2d, 1.0, 10, 2)
+        cs = assign_radius(In2, cs, lat2d, lon2d, 1.0, 10, 2)
 
     In3 = np.where((cc > 0) & (bkgnd > 32.) & (bkgnd <= 37.))
     if len(In3[0]):
-	cs = assign_radius(In3, cs, lat2d, lon2d, 2.0, 10, 3)
+        cs = assign_radius(In3, cs, lat2d, lon2d, 2.0, 10, 3)
 
     In4 = np.where((cc > 0) & (bkgnd > 37.) & (bkgnd <= 42.))
     if len(In4[0]):
-	cs = assign_radius(In4, cs, lat2d, lon2d, 2.0, 10, 4)
+        cs = assign_radius(In4, cs, lat2d, lon2d, 2.0, 10, 4)
 
     In5 = np.where((cc > 0) & (bkgnd > 42.))
     if len(In5[0]):
-	cs = assign_radius(In5, cs, lat2d, lon2d, 2.0, 10, 5)
+        cs = assign_radius(In5, cs, lat2d, lon2d, 2.0, 10, 5)
 
 
     return cs, cc, bkgnd

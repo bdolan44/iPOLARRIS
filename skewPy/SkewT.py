@@ -13,12 +13,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-from thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
-	VirtualTempFromMixR,MixR2VaporPress,DewPoint,Theta,TempK
-from thermodynamics import Rs_da, Cp_da, Epsilon
+from .thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
+    VirtualTempFromMixR,MixR2VaporPress,DewPoint,Theta,TempK
+from .thermodynamics import Rs_da, Cp_da, Epsilon
 
 
-from UserDict import UserDict
+#from UserDict import UserDict
 from datetime import datetime
 import os,sys
 import scipy.interpolate as si
@@ -460,9 +460,8 @@ class Sounding(UserDict):
 
         self.fmt = fmt
         self.station_name = station_name
-	self.mixing_depth = parcel_mixing_depth
+        self.mixing_depth = parcel_mixing_depth
         self.surface_pressure = surface_pressure
-	# if there is data, go ahead and do stuff
         if data is None:
             self.data={}
             self.readfile(filename)
@@ -472,179 +471,179 @@ class Sounding(UserDict):
             self['SoundingDate']=""
 
 
-	if calculate_parcel:
-	# if this is set to True, make a parcel attribute that can be used to calculate all sorts of stuff
-	    self.parcel_pres, self.parcel_temp, self.parcel_dpt = self.surface_parcel(mixdepth=self.mixing_depth, 
-                                                                pres_s=self.surface_pressure)
-	    self.p, self.tdry, self.tiso, self.pwet, self.twet = self.lift_parcel(self.parcel_pres, self.parcel_temp, 
-                                                                        self.parcel_dpt)
+        if calculate_parcel:
+        # if this is set to True, make a parcel attribute that can be used to calculate all sorts of stuff
+            self.parcel_pres, self.parcel_temp, self.parcel_dpt = self.surface_parcel(mixdepth=self.mixing_depth, 
+                                                                    pres_s=self.surface_pressure)
+            self.p, self.tdry, self.tiso, self.pwet, self.twet = self.lift_parcel(self.parcel_pres, self.parcel_temp, 
+                                                                            self.parcel_dpt)
 
-	# these are interpolation-based conversion functions
-	    self.f_pres_ht = si.interp1d(self.data['pres'], self.data['hght'])
-	    self.f_temp_ht = si.interp1d(self.data['temp'], self.data['hght'])
-		
-	# Here are some calculations on the default parcel
-	    self.interp_parcel()	
-	    self.p_el, self.p_lfc = self.find_el_lfc()
+        # these are interpolation-based conversion functions
+        self.f_pres_ht = si.interp1d(self.data['pres'], self.data['hght'])
+        self.f_temp_ht = si.interp1d(self.data['temp'], self.data['hght'])
+
+        # Here are some calculations on the default parcel
+        self.interp_parcel()	
+        self.p_el, self.p_lfc = self.find_el_lfc()
 
 
     def get_lcl_pres(self):
-	return self.pwet[0]
+        return self.pwet[0]
 	
 
     def get_lcl_height(self):
-	return self.f_pres_ht([self.get_lcl_pres()])[0]
+        return self.f_pres_ht([self.get_lcl_pres()])[0]
 
 
     def get_melting_height(self):
-	return self.f_temp_ht([0])[0]
+        return self.f_temp_ht([0])[0]
 
     def get_warm_cloud_depth(self):
-	return self.get_melting_height() - self.get_lcl_height()
+        return self.get_melting_height() - self.get_lcl_height()
 
     def interp_parcel(self):
 
-	p_lcl = self.get_lcl_pres()
-	subsat = self.p >= p_lcl
+        p_lcl = self.get_lcl_pres()
+        subsat = self.p >= p_lcl
     
-    	dry_p = self.p[subsat]
-    	dry_t = self.tdry[subsat]
+        dry_p = self.p[subsat]
+        dry_t = self.tdry[subsat]
     
-    	moist_t = self.twet
-    	moist_p = self.pwet
+        moist_t = self.twet
+        moist_p = self.pwet
     
-    	all_parcel_t = np.concatenate((dry_t, moist_t))
-    	all_parcel_p = np.concatenate((dry_p, moist_p))
+        all_parcel_t = np.concatenate((dry_t, moist_t))
+        all_parcel_p = np.concatenate((dry_p, moist_p))
     
 
 #	let's try to interpolate the parcel stuff onto the environmental stuff
-	f_pt = si.interp1d(all_parcel_p, all_parcel_t, bounds_error=True)
+        f_pt = si.interp1d(all_parcel_p, all_parcel_t, bounds_error=True)
 
-	self.parcel_p = self.data['pres'].copy()
-	###BD added .compressed here because I was getting an error about being a masked array in si.interp1d   3/2017
-	self.parcel_t = f_pt(self.parcel_p.compressed())
-	
-	self.parcel_t_diff = self.parcel_t-self.data['temp']
+        self.parcel_p = self.data['pres'].copy()
+        ###BD added .compressed here because I was getting an error about being a masked array in si.interp1d   3/2017
+        self.parcel_t = f_pt(self.parcel_p.compressed())
+
+        self.parcel_t_diff = self.parcel_t-self.data['temp']
 
 
     def find_el_lfc(self):
 
-	np_zeros = []
-	pn_zeros = []
+        np_zeros = []
+        pn_zeros = []
 
-	# maybe not, just gonna try to find the EL
-	for iz in range(len(self.parcel_t)-1):
-	    if (self.parcel_t_diff[::-1][iz] < 0) and (self.parcel_t_diff[::-1][iz+1] > 0):
-		np_zeros.append(self.parcel_p[::-1][iz])
-	    elif (self.parcel_t_diff[::-1][iz] > 0) and (self.parcel_t_diff[::-1][iz+1] < 0):
-		pn_zeros.append(self.parcel_p[::-1][iz])       
+        # maybe not, just gonna try to find the EL
+        for iz in range(len(self.parcel_t)-1):
+            if (self.parcel_t_diff[::-1][iz] < 0) and (self.parcel_t_diff[::-1][iz+1] > 0):
+                np_zeros.append(self.parcel_p[::-1][iz])
+            elif (self.parcel_t_diff[::-1][iz] > 0) and (self.parcel_t_diff[::-1][iz+1] < 0):
+                pn_zeros.append(self.parcel_p[::-1][iz])       
 
 
-	np_zeros = np.array(np_zeros)
-	pn_zeros = np.array(pn_zeros)
+        np_zeros = np.array(np_zeros)
+        pn_zeros = np.array(pn_zeros)
 
 
         if len(np_zeros):
-	    p_el = np_zeros[0]
+            p_el = np_zeros[0]
         else:
-            p_el = None
+                p_el = None
         if len(pn_zeros):
-	    p_lfc = pn_zeros[0]
+            p_lfc = pn_zeros[0]
         else:
-            p_lfc = None
+                p_lfc = None
 
-	return p_el, p_lfc
+        return p_el, p_lfc
 
 
 
     def CAPE(self):
-	return self.CAPE_profile().sum()
+        return self.CAPE_profile().sum()
 
 
     def CAPE_profile(self):
-	p_lcl = self.get_lcl_pres()
-	i_lcl = np.argmin(np.abs(p_lcl-self.parcel_p))
-	i_lfc = np.argmin(np.abs(self.p_lfc-self.parcel_p))
-	i_el = np.argmin(np.abs(self.p_el-self.parcel_p))
+        p_lcl = self.get_lcl_pres()
+        i_lcl = np.argmin(np.abs(p_lcl-self.parcel_p))
+        i_lfc = np.argmin(np.abs(self.p_lfc-self.parcel_p))
+        i_el = np.argmin(np.abs(self.p_el-self.parcel_p))
 
 
-	h_lfc = self.f_pres_ht(self.p_lfc)
-	h_el = self.f_pres_ht(self.p_el)
+        h_lfc = self.f_pres_ht(self.p_lfc)
+        h_el = self.f_pres_ht(self.p_el)
 
-	capes = np.zeros_like(self.data['hght'])
+        capes = np.zeros_like(self.data['hght'])
 
-	# okay, now let's loop thru to calculate cape?
-	for ilev in range(i_lcl, i_el):    
-	    capes[ilev] = 9.81*(self.parcel_t_diff[ilev])*(self.data['hght'][ilev] - self.data['hght'][ilev-1])/(self.data['temp'][ilev]+273.15)	
+        # okay, now let's loop thru to calculate cape?
+        for ilev in range(i_lcl, i_el):    
+            capes[ilev] = 9.81*(self.parcel_t_diff[ilev])*(self.data['hght'][ilev] - self.data['hght'][ilev-1])/(self.data['temp'][ilev]+273.15)	
 
 
-	return capes
+        return capes
 
     def NCAPE(self):
-	cape = self.CAPE()
-	
-	h_lfc = self.f_pres_ht(self.p_lfc)
-	h_el = self.f_pres_ht(self.p_el)
+        cape = self.CAPE()
 
-	return cape/np.float(h_el-h_lfc)
+        h_lfc = self.f_pres_ht(self.p_lfc)
+        h_el = self.f_pres_ht(self.p_el)
+
+        return cape/np.float(h_el-h_lfc)
 
 
     def WCAPE(self, ht_name='hght'):
-	# this is the amount of CAPE below the melting level
-	# so we'll just get the cape profile and cut it off at the freezing level
-	cp = self.CAPE_profile()
-	# now get the freezing height
-	ht0 = self.get_melting_height()
-	# now the corresponding index
-	h0_index = np.argmin(np.abs(ht0-self.data[ht_name]))
-	# now figure out if height is increasing or decreasing
-	inc = np.sign(np.diff(self.data[ht_name])[0])
-	if inc == 1:
-	    out = np.sum(cp[:inc])
-	else:
-	    out = np.sum(cp[inc:])
+    # this is the amount of CAPE below the melting level
+    # so we'll just get the cape profile and cut it off at the freezing level
+        cp = self.CAPE_profile()
+        # now get the freezing height
+        ht0 = self.get_melting_height()
+        # now the corresponding index
+        h0_index = np.argmin(np.abs(ht0-self.data[ht_name]))
+        # now figure out if height is increasing or decreasing
+        inc = np.sign(np.diff(self.data[ht_name])[0])
+        if inc == 1:
+            out = np.sum(cp[:inc])
+        else:
+            out = np.sum(cp[inc:])
 
-	return out
-	
+        return out
+
 
     def calc_shear(self, lower=None, upper=None, ht_name='hght', wspd_name='sknt', direction_name='drct'):
-	# this will calculate the shear between any 2 layers
-	if lower is None: lower=self.data[ht_name][0]
-	if upper is None: upper=6000. # 6 km shear by default
+        # this will calculate the shear between any 2 layers
+        if lower is None: lower=self.data[ht_name][0]
+        if upper is None: upper=6000. # 6 km shear by default
 
-	i_lower = np.argmin(np.abs(lower-self.data[ht_name]))
-	i_upper = np.argmin(np.abs(upper-self.data[ht_name]))
+        i_lower = np.argmin(np.abs(lower-self.data[ht_name]))
+        i_upper = np.argmin(np.abs(upper-self.data[ht_name]))
 
-	spd_lower = self.data[wspd_name][i_lower]
-	drct_lower = self.data[direction_name][i_lower]
-	
-	spd_upper = self.data[wspd_name][i_upper]
-	drct_upper = self.data[direction_name][i_lower]
-	
-	u_lower, v_lower = wind_components(spd_lower, drct_lower)
-	u_upper, v_upper = wind_components(spd_upper, drct_upper)
+        spd_lower = self.data[wspd_name][i_lower]
+        drct_lower = self.data[direction_name][i_lower]
 
-	du = u_upper-u_lower
-	dv = v_upper-v_lower
+        spd_upper = self.data[wspd_name][i_upper]
+        drct_upper = self.data[direction_name][i_lower]
 
-	return np.sqrt(du**2 + dv**2)	
+        u_lower, v_lower = wind_components(spd_lower, drct_lower)
+        u_upper, v_upper = wind_components(spd_upper, drct_upper)
+
+        du = u_upper-u_lower
+        dv = v_upper-v_lower
+
+        return np.sqrt(du**2 + dv**2)	
 
     def calculate_params(self):
 	# This will calculate a bunch of stuff given the sounding and output as a dictionary
 	# This will call a bunch of other methods in this class, so make those first and then call them
-	out = {}
+        out = {}
 
-	out['lcl'] = self.get_lcl_height()
-	out['wcd'] = self.get_warm_cloud_depth()
-	out['cape'] = self.CAPE()
-	out['ncape'] = self.NCAPE()
-	out['wcape'] = self.WCAPE()
-	out['sh03'] = self.calc_shear(lower=None, upper=3000.0)
-	out['sh06'] = self.calc_shear(lower=None, upper=6000.0)
+        out['lcl'] = self.get_lcl_height()
+        out['wcd'] = self.get_warm_cloud_depth()
+        out['cape'] = self.CAPE()
+        out['ncape'] = self.NCAPE()
+        out['wcape'] = self.WCAPE()
+        out['sh03'] = self.calc_shear(lower=None, upper=3000.0)
+        out['sh06'] = self.calc_shear(lower=None, upper=6000.0)
 
 
 
-	return out
+        return out
 
 
     def plot_skewt(self, imagename=None, title=None, mixdepth=50, pres_s=1000.0, windskip=None, \
@@ -695,14 +694,14 @@ class Sounding(UserDict):
         """
 
         try: pres = ma.masked_invalid(self.data['pres'])
-        except KeyError: raise KeyError, "Pressure in hPa (PRES) is required!"
+        except KeyError: raise KeyError("Pressure in hPa (PRES) is required!")
 
         try: tc=ma.masked_invalid(self.data['temp'])
-        except KeyError: raise KeyError, "Temperature in C (TEMP) is required!"
+        except KeyError: raise KeyError("Temperature in C (TEMP) is required!")
 
         try: dwpt=ma.masked_invalid(self.data['dwpt'])
         except KeyError:
-            print "Warning: No DWPT available"
+            print( "Warning: No DWPT available")
             dwpt=ma.masked_array(zeros(pres.shape),mask=False)
 
         try:
@@ -712,7 +711,7 @@ class Sounding(UserDict):
             uu = ma.masked_invalid(sknt*cos(rdir))
             vv = ma.masked_invalid(sknt*sin(rdir))
         except KeyError:
-            print "Warning: No SKNT/DRCT available"
+            print ("Warning: No SKNT/DRCT available")
             uu = ma.masked_array(zeros(pres.shape), mask=True)
             vv = ma.masked_array(zeros(pres.shape), mask=True)
 
@@ -1116,10 +1115,10 @@ class Sounding(UserDict):
         dwpt=self.data["dwpt"]
 
 	# if a surface pressure is provided, use that, otherwise just grab the first pressure
-	if pres_s is None:
-	    pres_s = pres[0]
-	else:
-	    pass
+        if pres_s is None:
+	        pres_s = pres[0]
+        else:
+            pass
 
         layers = pres>pres_s - mixdepth
 

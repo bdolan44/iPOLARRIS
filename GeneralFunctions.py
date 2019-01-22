@@ -13,6 +13,7 @@
 # 2/22/2016: Trying to modularize to allow for integration with larger datasets such as 
 # WRF output and other functions.
 
+from __future__ import print_function
 from __future__ import division
 import numpy as np
 from netCDF4 import Dataset
@@ -72,7 +73,7 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
         pass
 
     if hts is None:
-        print 'Please provide Nominal heights'
+        print ('Please provide Nominal heights')
         return
     hold = deepcopy(data)
 
@@ -84,7 +85,7 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
 
     delz = hts[1]-hts[0]
     if np.mod(z_resolution, delz) != 0:
-            print 'Need even multiple of vertical resolution: {d.1f}'.format(d = delz)
+            print ('Need even multiple of vertical resolution: {d.1f}'.format(d = delz))
             return
 
     multiple = np.int(z_resolution/delz)
@@ -120,7 +121,7 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
         log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
 
     if hts is None:
-        print 'please provide nominal heights to cfad_plot'
+        print ('please provide nominal heights to cfad_plot')
         return
     if data is not None:
 #         hold = deepcopy(data)
@@ -139,7 +140,7 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
                 bins = np.arange(0,10,nbins)
         reshts = hts
     else:
-        print 'please specify data or cfad'
+        print ('please specify data or cfad')
         return
  
     if ax is None:
@@ -161,8 +162,8 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
             pc = ax.contourf(bins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
-        except Exception, e:
-            print 'Can not plot {v} with exception {e}'.format(v=var,e=e)
+        except (Exception, e):
+            print ('Can not plot {v} with exception {e}'.format(v=var,e=e))
             return fig, ax
     else:
 
@@ -271,7 +272,7 @@ def hid_cdf(data, hts,species,z_resolution=1.0, pick=None,z_ind =0, mask = None)
     # vertical HID_cdf with bar plots I think
     delz = hts[1]-hts[0]
     if np.mod(z_resolution, delz) != 0:
-            print 'Need even multiple of vertical resolution: {d.1f}'.format(d = delz)
+            print ('Need even multiple of vertical resolution: {d.1f}'.format(d = delz))
             return
     hold = deepcopy(data)
 
@@ -352,7 +353,7 @@ def hid_vertical_fraction(data,hts,hid_nums,species, z_resolution=1.0, above=Non
 
     delz = hts[1]-hts[0]
     if np.mod(z_resolution, delz) != 0:
-            print 'Need even multiple of vertical resolution: {d.1f}'.format(d = delz)
+            print ('Need even multiple of vertical resolution: {d.1f}'.format(d = delz))
             return
     multiple = np.int(z_resolution/delz)
     htsn = np.zeros(int(np.shape(hts)[0]/multiple))
@@ -378,7 +379,7 @@ def hid_vertical_fraction(data,hts,hid_nums,species, z_resolution=1.0, above=Non
 def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
     # this will just plot it
     if rconf is None:
-        print "sorry, need rconf to run properly"
+        print ("sorry, need rconf to run properly")
         return
     #print np.shape(data)
     if ax is None:
@@ -401,7 +402,7 @@ def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
 #            print data[spec-1,i]
 #            print spec, data[spec,i], data[spec-1,i]
             if data[spec-1,i] == np.nan:
-                print 'shoot'
+                print( 'shoot')
             ax.barh(vl, data[spec, i], left = data[spec-1, i], \
             color = rconf.hid_colors[spec+1], edgecolor = 'none')
     ax.set_xlim(0,100)
@@ -446,7 +447,7 @@ def updraft_width_profile(data,hts,thresh=5.0, temps=np.arange(20,-60,-5),z_ind=
     # now inerpolate this to the temps listed
     if tcoord ==  True:
         if temp is None:
-            print "IF you want temperature coordinates, please supply a temperature"
+            print ("IF you want temperature coordinates, please supply a temperature")
         else:
             f_temp_u = sint.interp1d(temp, uw, bounds_error=False)
             uwp_interp = f_temp_u(temps)
@@ -605,7 +606,7 @@ def plot_w_profile(data, hts,rep_func=np.average, masked=True, ax=None):
              self.downdraft = (self.data[self.w_name] <= downdraft_thresh) & (self.data[self.w_name] >= -99.0)
 
         else:
-            print 'Make sure your thresholds are valid'
+            print ('Make sure your thresholds are valid')
             return
 
 

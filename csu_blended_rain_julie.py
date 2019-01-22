@@ -115,6 +115,7 @@ def calc_blended_rain(dz, zdr, kdp, r_z_a, r_z_b, r_kdp_a, r_kdp_b,
     See Bringi and Chandrasekar textbook for more information
     """
     # Initialize, check for all vars, check for scalars
+    print 'baind in Julie 118',band
     if dz is None or kdp is None or zdr is None:
         warnings.warn('No dz, zdr, or kdp provided, failing ...')
         return
@@ -274,7 +275,8 @@ def csu_hidro_rain(
     cond_ice_b = np.logical_or(fhc == 8, fhc == 9)
     cond_ice = np.logical_or(cond_ice_a,cond_ice_b)
     cond_ice_kdp = np.logical_and(cond_ice, cond_kdp)
-
+    print 'band in julie',band
+    print np.shape(crr_meth),np.shape(zdr),np.shape(fhc)
     if band == 'S':
         # S-band only rain calcs
         crr_zhdr = calc_rain_z_zdr(dz, zdr, a=r_z_zdr_a,
@@ -311,6 +313,8 @@ def csu_hidro_rain(
         cond_meth_4 = np.logical_and(~cond_dz_kdp, cond_rain)
         # (high Z, low Kdp) or (low Z, high Kdp) and no HID rain, R = 0.0
         cond_ice_kdp = np.logical_and(~cond_dz_kdp, ~cond_rain)
+        print np.shape(cond_ice_kdp),np.shape(crr_meth)
+        print np.shape(np.where(cond_ice_kdp))
         crr_meth[cond_ice_kdp] = 2
         crr_hidzk[cond_ice_kdp] = 0.0
 
