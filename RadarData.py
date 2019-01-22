@@ -14,6 +14,7 @@
 # WRF output and other functions.
 
 from __future__ import division
+from __future__ import print
 import numpy as np
 from netCDF4 import Dataset
 import matplotlib
@@ -81,7 +82,7 @@ class RadarData(RadarConfig.RadarConfig):
             self.data = data
         self.zdr_offset = zdr_offset
         if zdr_offset != 0:
-            print 'fixing Zdr!'
+            print ('fixing Zdr!')
             self.zdr_correct()
         self.cs_z =cs_z
         self.zconv =zconv
@@ -92,14 +93,12 @@ class RadarData(RadarConfig.RadarConfig):
         self.yind = 2
         self.xind = 3
         self.ntimes =1
-#         print self.data.variables['z']
-#         print np.shape(self.data['z'].data)
         try:
             self.nhgts = np.shape(self.data[self.z_name].data)[self.zind][0]
         except:
             self.nhgts = np.shape(self.data[self.z_name].data)
 #            self.read_data_from_nc(self.radar_file)
-        print 'calculating deltas'
+        print ('calculating deltas')
         self.calc_deltas()
         self.rr_name = rr
         #print 'masking data'
@@ -141,7 +140,7 @@ class RadarData(RadarConfig.RadarConfig):
         try:
             self.T = self.data[temp]
         except:
-            print ''
+            print ('')
 #        self.set_masks()
 #        self.remove_nc()
     # Have some options of how to pass it files? 
@@ -186,7 +185,7 @@ class RadarData(RadarConfig.RadarConfig):
     #############################################################################################################
 
     def raintype_calc(self):
-        print 'Setting up default C/S parameters. Can change in RadarData.py'
+        print ('Setting up default C/S parameters. Can change in RadarData.py')
         minZdiff = 20 
         deepcoszero = 40
         shallowconvmin = 28
@@ -209,7 +208,7 @@ class RadarData(RadarConfig.RadarConfig):
         zlev = self.get_ind(self.cs_z,self.data[self.z_name].values)
 #        print zlev
 
-        print 'Unfortunatley have to run the raintype per file. Might take a minute....{n}'.format(n=self.data.dims['d'])
+        print ('Unfortunatley have to run the raintype per file. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
         for q in range(self.data.dims['d']):        
         
@@ -298,7 +297,7 @@ class RadarData(RadarConfig.RadarConfig):
         for k in self.data.variables.keys():
 #            print k, np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
             if k != 'TIME' and k != self.t_name:
-                print k
+                print(k)
 #                print np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
                 try:
                     whbad = np.where(np.less_equal(self.data[self.dz_name].values, self.z_thresh))
@@ -412,7 +411,7 @@ class RadarData(RadarConfig.RadarConfig):
             return x, y
 
         else:
-            print 'Need to set the radar lat/lon'
+            print ('Need to set the radar lat/lon')
             return None, None
     
 
@@ -555,7 +554,7 @@ class RadarData(RadarConfig.RadarConfig):
            self.hid_band = band
         
         scores = []
-        print "Unfortunately need to run HID by time"
+        print ("Unfortunately need to run HID by time")
         for v in tqdm(range(len(self.data[self.dz_name]))):
             dzhold =self.data[self.dz_name].sel(d=v).values
             drhold =self.data[self.zdr_name].sel(d=v).values
@@ -563,7 +562,7 @@ class RadarData(RadarConfig.RadarConfig):
             rhhold = self.data[self.rho_name].sel(d=v).values
   
             if use_temp and hasattr(self, 'T'):
-               print 'Using T!'
+               print ('Using T!')
                tdum = self.T.sel(d=v)
             else:
                tdum = None
@@ -579,7 +578,7 @@ class RadarData(RadarConfig.RadarConfig):
 #         #dzmask = self.data[self.dz_name].values <=zthresh
 #            # set the hid
         self.hid = np.argmax(self.scores, axis=1)+1
-        print 'hid shape',np.shape(self.hid)
+        print ('hid shape',np.shape(self.hid))
 #        try:
 #         #           print 'Trying to mask HID!'
 #            self.hid[dzmask] = -1
@@ -631,7 +630,7 @@ class RadarData(RadarConfig.RadarConfig):
                 z_c=0.0014377
                 z_m=0.66743
         else:
-            print 'Your wavelength has not been run yet! Please return to fundamentals.'
+            print ('Your wavelength has not been run yet! Please return to fundamentals.')
             return
             
 
@@ -734,7 +733,7 @@ class RadarData(RadarConfig.RadarConfig):
                 b=bzdrk_coeff=0.9337
                 c=czdrk_coeff=-1.9350
         else:
-            print 'Sorry, your wavelength has not been run yet! Return to first principles!'
+            print ('Sorry, your wavelength has not been run yet! Return to first principles!')
             return
 
         rr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
@@ -867,7 +866,7 @@ class RadarData(RadarConfig.RadarConfig):
 
             #print xmini,xmaxi,zmini,zmaxi
             # if this variable is already included in the defaults, then this is straightforward
-            print tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var
+            print (tsi, tsi, zmini,zmaxi,xmini,xmaxi,y_ind,var)
     #        print zmini,zmaxi,y_ind,xmini,xmaxi
             if self.y_name == 'latitude':
                 data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),y=slice(y_ind,y_ind+1),x=slice(xmini,xmaxi)).data)
@@ -937,13 +936,13 @@ class RadarData(RadarConfig.RadarConfig):
                 try:
                     #print zlim
                     self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
-                except Exception, e:
-                    print 'Error trying to plot xsec vectors: {}'.format(e)
+                except (Exception, e):
+                    print ('Error trying to plot xsec vectors: {}'.format(e))
 
             if title_flag:
                 ax.set_title('%s %s Cross Section' %(ts, self.radar_name), fontsize = 14)
         else:
-            print 'No data for this variable!'
+            print ('No data for this variable!')
             dummy = fig
 #        print type(dummy),dummy
 
@@ -1429,7 +1428,7 @@ class RadarData(RadarConfig.RadarConfig):
             qk = ax.quiverkey(q_handle, 0.85, 0.85, 20, r'20 $\frac{m}{s}$',coordinates='axes', \
                         fontproperties={'weight':'bold','size':14})
         else:
-            print 'No vectors. No {t}'.format(t=self.u_name)
+            print ('No vectors. No {t}'.format(t=self.u_name))
             q_handle = fig
             return q_handle
         return q_handle
@@ -1445,7 +1444,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             resx = res[0]
             resy = res[1]
-        print 'RadarDAta 1408:',res
+        print ('RadarDAta 1408:',res)
 
         if self.data[self.x_name].units == "[deg]":
             xskip = int(np.round(resx/(self.dx*110.)))
@@ -1520,7 +1519,7 @@ class RadarData(RadarConfig.RadarConfig):
     #            print np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat),'ln1431'
             if thresh_dz == True:
                 dzdat = np.squeeze(self.data[self.dz_name].sel(z=slice(z_ind,z_ind),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data)
-                print 'trying to threshold...',np.shape(vdat),np.shape(dzdat)
+                print ('trying to threshold...',np.shape(vdat),np.shape(dzdat))
                 msk = np.less(dzdat,self.z_thresh)
                 msk2 =np.where(np.logical_or(udat< -1000.,vdat < -1000.))
 
@@ -1553,7 +1552,7 @@ class RadarData(RadarConfig.RadarConfig):
                 udatskip = udat[::yskip, ::xskip]
                 vdatskip = vdat[::yskip, ::xskip]
 #            print np.shape(xdatskip),np.shape(ydatskip),np.shape(udatskip),np.shape(vdatskip)
-            print 'RadarData 1516:', xskip, yskip,np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat)
+            print ('RadarData 1516:', xskip, yskip,np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat))
             q_handle = ax.quiver(xdatskip, ydatskip, \
                 udatskip, vdatskip, \
                     scale=100, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
@@ -1586,7 +1585,7 @@ class RadarData(RadarConfig.RadarConfig):
 #         print np.shape(data),type(data)
 
         if np.mod(z_resolution, self.dz) != 0:
-                print 'Need even multiple of vertical resolution: %.1f'%self.dz
+                print('Need even multiple of vertical resolution: %.1f'%self.dz)
                 return
 
         multiple = np.int(z_resolution/self.dz)
@@ -1946,7 +1945,7 @@ class RadarData(RadarConfig.RadarConfig):
         #print 'vhv dat',np.shape(data)
         # Not sure if I need this here.....
         if np.mod(z_resolution, self.dz) != 0:
-            print 'Need even multiple of vertical resolution: %.1f'%self.dz
+            print ('Need even multiple of vertical resolution: %.1f'%self.dz)
             return
 
         multiple = np.int(z_resolution/self.dz)
@@ -1986,7 +1985,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         if np.mod(z_resolution, self.dz) != 0:
-            print 'Need even multiple of vertical resolution: %.1f'%self.dz
+            print ('Need even multiple of vertical resolution: %.1f'%self.dz)
             return None
         else:
             #hts = self.data[self.z_name].data[0][::int(np.round(z_resolution/self.dz))]
@@ -2016,7 +2015,7 @@ class RadarData(RadarConfig.RadarConfig):
     def hid_cdf(self, z_resolution=1.0, pick=None,cscfad = None):
         # vertical HID_cdf with bar plots I think
         if np.mod(z_resolution, self.dz) != 0:
-            print 'Need even multiple of vertical resolution: %.1f'%self.dz
+            print ('Need even multiple of vertical resolution: %.1f'%self.dz)
             return None
 
         # loop thru the species and just call the vertical hid volume
@@ -2141,7 +2140,7 @@ class RadarData(RadarConfig.RadarConfig):
              self.downdraft = (self.data[self.w_name] <= downdraft_thresh) & (self.data[self.w_name] >= -99.0)
 
         else:
-            print 'Make sure your thresholds are valid'
+            print ('Make sure your thresholds are valid')
             return
 
 
@@ -2304,7 +2303,7 @@ class RadarData(RadarConfig.RadarConfig):
             
         
         else:
-            print 'No Rain field available'
+            print( 'No Rain field available')
     
     
 
@@ -2356,7 +2355,7 @@ class RadarData(RadarConfig.RadarConfig):
     
     #############################################################################################################
     def calc_cs_shy(self):
-        print 'Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d'])
+        print ('Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
 
         for q in tqdm(range(self.data.dims['d'])):
