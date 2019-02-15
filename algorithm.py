@@ -100,8 +100,10 @@ def convectivecore(background,refl,minZdiff,types,dBZformaxconvradius,
         dummy[Ilow:Ihigh+1,Jlow:Jhigh+1]= rt.chopmask(maskcell[0],topchop,rightchop,
                                                       btmchop,leftchop)
       elif convRadiuskm[I[k],J[k]] == maxConvRadius - 3:
-        dummy[Ilow:Ihigh+1,Jlow:Jhigh+1] = rt.chopmask(maskcell[1],topchop,rightchop,
+        testdat = rt.chopmask(maskcell[1],topchop,rightchop,
                                                        btmchop,leftchop)
+        print(np.shape(testdat))
+        dummy[Ilow:Ihigh+1,Jlow:Jhigh+1] = testdat
       elif convRadiuskm[I[k],J[k]] == maxConvRadius - 2:
 #        print 'dummy',np.shape(dummy[Ilow:Ihigh+1,Jlow:Jhigh+1])
         try:

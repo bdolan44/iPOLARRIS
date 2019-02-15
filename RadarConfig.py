@@ -10,7 +10,7 @@ import datetime as dt
 
 class RadarConfig(object):
     
-    def __init__(self, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid = 'HID',
+    def __init__(self, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid = 'HID',conv='Con',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar',vr='VR',mphys='None',exper = 'Case',
             band = 'C',lat_0 = 0,lon_0=90.0,lat_r=None,lon_r=None,lat=None,lon=None,tm = None,radar_name = None):
         # ******** first the polarimetric stuff *************
@@ -22,6 +22,7 @@ class RadarConfig(object):
         self.temp_name = temp
         self.hid_name = hid
         self.vr_name = vr
+        self.conv_name=conv
 
         # ********** next the cartesian coordinates **********
         self.x_name = x

@@ -11,6 +11,7 @@ import datetime
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 from polarris_config import get_data
 import RadarData
@@ -426,46 +427,76 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         plt.savefig('{d}{e1}_{e2}_wr_comp_{x}.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,x=config['extra'],t=config['ptype']),dpi=300)
         plt.clf()
 
-def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
+def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None):
+    r1cdf,r1bins,r1ht = rdata1.cfad(var1,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
+    r2cdf,r2bins,r2ht = rdata2.cfad(var2,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
+    
+    if n1 is None:
+        n1 = rdata1.exper
+    if n2 is None:
+        n2 = rdata2.exper
+    if n3 is None:
+        n3 = '{a}-{b}'.format(a=rdata1.exper,b=rdata2.exper)
+    
+    
+    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,n1=n1,n2=n2,n3=n3,typ='dz')
+    if cscfad is not False:
+        plt.suptitle('{c} {l}'.format(c=cscfad,l=lonvar),y=1.05,fontsize=30)
+    else:
+        plt.suptitle('{l}'.format(l=lonvar),y=1.05,fontsize=30)
+    
+    axf[0].set_xlabel('{l} bin'.format(l=lonvar))
+    axf[1].set_xlabel('{l} bin'.format(l=lonvar))
+    axf[2].set_xlabel('{l} bin'.format(l=lonvar))
+    if savefig == True:
+        if cscfad is not None:
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config1['image_dir'],c=cscfad,x=config1['extra'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+        else:
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}_{x}.png'.format(d=config1['image_dir'],x=config1['extra'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+        return fig, axf
+    else:
+        return fig,axf
+
+def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False):
     fig, ax = plt.subplots(1,3,figsize=(18,8))
     axf = ax.flatten()
-    if n1 is None:
-        n1 = '{e}_{x}_{t}'.format(e=dat1['rconf'].exper,x=dat1['rconf'].mphys,t=config['extra'])
-    if n2 is None:
-        n2 = '{e}_{x}_{t}'.format(e=dat2['rconf'].exper,x=dat2['rconf'].mphys,t=config['extra'])
-    if n3 is None:
-        n3 = '{e}{m1}-{x}{m2}_{t}'.format(e=dat1['rconf'].exper,x=dat2['rconf'].exper,m1=dat1['rconf'].mphys,m2=dat2['rconf'].mphys,t=config['extra'])
 
-    dat1cnt = np.shape(dat1['{t}cfad'.format(t=typ)])[0]
-    dat2cnt = np.shape(dat2['{t}cfad'.format(t=typ)])[0]
+    dat1cnt = np.shape(dat1)[0]
+    dat2cnt = np.shape(dat2)[0]
 #
 
-    cfad1_all = np.sum(dat1['{t}cfad'.format(t=typ)],axis=0)/dat1cnt
-    cfad2_all = np.sum(dat2['{t}cfad'.format(t=typ)],axis=0)/dat2cnt
+    cfad1_all = np.sum(dat1,axis=0)/dat1cnt
+    cfad2_all = np.sum(dat2,axis=0)/dat2cnt
+    
+    cfad1_all = dat1
+    cfad2_all = dat2
+
 
 #     print np.nanmax(cfad1_all)
 #     print np.nanmax(cfad2_all)
     
     if typ == 'w':
-        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=axf[0],cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),data = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf =config,tspan = dat1['time'],maxval=20,cont=True,levels = True)
 
-        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad2_all, hts = dat2['hts'][0],  bins = dat2['{t}bins'.format(t=typ)],ax=axf[1],cfad_on = 0,rconf = dat2['rconf'],tspan = dat2['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad2_all, hts =ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = confing,tspan = dat2['time'],maxval=20,cont=True,levels = True)
 
     else:
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = dat1['hts'][0],  bins = dat1['{t}bins'.format(t=typ)],ax=axf[0],cfad_on = 0,rconf = dat1['rconf'],tspan = dat1['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True)
 
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = dat2['hts'][0],  bins = dat2['{t}bins'.format(t=typ)],ax=axf[1],cfad_on = 0,rconf = dat2['rconf'],tspan = dat2['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True)
     axf[0].set_title('{n}'.format(n=n1))
     axf[1].set_title('{n}'.format(n=n2))
 
     axf[0].set_ylim(0,18)
     axf[1].set_ylim(0,18)
+    axf[2].set_ylim(0,18)
 
-    if len(dat1['hts'][0]) != len(dat2['hts'][0]):
-        hvals = [dat1['hts'][0],dat2['hts'][0]]
+    if len(ht1) != len(ht2):
+        print('fixing heights')
+        hvals = [ht1,ht2]
         vals = np.array([cfad1_all, cfad2_all])
 
-        lens = [len(dat1['hts'][0]),len(dat2['hts'][0])]
+        lens = [len(ht1),len(ht2)]
         sz = np.max(lens)
         arg = np.argmax(lens)
         cfad_new1=np.zeros_like(vals[arg])
@@ -483,7 +514,7 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
         diff_cfad = cfad_new1-cfad_new2
     else:
         diff_cfad = cfad1_all - cfad2_all
-        hts = dat1['hts'][0]
+        hts = ht1
 
     
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
@@ -496,13 +527,16 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
         delt = np.around((maxa+maxa)/50,decimals=2)
         print( maxa,nor,delt)
         levels = np.arange(-1 * maxa, maxa+delt, delt)
-        cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
+        cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
 
     else:
+        nor = np.around(np.nanpercentile(np.abs(cfad_ma),98),decimals=1)
+        cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
 
-        cb=axf[2].contourf(dat1['{t}bins'.format(t=typ)][:-1],hts,cfad_ma,levels,cmap='bwr',extend='both')
-
-    plt.colorbar(cb,ax=axf[2])
+    cb3= plt.colorbar(cb,ax=axf[2])
+    cb3.set_label('Relative difference (%)')
+    cb3.set_ticks(np.linspace(-1.*nor,nor,9))
+    print('nor',nor)
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
     if typ == 'drc' or typ == 'drs' or typ == 'dr':
@@ -523,10 +557,15 @@ def plot_cfad_compare(dat1,dat2,config,typ='dz',n1 = None,n2 = None,n3= None):
         axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
     axf[2].set_title('{v}'.format(v=n3))
 
-    plt.tight_layout()
-    st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
 
-    plt.savefig('{id}CFAD_{tp}_{s}_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra'],tp=typ.upper()),dpi=200)
+    plt.tight_layout()
+    if savefig==True:
+    
+        st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
+
+        plt.savefig('{id}CFAD_{tp}_{s}_{x}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],x=config['extra'],tp=typ.upper()),dpi=200)
+    else:
+        return fig, axf
 #    plt.clf()
 
 def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
@@ -984,7 +1023,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         wdn90 = wdn.quantile(1-q1,dim=['x','y','d'])
         wdn99 = wdn.quantile(1-q3,dim=['x','y','d'])                                               
 
-        zdat = z.sel(d=0).values
+        zdat = z.values
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
@@ -1002,7 +1041,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         wup90 = pdat.quantile(q1,dim=['x','y','d'])
         wup99 = pdat.quantile(q3,dim=['x','y','d'])
 
-        zdat = z.sel(d=0).values
+        zdat = z.values
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
@@ -1025,7 +1064,7 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
 
         wdn50 = wdn.mean(dim=['x','y','d'])
 
-        zdat = z.sel(d=0).values
+        zdat = z.values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.plot(wdn50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.legend(loc='best')
@@ -1036,13 +1075,134 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
         
     
         wup50 = pdat.mean(dim=['x','y','d'])
-        zdat = z.sel(d=0).values
+        zdat = z.values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.legend(loc='best')
 
     ax.set_ylabel('Height (km)')
     return ax
     
+def hid_cdf(data,rdata,hts,species,z_resolution=1.0, ret_z=0,pick=None,z_ind =0, mask = None):
+    # vertical HID_cdf with bar plots I think
+    delz = hts[1]-hts[0]
+    if np.mod(z_resolution, delz) != 0:
+            print ('Need even multiple of vertical resolution: {d.1f}'.format(d = delz))
+            return
+    hold = deepcopy(data)
+
+    if mask is not None:
+#        print 'maskind HID data'
+        hold[mask] = -1
+
+    multiple = np.int(z_resolution/delz)
+
+    # loop thru the species and just call the vertical hid volume
+    all_vols = []
+    for sp in range(len(species)):
+        #print sp
+        htsn, tdat = GF.vertical_hid_volume(hold,hts,delz,[sp+1], z_resolution=z_resolution, pick=pick,z_ind=0) # need the +1
+        all_vols.append(tdat)
+        
+    print('htsn',np.shape(htsn))
+    all_vols = np.array(all_vols)
+    all_cdf = np.zeros_like(all_vols)
+#9        print np.shape(all_vols)
+#3    print np.min(all_vols)
+    # shape is 10,16, which is nspecies x nheights
+    # need to do cdf on each level
+    all_vols[all_vols == np.nan] = 0.0
+#    print np.max(all_vols)
+    for iz in range(all_vols.shape[1]):
+        # loop thru the vertical
+#        print all_vols[:,iz]
+#        print iz
+        level_cum_vol = np.cumsum((all_vols[:, iz]))
+#        if level_cum_vol[-1] != 0:
+        all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
+#        else:
+#            all_cdf[:, iz] = 100.0*level_cum_vol/1.
+
+#    all_cdf[np.isnan(all_cdf)] = 0.0
+#    print np.max(all_cdf)
+    if ret_z == 1:
+    
+        return htsn,all_cdf,all_vols
+    else:
+        return htsn,all_cdf#, all_vols
+
+def plot_hid_cdf(data, hts,rconf=None, ax=None, pick=None):
+    # this will just plot it
+    if rconf is None:
+        print ("sorry, need rconf to run properly")
+        return
+    #print np.shape(data)
+    if ax is None:
+        fig, ax = plt.subplots(1,1)
+    else:
+        fig = ax.get_figure()   
+
+    fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.8, bottom = 0.1)
+    print("starting loop",np.shape(data),np.shape(hts))
+
+    for i, vl in enumerate(hts):
+        #print vl,i
+#            print self.data[self.z_name].data[vl]
+        #print data[0,:]
+#        print vl, rconf.hid_colors[1],data[0,i]
+        ax.barh(vl, data[0, i], left = 0., edgecolor = 'none', color = rconf.hid_colors[1]) 
+#        print vl
+
+        for spec in range(1, len(rconf.species)): # now looping thru the species to make bar plot
+#             print rconf.hid_colors[spec+1]
+#            print data[spec-1,i]
+#            print spec, data[spec,i], data[spec-1,i]
+            if data[spec-1,i] == np.nan:
+                print( 'shoot')
+            ax.barh(vl, data[spec, i], left = data[spec-1, i], \
+            color = rconf.hid_colors[spec+1], edgecolor = 'none')
+    ax.set_xlim(0,100)
+    ax.set_xlabel('Cumulative frequency (%)')
+    ax.set_ylabel('Height (km MSL)')
+    # now have to do a custom colorbar?
+    GF.HID_barplot_colorbar(rconf,fig)  # call separate HID colorbar function for bar plots
+
+    return fig, ax 
+
+def plot_hid_comparison_cfad(rdata1,rdata2,z_res=1.0,config=None,n1=None,n2=None,n3=None,cscfad=None,savefig=True):
+    hidtest1,hts1 = rdata1.hid_cdf(z_resolution=z_res,cscfad=cscfad)
+    hidtest2,hts2 = rdata2.hid_cdf(z_resolution=z_res,cscfad=cscfad)
+    
+    fig, ax = plt.subplots(1,2,figsize=(18,8))
+    axf = ax.flatten()
+  
+    fig,ax = plot_hid_cdf(hidtest1,hts1,rdata1,ax=axf[0])
+    fig,ax = plot_hid_cdf(hidtest2,hts2,rdata2,ax=axf[1])
+    
+    if n1 is None:
+        n1 = rdata1.exper
+    if n2 is None:
+        n2 = rdata2.exper
+    
+    axf[0].set_title(n1)
+    axf[1].set_title(n2)
+    
+    if n3 is None and cscfad is not None:
+        n3=cscfad
+    else:
+        n3='ALL'
+    plt.tight_layout()
+    if savefig == True:
+        if cscfad is not None:
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}_HID_{x}.png'.format(d=config['image_dir'],c=cscfad,x=config['extra'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
+        else:
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_HID_{x}.png'.format(d=config['image_dir'],x=config['extra'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
+        return fig, axf
+    else:
+        return fig,axf
+    
+    
+    
+
 def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_z=0,z_resolution=1.0,cscfad = False):
 # pick a variable and do a CFAD for the cell
     if value_bins is None: # set a default if nothing is there
@@ -1095,10 +1255,10 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
-            pc = ax.contourf(vbins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
+            pc = ax.contourf(vbins[0:-1],hts,cfad_ma,levs,colors=cols,extend = 'both')
         except (Exception, e):
-            print( 'Can not plot {v} with exception {e}'.format(v=var,e=e))
-            return fig, ax
+            print( 'Can not plot {v} with exception {e}'.format(e=e))
+            return ax
     else:
 
         if levels is not None:
@@ -1141,3 +1301,6 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
     return ax
 
+def plot_composite(rdata,var,time):
+    
+    return

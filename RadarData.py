@@ -51,12 +51,12 @@ import RadarConfig
 class RadarData(RadarConfig.RadarConfig): 
 
 
-    def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',
+    def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',conv='Con',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',lat_r=None,lon_r=None,
             radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,lat_0 = 0.0,lon_0=90.0,
             conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg']): 
 
-        super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, temp=temp, x=x, y=y,lat_0=lat_0,lon_0=lon_0,lat_r=lat_r,lon_r=lon_r,
+        super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, conv=conv,temp=temp, x=x, y=y,lat_0=lat_0,lon_0=lon_0,lat_r=lat_r,lon_r=lon_r,
                       z=z, u=u, v=v, w=w,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
 
         # ********** initialize the data *********************
@@ -102,7 +102,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.calc_deltas()
         self.rr_name = rr
         #print 'masking data'
-        #self.mask_dat()
+        self.mask_dat()
         if remove_diffatt == True:
             self.corr_zdr()
 #        self.raintype_calc()
@@ -210,7 +210,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         print ('Unfortunatley have to run the raintype per file. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
-        for q in range(self.data.dims['d']):        
+        for q in tqdm(range(self.data.dims['d'])):        
         
             refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=slice(zlev,zlev)).values)
             #print 'refl shape',np.shape(refl)
@@ -297,7 +297,7 @@ class RadarData(RadarConfig.RadarConfig):
         for k in self.data.variables.keys():
 #            print k, np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
             if k != 'TIME' and k != self.t_name:
-                print(k)
+                #print(k)
 #                print np.shape(self.data[self.dz_name].data), np.shape(self.data[k].data)
                 try:
                     whbad = np.where(np.less_equal(self.data[self.dz_name].values, self.z_thresh))
@@ -516,7 +516,7 @@ class RadarData(RadarConfig.RadarConfig):
         """This will take the sounding data and interpolate it to the radar coordinates"""
         self.gridded_height = np.zeros(self.data[self.dz_name].shape)
         for i in range(self.data[self.z_name].shape[0]):
-                 self.gridded_height[i,:,:] = self.data[self.z_name][i]
+                 self.gridded_height[:,i,:,:] = self.data[self.z_name][i]
 
         self.T = np.interp(self.gridded_height, self.snd_height, self.snd_temp)
 
@@ -531,8 +531,9 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
    ############ Here is calling CSU radartools for HID, RR, etc... ############################
 #############################################################################################################
-    def calc_pol_analysis(self):
+    def calc_pol_analysis(self,**kwargs):
         self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh)
+        print("running pol rain")
         self.calc_qr_pol()
         self.calc_rr_pol(**kwargs)
 
@@ -553,7 +554,8 @@ class RadarData(RadarConfig.RadarConfig):
         else:
            self.hid_band = band
         
-        scores = []
+        hid = []
+        scores=[]
         print ("Unfortunately need to run HID by time")
         for v in tqdm(range(len(self.data[self.dz_name]))):
             dzhold =self.data[self.dz_name].sel(d=v).values
@@ -562,32 +564,44 @@ class RadarData(RadarConfig.RadarConfig):
             rhhold = self.data[self.rho_name].sel(d=v).values
   
             if use_temp and hasattr(self, 'T'):
-               print ('Using T!')
-               tdum = self.T.sel(d=v)
+               #print ('Using T!')
+               tdum = self.T[v,...]
+               #print('T:',np.shape(tdum))
             else:
                tdum = None
 
             scoresdum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=drhold, rho=rhhold, 
                                 kdp=kdhold, band=self.hid_band, use_temp=True, T=tdum)
             scores.append(scoresdum)
-
+            hiddum = np.argmax(scoresdum,axis=0)+1
+            whbad = np.logical_and(hiddum ==1,tdum <-5.0)
+            hiddum[whbad] = -1
+            hid.append(hiddum)
 #        print "Returned to RadarData"
         self.scores=np.array(scores)
         #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
-#         #dzmask = self.data[self.dz_name].values <=zthresh
+        dzmask = np.where(np.logical_or(self.data[self.dz_name].values <=zthresh, np.isnan(self.data[self.dz_name].values)))
 #            # set the hid
-        self.hid = np.argmax(self.scores, axis=1)+1
-        print ('hid shape',np.shape(self.hid))
-#        try:
+#        self.hid = np.argmax(scores, axis=1)+1
+        hid = np.array(hid,dtype='float64')
+        print('dzmask shape',np.shape(dzmask))
+        hid[dzmask] = np.nan
+        self.hid = np.array(hid)
+        print ('setting bad hid with Drizzle, T<-5')
+
+#       = try:
 #         #           print 'Trying to mask HID!'
-#            self.hid[dzmask] = -1
+        self.hid = np.ma.masked_where(dzmask==True,self.hid)
+        
+#         self.hid = np.ma.masked_where(self.T.mask,self.hid)
+#         self.hid = np.ma.masked_where(self.data[self.dz_name].mask,self.hid)
 #        except:
 #            print 'Problem trying to threshold HID'
 #        try:
-        scmask = np.isnan(self.scores[:,0,...])
-#         #            print 'trying to mask via scores!'
-        self.hid[scmask] =-1
+#         scmask = np.isnan(self.scores[:,0,...])
+# #         #            print 'trying to mask via scores!'
+#         self.hid[scmask] =-1
 #        except:
 #             print 'Cant threshold on scores!'
 #         #           self.hid=np.ma.masked_where(self.data[self.dz_name].data < self.z_thresh,self.hid)
@@ -635,16 +649,16 @@ class RadarData(RadarConfig.RadarConfig):
             
 
 
-        dbzz = np.ma.masked_less(self.data[self.dz_name].data,35)
-        kdpp = np.ma.masked_where(dbzz.mask,self.data[self.kdp_name].data)
+        dbzz = np.ma.masked_less(self.data[self.dz_name].values,35)
+        kdpp = np.ma.masked_where(dbzz.mask,self.data[self.kdp_name].values)
 
         kdppp = np.ma.masked_less(kdpp,0.2)
         dbzzz = np.ma.masked_where(kdppp.mask,dbzz)
 
         M_Kdp = k_c*(kdppp**k_m)
 
-        kdp_notmet = np.ma.masked_greater_equal(self.data[self.kdp_name].data,0.2)
-        dbz_notmet = np.ma.masked_where(kdp_notmet.mask,self.data[self.dz_name].data)
+        kdp_notmet = np.ma.masked_greater_equal(self.data[self.kdp_name].values,0.2)
+        dbz_notmet = np.ma.masked_where(kdp_notmet.mask,self.data[self.dz_name].values)
 
         dbz_notmett = np.ma.masked_greater_equal(dbz_notmet,35.0)
         kdp_notmett = np.ma.masked_where(dbz_notmett.mask,kdp_notmet)
@@ -1042,23 +1056,23 @@ class RadarData(RadarConfig.RadarConfig):
 
         # first, get the appropriate z index from the z that's wanted in altitude
         #z_ind = np.argmin(np.abs(z - self.data[self.z_name].data))
-        z_ind = self.get_ind(z,self.data[self.z_name].data)
-
+#        z_ind = self.get_ind(z,self.data[self.z_name].values)
+        z_ind = z
 
         if xlim is None:
 #          print 'xlim is also none!'
             if self.x_name == 'longitude':
-                xmint, xmaxt = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
-                xmini = self.get_ind(xmint,self.data[self.x_name].data[:,0])
-                xmaxi = self.get_ind(xmaxt,self.data[self.x_name].data[:,0])
+                xmint, xmaxt = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
+                xmini = self.get_ind(xmint,self.data[self.x_name].values[:,0])
+                xmaxi = self.get_ind(xmaxt,self.data[self.x_name].values[:,0])
             else:
-                xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
+                xmini, xmaxi = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
             xmin =xmini
             xmax = xmaxi
         else:
             if self.x_name == 'longitude':
-                xmini = self.get_ind(xlim[0],self.data[self.x_name].data[0,:])
-                xmaxi = self.get_ind(xlim[1],self.data[self.x_name].data[0,:])
+                xmini = self.get_ind(xlim[0],self.data[self.x_name].values[0,:])
+                xmaxi = self.get_ind(xlim[1],self.data[self.x_name].values[0,:])
                 xmin = xlim[0]
                 xmax = xlim[1]
             else:
@@ -1068,26 +1082,26 @@ class RadarData(RadarConfig.RadarConfig):
         if ylim is None:
  #           print 'ylim is None!'
             if self.y_name == 'latitude':
-                ymint, ymaxt = self.data[self.y_name].data.min(), self.data[self.y_name].data.max()
-                ymini = self.get_ind(ymint,self.data[self.y_name].data[:,0])
-                ymaxi = self.get_ind(ymaxt,self.data[self.y_name].data[:,0])
+                ymint, ymaxt = self.data[self.y_name].data.min(), self.data[self.y_name].values.max()
+                ymini = self.get_ind(ymint,self.data[self.y_name].values[:,0])
+                ymaxi = self.get_ind(ymaxt,self.data[self.y_name].values[:,0])
             else:
-                ymini, ymaxi = self.data[self.y_name].data.min(), self.data[self.y_name].data.max()
+                ymini, ymaxi = self.data[self.y_name].values.min(), self.data[self.y_name].values.max()
             
             ymin = ymini
             ymax = ymaxi
         else:
             if self.y_name == 'latitude':
 #                print 'trying to get indices'
-                ymini = self.get_ind(ylim[0],self.data[self.y_name].data[:,0])
-                ymaxi = self.get_ind(ylim[1],self.data[self.y_name].data[:,0])
+                ymini = self.get_ind(ylim[0],self.data[self.y_name].values[:,0])
+                ymaxi = self.get_ind(ylim[1],self.data[self.y_name].values[:,0])
                 ymin = ylim[0]
                 ymax = ylim[1]
 
             else:
                 ymini, ymaxi = ylim
             
-        ts=self.date
+#        ts=self.date
         tsi = 0
 
         # If ax is not given, open a fig and ax object. This is not advisable
@@ -1098,22 +1112,28 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
         #print np.shape(self.data[var])
-        try:
-            data = np.squeeze(self.data[var].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
-        except:
+##        try:
+        print('ts',ts)
+        data = np.squeeze(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+        print(z_ind)
+        if np.ndim(data) == 3:
+            data = np.squeeze(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+            print("changing shape",np.shape(data))
+        print('lims',self.lims[var])
+##        except:
 #            print 'ln1033',z_ind,ymini,ymaxi,xmini,xmaxi,var
 #            print np.shape(self.data[var].data)
             
-            data = np.squeeze(self.data[var].data[z_ind,ymini:ymaxi,xmini:xmaxi])
-        if len(np.shape(data)) > 2:
-#            print 'data shape is wrong!',np.shape(data)
-            data = data[0,...]
+##           data = np.squeeze(self.data[var].data[z_ind,ymini:ymaxi,xmini:xmaxi])
+#         if len(np.shape(data)) > 2:
+# #            print 'data shape is wrong!',np.shape(data)
+#             data = data[0,...]
         try:
-            xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
+            xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
         except:
             xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)))
         try:
-            ydat = np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).data)
+            ydat = np.squeeze(self.data[self.y_name].sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
         except:
             ydat = np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi)))
         
@@ -1130,6 +1150,7 @@ class RadarData(RadarConfig.RadarConfig):
   #          print np.shape(data), np.shape(xdat),np.shape(ydat)
 #            print 'in var',var
             #print **kwargs
+            print(np.shape(xdat),np.shape(ydat),np.shape(data))
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
         else:
@@ -1566,14 +1587,14 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
 
-    def cfad(self, var, value_bins=None, above=2.0, below=15.0,tspan=None, pick=None, ret_z=0,z_resolution=1.0,cscfad = False):
+    def cfad(self, var, value_bins=None, above=2.0, below=15.0,tspan=None, pick=None, ret_z=0,z_resolution=1.0,cscfad = None):
     # pick a variable and do a CFAD for the cell
 
         if value_bins is None: # set a default if nothing is there
             value_bins = np.linspace(self.lims[var][0], self.lims[var][1], 20)
         else:
             pass
-        #print value_bins
+        #print('value bins',value_bins)
 
         nbins = value_bins.shape[0]
         bot_index, top_index = self._get_ab_incides(above=above, below=below)
@@ -1587,12 +1608,13 @@ class RadarData(RadarConfig.RadarConfig):
         if np.mod(z_resolution, self.dz) != 0:
                 print('Need even multiple of vertical resolution: %.1f'%self.dz)
                 return
-
+#        print('ln 1592')
         multiple = np.int(z_resolution/self.dz)
-        sz=np.shape(self.data[self.z_name].data)[0]
-        #print np.shape(sz),sz, multiple
+        sz=np.shape(self.data[self.z_name].values)[0]
+        #print( np.shape(sz),sz, multiple)
         looped = np.arange(0, sz, multiple)
         cfad_out = np.zeros((sz//multiple, nbins-1))
+        #print (np.shape(cfad_out),'cfad shape')
         #print looped
         #print cfad_out.shape, multiple
 #        if tspan == None:
@@ -1607,54 +1629,59 @@ class RadarData(RadarConfig.RadarConfig):
 #        print 'cscfad',cscfad
         if cscfad == 'convective':
             #mask = np.where(self.raintype != 2)
-            mask= np.where(self.raintype != 2)
-            holddat = deepcopy(self.data[var].data)
-            self.data[var].data[mask] = np.nan
-#            print 'in conv'
+           mask= np.where(self.raintype != 2)
+           holddat = deepcopy(self.data[var].values)
+           self.data[var].values[mask] = np.nan
+           print ('in conv')
         elif cscfad == 'stratiform':
-            mask = np.where(self.raintype != 1)
-            holddat = deepcopy(self.data[var].data)
-            self.data[var].data[mask] = np.nan
-#            print 'in strat',type(self.data[var].data)
+           mask = np.where(self.raintype != 1)
+           holddat = deepcopy(self.data[var].values)
+           self.data[var].values[mask] = np.nan
+           print ('in strat',type(self.data[var].data))
         else:
-            mask = np.where(self.raintype > 100)
-
+           mask = np.where(self.raintype > 100)
+           print('entering deep copy')
+           holddat = deepcopy(self.data[var].values)
+           self.data[var].values[mask] = np.nan
+        #print('ready to go in loop!')
         # if left blank, check the whole thing
-        for ivl, vl in enumerate(looped[:-1]):
+        for ivl, vl in (enumerate(tqdm(looped[:-1]))):
             #print ivl, vl
 #             try:
             #cfad, ed = (np.histogram(mc3e_wrf.data['w'].sel(z=slice(3,15))))            
             #print ts,te,'ts,te'
-            v = self.data[self.z_name].data[vl]
-            v2 = self.data[self.z_name].data[vl+multiple]
+            v = self.data[self.z_name].values[vl]
+            v2 = self.data[self.z_name].values[vl+multiple]
 #            print v, v2, 'line1527'
             try:
-                dum = (self.data[var].sel(z=slice(v,v2)).data)
+                dum = self.data[var].sel(z=slice(v,v2)).where(np.isfinite)
             except:
 #                v = self.get_ind(vl,self.data[self.z_name].data)
 #                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data])
 #                print v,v2
-                dum = (self.data[var].sel(z=slice(vl,vl+multiple)).data)
+                dum = self.data[var].sel(z=slice(vl,vl+multiple)).where(np.isfinite)
             #print np.max(dum)
 #            dum2 = np.ma.masked_less(dum,-900.0)
-            dum2 = np.where(np.isfinite(dum))
+#             dum2 = np.where(np.isfinite(dum))
+#             print(type(dum[dum2]))
             #print dum[dum2]
-            lev_hist, edges = np.histogram(dum[dum2], bins=value_bins, density=True) 
+            lev_hist, edges = np.histogram(dum, bins=value_bins, density=True) 
 #             except:
 #            lev_hist, edges = np.histogram(data[vl:vl+multiple].ravel(), bins=value_bins, density=True) 
             #print lev_hist, edges
                     # this keeps it general, can make more elaborate calls in other functions
+            #print(np.shape(lev_hist))
             lev_hist = 100.0*lev_hist/np.sum(lev_hist)
             if np.max(lev_hist) > 0:
                 cfad_out[ivl, :] = lev_hist
         #print np.shape(cfad_out)
-        if cscfad == 'convective' or cscfad == 'stratiform':
+#        if cscfad == 'convective' or cscfad == 'stratiform':
 #            print 'setting data back'
-            self.data[var].data = holddat
+        self.data[var].values = holddat
 
         if ret_z == 1:
         
-            return cfad_out,self.data[self.z_name].data[0][looped]
+            return cfad_out,value_bins,self.data[self.z_name].values[looped]
         else:
             return cfad_out
 
@@ -1696,9 +1723,11 @@ class RadarData(RadarConfig.RadarConfig):
         #print np.shape(cfad_ma)
 #        print multiple, self.data[self.z_name].data[::multiple]
         if cont is True:
+            cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
             levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
             cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
-            pc = ax.contourf(bins[0:-1],self.data[self.z_name].data[::multiple],(cfad_ma/np.sum(cfad_ma))*100.,levs,color=cols)
+            #pc = ax.contourf(bins[0:-1],self.data[self.z_name].data[::multiple],(cfad_ma/np.sum(cfad_ma))*100.,levs,color=cols)
+            pc = ax.contourf(bins[0:-1],self.data[self.z_name].values[::multiple],(cfad_ma),levs,color=cols,cmap=cmap,norm=norm,extend='both')
         else:
 
             if levels is not None:
@@ -1706,18 +1735,19 @@ class RadarData(RadarConfig.RadarConfig):
                 #print cmap
                 pc = ax.pcolormesh(bins, self.data[self.z_name].data[::multiple], cfad_ma, norm=norm, cmap=cmap)
             else:
-                pc = ax.pcolormesh(bins, self.data[self.z_name].data[::multiple], cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
+                cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
+                pc = ax.pcolormesh(bins, self.data[self.z_name].data[::multiple], cfad_ma, vmin=0, vmax=maxval, norm=norm,cmap=cmap, **kwargs)
 
 #        print np.shape(cfad_ma)
 
-        cb = fig.colorbar(pc, ax=ax)
+        cb = fig.colorbar(pc)#, ax=ax)
         cb.set_label('Frequency (%)')
         ax.set_ylabel('Height (km MSL)')
-#        try:
-        ax.set_xlabel('%s %s' %(self.names[var], self.units[var]))
-        ax.set_title("{d} {r} {v}".format(d=self.date,r=self.radar_name,v=self.longnames[var]))
-#            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
-#        except:
+# #        try:
+        ax.set_xlabel('%s %s' %(var, self.units[var]))
+#        ax.set_title("{d} {r} {v}".format(d=self.date,r=self.radar_name,v=self.longnames[var]))
+#        ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
+#       except:
 #            pass
 
         return fig, ax
@@ -1737,8 +1767,8 @@ class RadarData(RadarConfig.RadarConfig):
         if below is None:
             below = self.nhgts[0]
         
-        datax = self.data[varx].sel(z=slice(above,below)).data
-        datay = self.data[vary].sel(z=slice(above,below)).data
+        datax = self.data[varx].sel(z=slice(above,below)).values
+        datay = self.data[vary].sel(z=slice(above,below)).values
                     
         dum = np.less(datax,xthr)
         dumy = np.less(datay,ythr)
@@ -1779,19 +1809,19 @@ class RadarData(RadarConfig.RadarConfig):
     def percentile(self,wup =False,wdown=False,use_frzht=False,frzhgt=None):
 
         if wup is not False:
-            wdat = deepcopy(self.data[self.w_name].data)
+            wdat = deepcopy(self.data[self.w_name].values)
             wdat[wdat<=0] = np.nan
             t1=99
             t2=90
             t3=50
         elif wdown is not False:
-            wdat = deepcopy(self.data[self.w_name].data)
+            wdat = deepcopy(self.data[self.w_name].values)
             wdat[wdat>=0] = np.nan
             t1=1
             t2=10
             t3=50
         else:
-            wdat =deepcopy(self.data[self.w_name].data)
+            wdat =deepcopy(self.data[self.w_name].values)
 
             t1 = 99
             t2 = 90
@@ -1808,20 +1838,20 @@ class RadarData(RadarConfig.RadarConfig):
         for i,ht in enumerate(height):
             #summed_z = np.ma.sum(winds[:,i,:,:])
             try:
-                percentile_90[i]=np.nanpercentile(np.ravel(wdat[i,...]),t2) #use w/ masked arrays
+                percentile_90[i]=np.nanpercentile(np.ravel(wdat[:,i,...]),t2) #use w/ masked arrays
 
                 #percentile_90[i]=np.percentile(winds[:,i,:,:],90)
                 #percentile_90[i]=np.percentile(winds[i],99)
             except IndexError:
                 percentile_90[i]=np.nan
             try:
-                percentile_99[i]=np.nanpercentile(np.ravel(wdat[i,...]),t1) #use w/ masked arrays
+                percentile_99[i]=np.nanpercentile(np.ravel(wdat[:,i,...]),t1) #use w/ masked arrays
                 #percentile_99[i]=np.percentile(winds[:,i,:,:],99)
                 #percentile_99[i]=np.percentile(winds[i],99)
             except IndexError:
                 percentile_99[i]=np.nan
             try:
-                percentile_50[i]=np.nanpercentile(np.ravel(wdat[i,...]),t3) #use w/ masked arrays
+                percentile_50[i]=np.nanpercentile(np.ravel(wdat[:,i,...]),t3) #use w/ masked arrays
                 #percentile_50[i]=np.percentile(winds[:,i,:,:],50)
                 #percentile_50[i]=np.percentile(winds[i],50)
             except IndexError:
@@ -1861,20 +1891,20 @@ class RadarData(RadarConfig.RadarConfig):
         for i,ht in enumerate(height):
             #summed_z = np.ma.sum(winds[:,i,:,:])
             try: 
-                percentile_90[i]=np.nanpercentile(np.ravel(self.data[self.w_name].data[i,...]),90) #use w/ masked arrays
+                percentile_90[i]=np.nanpercentile(np.ravel(self.data[self.w_name].values[i,...]),90) #use w/ masked arrays
 
                 #percentile_90[i]=np.percentile(winds[:,i,:,:],90)
                 #percentile_90[i]=np.percentile(winds[i],99)
             except IndexError:
                 percentile_90[i]=np.nan
             try:
-                percentile_99[i]=np.nanpercentile(np.ravel(self.data[self.w_name].data[i,...]),99) #use w/ masked arrays
+                percentile_99[i]=np.nanpercentile(np.ravel(self.data[self.w_name].values[i,...]),99) #use w/ masked arrays
                 #percentile_99[i]=np.percentile(winds[:,i,:,:],99)
                 #percentile_99[i]=np.percentile(winds[i],99)
             except IndexError:
                 percentile_99[i]=np.nan
             try:
-                percentile_50[i]=np.nanpercentile(np.ravel(self.data[self.w_name].data[i,...]),50) #use w/ masked arrays
+                percentile_50[i]=np.nanpercentile(np.ravel(self.data[self.w_name].values[i,...]),50) #use w/ masked arrays
                 #percentile_50[i]=np.percentile(winds[:,i,:,:],50)
                 #percentile_50[i]=np.percentile(winds[i],50)
             except IndexError:
@@ -1927,20 +1957,20 @@ class RadarData(RadarConfig.RadarConfig):
         #print above,below,np.shape(self.data[self.hid_name].data)
         if cscfad == 'convective':
             mask= np.where(self.raintype != 2)
-            holddat = deepcopy(self.data[self.hid_name].data)
-            self.data[self.hid_name].data[mask] = -1
+            holddat = deepcopy(self.data[self.hid_name].values)
+            self.data[self.hid_name].values[mask] = -1
 #            print 'in conv'
         elif cscfad == 'stratiform':
             mask= np.where(self.raintype != 1)
-            holddat = deepcopy(self.data[self.hid_name].data)
-            self.data[self.hid_name].data[mask] = -1
+            holddat = deepcopy(self.data[self.hid_name].values)
+            self.data[self.hid_name].values[mask] = -1
 #            print 'in strat'
         else:
             mask = np.where(self.raintype < 100)
         
         
-        data = self.data[self.hid_name].sel(z=slice(above,below)).data
-        msk = (np.less(self.data[self.dz_name].data, -900))
+        data = self.data[self.hid_name].sel(z=slice(above,below)).values
+        msk = (np.less(self.data[self.dz_name].values, -900))
         data[msk] = -1
         #print 'vhv dat',np.shape(data)
         # Not sure if I need this here.....
@@ -1949,14 +1979,14 @@ class RadarData(RadarConfig.RadarConfig):
             return
 
         multiple = np.int(z_resolution/self.dz)
-        vol = np.zeros(int(self.data[self.z_name].data.shape[0]/multiple))
-        hts = np.zeros(int(self.data[self.z_name].data.shape[0]/multiple))
+        vol = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
+        hts = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
         #print np.shape(vol)
         #print self.data[self.z_name].data.shape[1]
-        looped = np.arange(0, int(self.data[self.z_name].data.shape[0]), multiple)
+        looped = np.arange(0, int(self.data[self.z_name].values.shape[0]), multiple)
         #print looped,multiple
         for vi,vl in enumerate(looped):
-            lev_hid = data[vl:vl+multiple,...] # go to vl+multiple cuz not inclusive
+            lev_hid = data[:,vl:vl+multiple,...] # go to vl+multiple cuz not inclusive
             #print 'lev_hid',np.shape(lev_hid)
 #            print hid_nums, np.shape(lev_hid)
             where_this_hid = np.where(lev_hid == hid_nums)
@@ -1964,10 +1994,10 @@ class RadarData(RadarConfig.RadarConfig):
             this_hid_vol = where_this_hid[0].shape[0]
             vol[vi] += this_hid_vol
             #print self.data[self.z_name].data[0][vl+multiple]
-        hts = self.data[self.z_name].data[looped]
+        hts = self.data[self.z_name].values[looped]
 
         if cscfad == 'convective' or cscfad == 'stratiform':
-            self.data[self.hid_name].data = holddat
+            self.data[self.hid_name].values = holddat
 
         #print np.shape(vol), np.max(vol)
         #print hts
@@ -2021,8 +2051,10 @@ class RadarData(RadarConfig.RadarConfig):
         # loop thru the species and just call the vertical hid volume
         all_vols = []
         for sp in range(len(self.species)):
-            all_vols.append(self.vertical_hid_volume([sp+1], z_resolution=z_resolution, pick=pick,cscfad = cscfad)[1]) # need the +1
-
+            
+            hts, dat = self.vertical_hid_volume([sp+1], z_resolution=z_resolution, pick=pick,cscfad = cscfad)
+            all_vols.append(dat) # need the +1
+            
 
         all_vols = np.array(all_vols)
         all_cdf = np.zeros_like(all_vols)
@@ -2035,7 +2067,7 @@ class RadarData(RadarConfig.RadarConfig):
 #            print level_cum_vol
             all_cdf[:, iz] = 100.0*level_cum_vol/level_cum_vol[-1]
 
-        return all_cdf
+        return all_cdf,hts
 
 
 #############################################################################################################
@@ -2360,19 +2392,23 @@ class RadarData(RadarConfig.RadarConfig):
 
         for q in tqdm(range(self.data.dims['d'])):
             if self.lat_name in self.data.keys():
-                        lat = self.data[self.lat_name].sel(d=q).values
-                        lon = self.data[self.lon_name].sel(d=q).values
+#                         lat = self.data[self.lat_name].sel(d=q).values
+#                         lon = self.data[self.lon_name].sel(d=q).values
+                        lat = self.data[self.lat_name].values
+                        lon = self.data[self.lon_name].values
             else:
                         self.get_latlon_fromxy()
                         lat = self.data[self.lat_name].values
                         lon = self.data[self.lon_name].values
-
+#            print (np.shape(self.data[self.lat_name]))
 #            print 'q is '
             #print np.shape(self.data[self.z_name].sel(d=q))
-            zlev = np.where(self.data[self.z_name].sel(d=q).values ==2.25)[0]#self.cs_z)
+#            zlev = np.where(self.data[self.z_name].sel(d=q).values ==2.25)[0]#self.cs_z)
+            zlev = np.where(self.data[self.z_name].values == 2.0)[0]
 #             print self.data[self.z_name].sel(d=q).values
 #             print np.shape(self.data[self.dz_name])
 #             print 'zlev',zlev
+#            print('zlev for shy is:',zlev)
             refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
 #             print np.shape(refl)
             #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
@@ -2393,7 +2429,21 @@ class RadarData(RadarConfig.RadarConfig):
 #                 lat = self.data[self.lat].values
 #                 lon = self.data[self.lon].values
             #print np.shape(refl),'radar data 2490'
-            yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat, lon, 40.0, method='SYH', sm_rad=2,a=8, b=64)
+#             if np.ndim(lat)==1:
+#                 lat2d = np.tile()            
+#            print(np.shape(lat),np.shape(lon))
+            if np.ndim(lat) == 1:
+                lon2d = np.tile(lon,np.shape(lon)[0])
+                lon2d = np.swapaxes(np.reshape(lon2d,(np.shape(lon)[0],np.shape(lon)[0])),1,0)
+
+                lat2d = np.tile(lat,np.shape(lat)[0])
+                lat2d = np.reshape(lat2d,(np.shape(lat)[0],np.shape(lat)[0]))
+            else:
+                lat2d = lat
+                lon2d = lon
+
+                
+            yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat2d, lon2d, 40.0, method='SYH', sm_rad=2,a=8, b=64)
             cs_arr = np.full(yh_cs.shape, np.nan)
             #print (np.nanmax(yh_cs),np.nanmax(cs_arr))
             yh_conv = (yh_cs == 3) | (yh_cs == 4) | (yh_cs == 5)| (yh_cs == 2) | (yh_cs == 1)
@@ -2403,7 +2453,7 @@ class RadarData(RadarConfig.RadarConfig):
             cs_arr[yh_strat] = 1
 
             cs_arr[np.isnan(refl)] =-1
-            nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
+            nlevs = np.shape(self.data[self.z_name].values)[0]
     #        print nlevs
             rpt = np.tile(cs_arr,(nlevs,1,1))
             #print np.shape(rpt)
@@ -2414,4 +2464,35 @@ class RadarData(RadarConfig.RadarConfig):
         #print 'shapes',np.shape(rntypetot)
         self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')     
 
+def composite(self, var,ts=0,map_on = True,res='10m'):
+    dat = np.squeeze(self.data[var].sel(d=sice(ts,ts+1)).values)
+    comp = dat.filled(fill_value=np.nan)
+    dzcomp = np.nanmax(comp,axis=0)
+    if not 'lat' in self.data.keys():
+        self.get_latlon_fromxy()
+        
+    lats = self.data['lat']
+    lons = self.data['lon']
+    
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
+    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+    ax.coastlines(resolution=res)
 
+    ax.set_extent([np.min(self.lons), np.max(lons), np.min(lats), np.max(lats)])
+    lon_formatter = LongitudeFormatter(number_format='.1f')
+    lat_formatter = LatitudeFormatter(number_format='.1f')
+    ax.xaxis.set_major_formatter(lon_formatter)
+    ax.yaxis.set_major_formatter(lat_formatter)
+
+    cb = ax.pcolormesh(lons,lats,dzcomp, vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var],transform=ccrs.PlateCarree())
+    plt.colorbar(cb)
+    # ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=2, color='gray', alpha=0.5, linestyle='--')
+
+    gl.xlabels_top = False
+    gl.ylabels_right = False
+    # ax.set_title('MC3E CSAPR {d:

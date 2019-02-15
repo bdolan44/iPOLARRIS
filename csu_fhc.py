@@ -243,8 +243,9 @@ def _get_test_list(fhc_vars, weights, radar_data, sets, varlist, weight_sum,
             if use_temp:
                 if pol_flag:
                     # *= multiplies by new value and stores in test
-                    test *= hid_beta_f(sz, radar_data['T'], sets['T']['a'][c],
+                    mdum= hid_beta_f(sz, radar_data['T'], sets['T']['a'][c],
                                        sets['T']['b'][c], sets['T']['m'][c])
+                    test=mdum*test
                     # print 'in loc 2'
                     # if test.max() > 1: #Maximum of test should never be > 1
                     #     print 'Fail loc 2, test.max() =', test.max()

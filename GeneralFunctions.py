@@ -156,13 +156,13 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
 
     # plot the CFAD
     cfad_ma = np.ma.masked_where(cfad==0, cfad)
-
+    print(np.shape(cfad_ma),'cfad shape')
     if cont is True:
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
-            pc = ax.contourf(bins[0:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
-        except (Exception, e):
+            pc = ax.contourf(bins[:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
+        except TypeError as e:
             print ('Can not plot {v} with exception {e}'.format(v=var,e=e))
             return fig, ax
     else:
@@ -191,18 +191,18 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
         else:
             varn = var
 #        print 'ln192',varn
-        if varn in rconf.names.keys():
-            
-            ax.set_xlabel('{n} {u}'.format(n=rconf.names[varn], u=rconf.units[varn]))
-            #print rconf.print_title(tm=tspan)
-#            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
-    #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
-        else:
-            ax.set_xlabel('{n}'.format(n=var))
-            #print rconf.print_title(tm=tspan)
-#            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
-#        except:
-#            pass
+#         if varn in rconf.names.keys():
+#             
+#             ax.set_xlabel('{n} {u}'.format(n=rconf.names[varn], u=rconf.units[varn]))
+#             #print rconf.print_title(tm=tspan)
+# #            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
+#     #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
+#         else:
+#             ax.set_xlabel('{n}'.format(n=var))
+#             #print rconf.print_title(tm=tspan)
+# #            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
+# #        except:
+# #            pass
 
     return fig, ax
 
@@ -333,7 +333,7 @@ def vertical_hid_volume(data,hts, delz,hid_nums, z_resolution=1.0, above=None, b
     #print looped,multiple
     for vi,vl in enumerate(looped):
         
-        lev_hid = data[vl:vl+multiple,...]
+        lev_hid = data.sel(z=slice(vl,vl+multiple)).values
         #print hid_nums,np.shape(dum2)
 #        print np.shape(lev_hid),np.max(lev_hid)
         #print 'lev_hid',np.shape(lev_hid)
