@@ -142,13 +142,15 @@ def polarris_driver(configfile):
                 key, val, comment = line.split('==')
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'mphys':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
                     numck = False
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
                 #print numck
                 #print vval,key
                 if key.replace(" ", "") == 'image_dir':
+                    numck = True
+                if key.replace(" ", "") == 'radar_files':
                     numck = True
 
                 if numck is True or vval == 'None' or vval == 'True' or vval == 'False':
@@ -160,7 +162,7 @@ def polarris_driver(configfile):
                 else:
                     config[(key.replace(" ", ""))] = vval
             
-
+    print(config['radar_files'])
     with open(config['radar_files'], 'r') as f:
         rfiles = f.read().splitlines()
     #rfiles= glob.glob('*.nc')
@@ -290,8 +292,8 @@ def polarris_driver(configfile):
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
                                                   kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                                   u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],
-                                                  rr=config['rr_name'],band = 'C',vr = 'vr',lat_r=lat_r,lon_r=lon_r,
-                                                  y=config['yname'],z=config['zname'],lat=config['xname'], lon=config['yname'],lat_0=lat_0,lon_0=lon_0,
+                                                  rr=config['rr_name'],band = 'C',vr = config['vr_name'],lat_r=lat_r,lon_r=lon_r,
+                                                  y=config['yname'],z=config['zname'],lat=config['lonname'], lon=config['latname'],lat_0=lat_0,lon_0=lon_0,
                                                   exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
                                                   z_thresh=0,conv_types =  config['conv_types'],
                                                    strat_types = config['strat_types'])
@@ -309,14 +311,16 @@ def polarris_driver(configfile):
     #print 'Calculating polarimetric fields like HID and rain...'
     if config['pol_on'] == True:
         rdata.calc_pol_analysis()
-
-    rdata.calc_cs_shy()
+#    print(config['cs_z'],'in 312 cs_z')
+    if config['mask_model'] == True:
+        rdata.mask_model()
+    rdata.calc_cs_shy(cs_z=config['cs_z'])
     rdata.raintype=rdata.data['CSS'].values#    rdata.set_hid()
     
     if config['comb_vicr'] == True:
         whvi = np.where(rdata.hid == 6)
         rdata.hid[whvi] = 3
-
+    
  
     ###Do some quick masking of the data####
     mask = np.zeros([rdata.data.dims['d'],rdata.data.dims['z'],rdata.data.dims['y'],rdata.data.dims['x']])
