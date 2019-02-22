@@ -1390,4 +1390,4 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
     gl.xlabels_top = False
     gl.ylabels_right = False
     
-    return fig,ax,dzcomp
+    return fig,ax#,dzcomp
