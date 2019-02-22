@@ -144,7 +144,7 @@ def polarris_driver(configfile):
                 numck = hasNumbers(vval)
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
                     numck = False
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'ptype':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'extra1' or key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
                 #print numck
                 #print vval,key
@@ -293,7 +293,7 @@ def polarris_driver(configfile):
                                                   kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                                   u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],
                                                   rr=config['rr_name'],band = 'C',vr = config['vr_name'],lat_r=lat_r,lon_r=lon_r,
-                                                  y=config['yname'],z=config['zname'],lat=config['lonname'], lon=config['latname'],lat_0=lat_0,lon_0=lon_0,
+                                                  y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=lat_0,lon_0=lon_0,
                                                   exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
                                                   z_thresh=0,conv_types =  config['conv_types'],
                                                    strat_types = config['strat_types'])
