@@ -79,6 +79,42 @@ if sys.argv[2:]:
 #rdata.data.keys()
 
 
+#tdate = datetime.datetime(2011,5,23,22,00)
+#tdate = datetime.datetime(2006,1,23,18,0)
+#whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
+#print(whdate[0])
+#fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,whdate[0][0])
+#rtimematch = rdata.date[whdate[0][0]]
+#ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
+#plt.tight_layout()
+#plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+#plt.clf()
+
+
+for i,d in enumerate(rdata.date):
+    print('plotting cfads by time....')
+    fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
+
+    rtimematch = d
+    ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
+    plt.tight_layout()
+    plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+    plt.close()
+
+
+
+#tdate = datetime.datetime(2011,5,23,22,00)
+#tdate = datetime.datetime(2006,1,23,19,00)
+
+#whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
+#fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,whdate[0][0])
+#rtimematch = rdata.date[whdate[0][0]]
+#ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
+#plt.tight_layout()
+#plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+#plt.clf()
+
+
 ################################################################################
 ##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
 ## The conditional rain rate is achieved by sending threshold = 0.
@@ -89,7 +125,10 @@ ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True
 ax.set_ylabel('Rain Rate (mm/hr)')
 ax.set_title('Precipitation Timeseries TWP-ICE')
 plt.tight_layout()
-plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+try:
+	plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+except:
+	plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400)
 plt.clf()
 ############################################################################
 
@@ -101,7 +140,10 @@ ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data
 ax.set_xlabel('Vertical velocity m/s')
 ax.set_title('Vertical velocity profiles TWP-ICE')
 plt.tight_layout()
-plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+try:
+	plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+except: 
+	plt.savefig('{i}Quantile_vvel_{e}_{m}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400)
 plt.clf()
 ################################################################################
 
@@ -112,19 +154,24 @@ ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name]
 ax.set_title('Vertical profile of reflectivity')
 ax.set_xlabel('Reflectivity')
 plt.tight_layout()
-plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
-
+try:
+	plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+except:
+	plt.savefig('{i}MeanProfile_refl_{e}_{m}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400)
 plt.clf()
 ################################################################################
 ##Next let's make a reflectivity CFAD
 
-cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
+cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name].sel(d=0),var=rdata.dz_name,nbins=40)
 
 fig,ax = plt.subplots(1,1,figsize=(10,10))
-ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name].values,vbins,ax,levels=True,cont=True)
+ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name].sel(d=0).values,vbins,ax,levels=True,cont=True)
 ax.set_xlabel('Reflectivity')
 ax.set_ylabel('Height (km)')
 ax.set_title('TWP-ICE CFAD')
 plt.tight_layout()
-plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+try:
+	plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra']),dpi=400)
+except:
+	plt.savefig('{i}CFAD_refl_{e}_{m}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400)
 plt.clf()

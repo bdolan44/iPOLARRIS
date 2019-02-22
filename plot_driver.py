@@ -24,6 +24,8 @@ dayFormatter = DateFormatter('%H%M')      # e.g., 12
 hourFormatter = DateFormatter('%H')      # e.g., 12
 
 from matplotlib.colors import from_levels_and_colors
+import cartopy.crs as ccrs
+import matplotlib.ticker as ticker
 
 
 
@@ -1023,7 +1025,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         wdn90 = wdn.quantile(1-q1,dim=['x','y','d'])
         wdn99 = wdn.quantile(1-q3,dim=['x','y','d'])                                               
 
-        zdat = z.values
+        zdat = z.sel(d=0).values
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
@@ -1041,7 +1043,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         wup90 = pdat.quantile(q1,dim=['x','y','d'])
         wup99 = pdat.quantile(q3,dim=['x','y','d'])
 
-        zdat = z.values
+        zdat = z.sel(d=0).values
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
@@ -1064,7 +1066,7 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
 
         wdn50 = wdn.mean(dim=['x','y','d'])
 
-        zdat = z.values
+        zdat = z.sel(d=0).values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.plot(wdn50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.legend(loc='best')
@@ -1075,7 +1077,7 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
         
     
         wup50 = pdat.mean(dim=['x','y','d'])
-        zdat = z.values
+        zdat = z.sel(d=0).values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.legend(loc='best')
 
@@ -1209,7 +1211,7 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
         value_bins = np.linspace(rdata.lims[var][0], rdata.lims[var][1], 20)
         nbins = len(value_bins)
     else:
-        value_biles = np.arange(0,nbins+1,1)
+        value_bins = np.arange(0,nbins+1,1)
         
     sz=len(zvals.values)
     print (sz,multiple)
@@ -1220,9 +1222,10 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
         v = zvals.values[vl]
         v2 = zvals.values[vl+multiple]
         try:
-            dum = (data.sel(z=slice(v,v2)).values)
+            dum = np.squeeze((data.sel(z=slice(v,v2)).values))
         except:
-            dum = (data.sel(z=slice(vl,vl+multiple)).values)
+            dum = np.squeeze((data.sel(z=slice(vl,vl+multiple)).values))
+        #print('dum shape',np.shape(dum))
         dum2 = np.where(np.isfinite(dum))
         lev_hist, edges = np.histogram(dum[dum2], bins=value_bins, density=True) 
         lev_hist = 100.0*lev_hist/np.sum(lev_hist)
@@ -1256,8 +1259,9 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
             pc = ax.contourf(vbins[0:-1],hts,cfad_ma,levs,colors=cols,extend = 'both')
-        except (Exception, e):
-            print( 'Can not plot {v} with exception {e}'.format(e=e))
+        except Exception,e:
+	#Change to this for py3.7  except (Exception, e):
+            print( 'Can not plot with exception {e}'.format(e=e))
             return ax
     else:
 
@@ -1301,6 +1305,52 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
     return ax
 
-def plot_composite(rdata,var,time):
+def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
+    dat = rdata.data[var].sel(d=time)
+    cs_arr = rdata.data['CSS'].sel(d=time,z=2)
+    dat = np.squeeze(dat.values)
+    print(np.shape(dat),"shape of dat in composite")
+    dzcomp = np.nanmax(dat,axis=0)
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
+    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+
+    print('in plot compmosite, 1313')
+    #ax.stock_img()
+    if not rdata.lat_name in rdata.data.keys():
+        rdata.get_latlon_fromxy()
+        print('No latitude')
+        lats = rdata.data['lat']
+        lons = rdata.data['lon']
+    else:
+        lats = rdata.data[rdata.lat_name].sel(d=time)
+        lons = rdata.data[rdata.lon_name].sel(d=time)
+    print('in plot compmosite, 1321',np.shape(lats))
+    print('lat max',np.max(lats.values),np.max(lons.values),np.min(lons.values),np.min(lats.values))
+    # Specifies the detail level of the map.
+    # Options are '110m' (default), '50m', and '10m'
+    ax.coastlines(resolution=resolution)
+
+    #ax.set_extent([np.min(lons.values), np.max(lons.values), np.min(lats.values), np.max(lats.values)])
+#    lon_formatter = LongitudeFormatter(number_format='.1f')
+#    lat_formatter = LatitudeFormatter(number_format='.1f')
+#    ax.xaxis.set_major_formatter(lon_formatter)
+#    ax.yaxis.set_major_formatter(lat_formatter)
+
+    cb = ax.pcolormesh(lons,lats,dzcomp, vmin =0,vmax=80,cmap=rdata.cmaps[var],transform=ccrs.PlateCarree())
+#    plt.colorbar(cb)
+#    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+#    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+
+    if cs_over == True:
+        ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','crimson'],transform=ccrs.PlateCarree())
+
+
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=2, color='gray', alpha=0.5, linestyle='--')
+
+    gl.xlabels_top = False
+    gl.ylabels_right = False
     
-    return
+    return fig,ax

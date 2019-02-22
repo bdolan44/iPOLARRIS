@@ -18,7 +18,8 @@ from .thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
 from .thermodynamics import Rs_da, Cp_da, Epsilon
 
 
-from collections import UserDict
+#from collections import UserDict
+from UserDict import UserDict
 from datetime import datetime
 import os,sys
 import scipy.interpolate as si

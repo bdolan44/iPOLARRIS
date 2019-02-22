@@ -578,21 +578,21 @@ class RadarData(RadarConfig.RadarConfig):
             hiddum[whbad] = -1
             hid.append(hiddum)
 #        print "Returned to RadarData"
-        self.scores=np.array(scores)
+        #self.scores=np.array(scores)
         #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
-        dzmask = np.where(np.logical_or(self.data[self.dz_name].values <=zthresh, np.isnan(self.data[self.dz_name].values)))
+        #dzmask = np.where(np.logical_or(self.data[self.dz_name].values <=zthresh, np.isnan(self.data[self.dz_name].values)))
 #            # set the hid
 #        self.hid = np.argmax(scores, axis=1)+1
         hid = np.array(hid,dtype='float64')
-        print('dzmask shape',np.shape(dzmask))
-        hid[dzmask] = np.nan
+        #print('dzmask shape',np.shape(dzmask))
+        #hid[dzmask] = np.nan
         self.hid = np.array(hid)
         print ('setting bad hid with Drizzle, T<-5')
 
 #       = try:
 #         #           print 'Trying to mask HID!'
-        self.hid = np.ma.masked_where(dzmask==True,self.hid)
+        #self.hid = np.ma.masked_where(dzmask==True,self.hid)
         
 #         self.hid = np.ma.masked_where(self.T.mask,self.hid)
 #         self.hid = np.ma.masked_where(self.data[self.dz_name].mask,self.hid)
@@ -2394,8 +2394,8 @@ class RadarData(RadarConfig.RadarConfig):
             if self.lat_name in self.data.keys():
 #                         lat = self.data[self.lat_name].sel(d=q).values
 #                         lon = self.data[self.lon_name].sel(d=q).values
-                        lat = self.data[self.lat_name].values
-                        lon = self.data[self.lon_name].values
+                        lat = self.data[self.lat_name].sel(d=q).values
+                        lon = self.data[self.lon_name].sel(d=q).values
             else:
                         self.get_latlon_fromxy()
                         lat = self.data[self.lat_name].values
@@ -2403,12 +2403,13 @@ class RadarData(RadarConfig.RadarConfig):
 #            print (np.shape(self.data[self.lat_name]))
 #            print 'q is '
             #print np.shape(self.data[self.z_name].sel(d=q))
-#            zlev = np.where(self.data[self.z_name].sel(d=q).values ==2.25)[0]#self.cs_z)
-            zlev = np.where(self.data[self.z_name].values == 2.0)[0]
+            zlev = np.where(self.data[self.z_name].sel(d=q).values ==2.25)[0]#self.cs_z)
+            #zlev = np.where(np.isclose(self.data[self.z_name].sel(d=q).values, 2.0))[0]
+            #zlev = np.where(self.data[self.z_name].values == 2.0)[0]
 #             print self.data[self.z_name].sel(d=q).values
 #             print np.shape(self.data[self.dz_name])
 #             print 'zlev',zlev
-#            print('zlev for shy is:',zlev)
+            print('zlev for shy is:',zlev)
             refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
 #             print np.shape(refl)
             #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
@@ -2442,7 +2443,7 @@ class RadarData(RadarConfig.RadarConfig):
                 lat2d = lat
                 lon2d = lon
 
-                
+            print(np.shape(refl),np.shape(lat2d),np.shape(lon2d))    
             yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat2d, lon2d, 40.0, method='SYH', sm_rad=2,a=8, b=64)
             cs_arr = np.full(yh_cs.shape, np.nan)
             #print (np.nanmax(yh_cs),np.nanmax(cs_arr))
@@ -2453,13 +2454,14 @@ class RadarData(RadarConfig.RadarConfig):
             cs_arr[yh_strat] = 1
 
             cs_arr[np.isnan(refl)] =-1
-            nlevs = np.shape(self.data[self.z_name].values)[0]
-    #        print nlevs
+            nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
+    #        print nlev.s
             rpt = np.tile(cs_arr,(nlevs,1,1))
-            #print np.shape(rpt)
+            print(np.shape(rpt),nlevs)
             #print np.nanmax(rpt)
             rntypetot.append(rpt)
         #self.def_convstrat()
+        print(np.shape(rntypetot),'rntypetot')
         #np.array(rntypetot)[np.isnan(self.data[self.dz_name].values)] =-1
         #print 'shapes',np.shape(rntypetot)
         self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')     
@@ -2468,12 +2470,16 @@ def composite(self, var,ts=0,map_on = True,res='10m'):
     dat = np.squeeze(self.data[var].sel(d=sice(ts,ts+1)).values)
     comp = dat.filled(fill_value=np.nan)
     dzcomp = np.nanmax(comp,axis=0)
-    if not 'lat' in self.data.keys():
-        self.get_latlon_fromxy()
-        
-    lats = self.data['lat']
-    lons = self.data['lon']
-    
+    print('lat name',self.lat_name)
+    if self.lat_name == None:
+        #self.get_latlon_fromxy()
+     
+        lats = self.data['lat']
+        lons = self.data['lon']
+    else:
+        lons = self.data[self.lon_name]
+        lats = self.data[self.lat_name]    
+
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
     from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
