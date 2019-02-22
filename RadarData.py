@@ -325,6 +325,14 @@ class RadarData(RadarConfig.RadarConfig):
         for k in self.data.keys():
             self.data[k] = np.ma.masked_where(self.data[k] < -998.0,self.data[k])
 
+    def mask_model(self):
+        self.data[self.zdr_name].values=np.ma.masked_less(self.data[self.zdr_name].values,-2)
+        mask_dat=[self.dz_name,self.zdr_name,self.vr_name,self.rr_name,self.kdp_name,self.w_name,self.u_name,self.v_name]
+        for k in mask_dat:
+            print(k)
+            self.data[k].values=np.ma.masked_where(np.isnan(self.data[self.zdr_name].values),self.data[k].values)
+        
+
     def valid_vars(self):
         return np.intersect1d(self.pol_vars, self.data.keys())
 #############################################################################################################
@@ -370,11 +378,11 @@ class RadarData(RadarConfig.RadarConfig):
     def _get_ab_incides(self, above=None, below=None):
 
         if above is not None:
-            bot_index = np.argsort(np.abs(self.data[self.z_name] - above))[0]
+            bot_index = np.argsort(np.abs(self.data[self.z_name].values - above))[0]
         else:
             bot_index = deepcopy(self.bot_index)
         if below is not None:
-            top_index = np.argsort(np.abs(self.data[self.z_name] - below))[0]
+            top_index = np.argsort(np.abs(self.data[self.z_name].values - below))[0]
         else:
             top_index = deepcopy(self.top_index)
 
@@ -752,10 +760,15 @@ class RadarData(RadarConfig.RadarConfig):
 
         rr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
                                                       czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band=band,fhc=self.hid)
+#         mask=np.where(np.isnan(self.data[self.dz_name].values))
+#         rr[mask]=np.nan
+#         rm[mask]=-1
 
         self.add_field((self.data[self.dz_name].dims,rr,), 'RRP')
         self.add_field((self.data[self.dz_name].dims,rm,), 'RRM')
-
+        whbad = np.where(np.isnan(self.data[self.dz_name]))
+        self.data['RRP'].values[whbad]=np.nan
+        self.data['RRM'].values[whbad]=-1
         return
 #############################################################################################################
 
@@ -1119,7 +1132,7 @@ class RadarData(RadarConfig.RadarConfig):
         if np.ndim(data) == 3:
             data = np.squeeze(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
             print("changing shape",np.shape(data))
-        print('lims',self.lims[var])
+        #print('lims',self.lims[var])
 ##        except:
 #            print 'ln1033',z_ind,ymini,ymaxi,xmini,xmaxi,var
 #            print np.shape(self.data[var].data)
@@ -1145,7 +1158,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #        print 'about to do plotting, ln 1113'
         if var in self.lims.keys():
- #           print 'var:',var
+            print( 'var:',var)
             range_lim = self.lims[var][1] - self.lims[var][0]
   #          print np.shape(data), np.shape(xdat),np.shape(ydat)
 #            print 'in var',var
@@ -1154,7 +1167,7 @@ class RadarData(RadarConfig.RadarConfig):
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
         else:
-   #         print 'unrecognized var',var
+            print ('unrecognized var',var)
             dat = self.data[var].data
             dat[dat<-900.0]=np.nan
             range_lim  = np.nanmax(dat) - np.nanmin(dat)
@@ -1168,20 +1181,24 @@ class RadarData(RadarConfig.RadarConfig):
 #            print 'Contour is not none',contour
             if contour == 'CS':
 #                print 'contours!'
-                csvals = deepcopy((self.data[var]))
-                mask = np.where(self.raintype == 2)
-                strat = np.where(self.raintype == 1)
-                csvals.data[:] = 0
-                csvals.data[mask]=2
-                csvals.data[strat] = 1
+                csvals = deepcopy((self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
+                csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
+                print(type(csvals),'csvals')
+                mask = np.where(csdats.values >= 2)
+                strat = np.where(csdats.values == 1)
+                csvals.values[:] = 0
+                csvals.values[mask]=2
+                csvals.values[strat] = 1
 #                print z_ind, z_ind+1
                 #Note: CS is the same at every level so we don't need to slice along z at the exact vert height....
+                print('csvals shape',np.shape(csvals))
                 try:
-                    cs = np.squeeze(csvals.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi),z=slice(z_ind,z_ind+1)).data)
-                    ax.contour(xdat, ydat, cs, levels=[1, 2], colors=['red', 'blue'], linewidths=[2], alpha=0.8)
+                    cs = np.squeeze(csdats.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+                    print('cs shape',np.shape(cs))
+                    ax.contour(xdat, ydat, cs, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8,zorder=10)
                 except:
-                    cs = np.squeeze(csvals.sel(x=slice(xmini, xmaxi), y=slice(ymini, ymaxi), z=slice(z_ind,z_ind)).data)
-                    ax.contour(xdat,ydat,cs,levels = [1,2],colors=['red','blue'],linewidths = [2],alpha = 0.8)
+                    cs = np.squeeze(csdats.sel(x=slice(xmini, xmaxi), y=slice(ymini, ymaxi)).values)
+                    ax.contour(xdat,ydat,cs,levels = [0,2],colors=['blue','k'],linewidths = [2],alpha = 0.8)
 
 
 
@@ -1587,7 +1604,7 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
 
-    def cfad(self, var, value_bins=None, above=2.0, below=15.0,tspan=None, pick=None, ret_z=0,z_resolution=1.0,cscfad = None):
+    def cfad(self, var, value_bins=None, above=None, below=15.0,tspan=None, pick=None, ret_z=0,z_resolution=1.0,cscfad = None):
     # pick a variable and do a CFAD for the cell
 
         if value_bins is None: # set a default if nothing is there
@@ -1597,7 +1614,8 @@ class RadarData(RadarConfig.RadarConfig):
         #print('value bins',value_bins)
 
         nbins = value_bins.shape[0]
-        bot_index, top_index = self._get_ab_incides(above=above, below=below)
+        if above is not None:
+            bot_index, top_index = self._get_ab_incides(above=above, below=below)
         #print self.data.keys()
 #         data = self._pick_data(self.data[var], pick)
 #         if 't' in self.data.dims.keys():
@@ -1610,7 +1628,12 @@ class RadarData(RadarConfig.RadarConfig):
                 return
 #        print('ln 1592')
         multiple = np.int(z_resolution/self.dz)
-        sz=np.shape(self.data[self.z_name].values)[0]
+        if 'd' in self.data[self.z_name].dims:
+            sz=np.shape(self.data[self.z_name].sel(d=0).values)[0]
+            hts = np.squeeze(self.data[self.z_name].sel(d=0).values)
+        else:
+            hts=np.squeeze(self.data[self.z_name].values)
+        
         #print( np.shape(sz),sz, multiple)
         looped = np.arange(0, sz, multiple)
         cfad_out = np.zeros((sz//multiple, nbins-1))
@@ -1650,8 +1673,8 @@ class RadarData(RadarConfig.RadarConfig):
 #             try:
             #cfad, ed = (np.histogram(mc3e_wrf.data['w'].sel(z=slice(3,15))))            
             #print ts,te,'ts,te'
-            v = self.data[self.z_name].values[vl]
-            v2 = self.data[self.z_name].values[vl+multiple]
+            v = hts[vl]
+            v2 = hts[vl+multiple]
 #            print v, v2, 'line1527'
             try:
                 dum = self.data[var].sel(z=slice(v,v2)).where(np.isfinite)
@@ -1681,13 +1704,13 @@ class RadarData(RadarConfig.RadarConfig):
 
         if ret_z == 1:
         
-            return cfad_out,value_bins,self.data[self.z_name].values[looped]
+            return cfad_out,value_bins,hts[looped]
         else:
             return cfad_out
 
 #############################################################################################################
 
-    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=2.0, below=15.0, bins=None, 
+    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, 
             log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False,cscfad = False, **kwargs):
 
         from matplotlib.colors import from_levels_and_colors
@@ -1701,9 +1724,10 @@ class RadarData(RadarConfig.RadarConfig):
 #         print self.dz
 #         print 'multiple: {}'.format(multiple)
 
-        cfad = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,tspan=tspan,cscfad=cscfad)
+        cfad,value_bins,hts = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,tspan=tspan,cscfad=cscfad,ret_z=1)
     #print cfad.sum(axis=1)
-        bot_index, top_index = self._get_ab_incides(above=above, below=below)
+        if above is not None:
+            bot_index, top_index = self._get_ab_incides(above=above, below=below)
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -1727,16 +1751,16 @@ class RadarData(RadarConfig.RadarConfig):
             levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
             cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
             #pc = ax.contourf(bins[0:-1],self.data[self.z_name].data[::multiple],(cfad_ma/np.sum(cfad_ma))*100.,levs,color=cols)
-            pc = ax.contourf(bins[0:-1],self.data[self.z_name].values[::multiple],(cfad_ma),levs,color=cols,cmap=cmap,norm=norm,extend='both')
+            pc = ax.contourf(bins[0:-1],hts,(cfad_ma),levs,color=cols,cmap=cmap,norm=norm,extend='both')
         else:
 
             if levels is not None:
                 cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
                 #print cmap
-                pc = ax.pcolormesh(bins, self.data[self.z_name].data[::multiple], cfad_ma, norm=norm, cmap=cmap)
+                pc = ax.pcolormesh(bins, hts, cfad_ma, norm=norm, cmap=cmap)
             else:
                 cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
-                pc = ax.pcolormesh(bins, self.data[self.z_name].data[::multiple], cfad_ma, vmin=0, vmax=maxval, norm=norm,cmap=cmap, **kwargs)
+                pc = ax.pcolormesh(bins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm,cmap=cmap, **kwargs)
 
 #        print np.shape(cfad_ma)
 
@@ -2019,8 +2043,10 @@ class RadarData(RadarConfig.RadarConfig):
             return None
         else:
             #hts = self.data[self.z_name].data[0][::int(np.round(z_resolution/self.dz))]
-            
-            hts2 = np.squeeze(self.data[self.z_name].sel(z=slice(above,below)).data)
+            if 'd' in self.data[self.z_name].dims:
+                hts2 = np.squeeze(self.data[self.z_name].sel(d=0,z=slice(above,below)).data)
+            else:
+                hts2 = np.squeeze(self.data[self.z_name].sel(z=slice(above,below)).data)
             #hts2 = (self.data[self.z_name].sel(t=slice(0,-1),z=slice(above,below))).data
             #print np.shape(hts2)
             hts = hts2[::int(np.round(z_resolution/self.dz))]
@@ -2328,16 +2354,45 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def calc_timeseries_stats(self,maxrain_height = 3):
+    def calc_timeseries_stats(self,var,ht_lev = 3,thresh=-99.,cs_flag=False,make_zeros=False,areas=False):
         #First calculate the domain averaged rain rates at a given level.
-        if self.rr_name is not None:
-            rr_timeseries_uncond = rr.mean(dim=['x','y','z'],skipna=True)       
-            
-        
+        #if self.rr_name is not None:
+        #    rr_timeseries_uncond = rr.mean(dim=['x','y','z'],skipna=True)       
+        data = deepcopy(self.data[var].sel(z=slice(ht_lev,ht_lev+1)))
+        whbad= np.where(data.values<thresh)
+
+        if make_zeros==True:
+            print('filling with zeros')
+            data.values[whbad] = 0.0
+            data =data.fillna(0.0)
         else:
-            print( 'No Rain field available')
-    
-    
+            data.values[whbad] = np.nan
+        
+        print('dat min:',data.values.min())
+            
+        if cs_flag is not False:
+            
+            datstrat = data.where(self.data[self.cs_name].sel(z=slice(1,2))==1)
+            datconv = data.where(self.data[self.cs_name].sel(z=slice(1,2))==2)
+            datall = data.where(self.data[self.cs_name].sel(z=slice(1,2))>0)       
+            if areas==False:       
+                datstrat_ts= datstrat.mean(dim=['z','y','x'],skipna=True)
+                datconv_ts= datconv.mean(dim=['z','y','x'],skipna=True)
+                datall_ts= datall.mean(dim=['z','y','x'],skipna=True)
+            else:
+                datstrat_ts = datstrat.count(dim=['z','y','x'])
+                datconv_ts = datconv.count(dim=['z','y','x'])
+                datall_ts = datall.count(dim=['z','y','x'])
+            
+            return datstrat_ts,datconv_ts,datall_ts
+        else:
+
+            datall = data
+            if areas==True:
+                datall_ts = datall.mean(dim=['z','y','x'],skipna=True)
+            else:
+                datall_ts = datall.count(dim=['z','y','x'])        
+            return datall
 
 
 #############################################################################################################
@@ -2386,31 +2441,47 @@ class RadarData(RadarConfig.RadarConfig):
         self.lon_name='lon'
     
     #############################################################################################################
-    def calc_cs_shy(self):
+    def calc_cs_shy(self,cs_z=2.0):
         print ('Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
-
+        print(cs_z,'cs_z in 2424')
         for q in tqdm(range(self.data.dims['d'])):
             if self.lat_name in self.data.keys():
 #                         lat = self.data[self.lat_name].sel(d=q).values
 #                         lon = self.data[self.lon_name].sel(d=q).values
+                    if 'd' in self.data[self.lat_name].dims:
+                        lat = self.data[self.lat_name].sel(d=q).values
+                        lon = self.data[self.lon_name].sel(d=q).values
+                        zlev = np.where(self.data[self.z_name].sel(d=q).values ==cs_z)[0]
+                        nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
+                    else:
                         lat = self.data[self.lat_name].values
                         lon = self.data[self.lon_name].values
+                        zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
+                        nlevs = np.shape(self.data[self.z_name].values)[0]
+
+                        
             else:
                         self.get_latlon_fromxy()
                         lat = self.data[self.lat_name].values
                         lon = self.data[self.lon_name].values
+                        zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
+                        nlevs = np.shape(self.data[self.z_name].values)[0]
+
 #            print (np.shape(self.data[self.lat_name]))
 #            print 'q is '
             #print np.shape(self.data[self.z_name].sel(d=q))
 #            zlev = np.where(self.data[self.z_name].sel(d=q).values ==2.25)[0]#self.cs_z)
-            zlev = np.where(self.data[self.z_name].values == 2.0)[0]
+            
+#            print('cs zlev is',zlev)
 #             print self.data[self.z_name].sel(d=q).values
 #             print np.shape(self.data[self.dz_name])
 #             print 'zlev',zlev
 #            print('zlev for shy is:',zlev)
+#            refl=np.squeeze(self.data[self.dz_name].sel(z=slice(zlev,zlev+1),d=q)).values
+            print('zlev',zlev)
             refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
-#             print np.shape(refl)
+            print ('refl shape',np.shape(refl))
             #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
             #refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
             #print 'refl shape',np.shape(refl),type(refl)
@@ -2442,10 +2513,9 @@ class RadarData(RadarConfig.RadarConfig):
                 lat2d = lat
                 lon2d = lon
 
-                
-            yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat2d, lon2d, 40.0, method='SYH', sm_rad=2,a=8, b=64)
+            print(np.shape(lat2d),np.shape(lon2d))                
+            yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat2d, lon2d, self.zconv, method='SYH', sm_rad=2,a=8, b=64)
             cs_arr = np.full(yh_cs.shape, np.nan)
-            #print (np.nanmax(yh_cs),np.nanmax(cs_arr))
             yh_conv = (yh_cs == 3) | (yh_cs == 4) | (yh_cs == 5)| (yh_cs == 2) | (yh_cs == 1)
             yh_strat = yh_cs == 0
 
@@ -2453,7 +2523,6 @@ class RadarData(RadarConfig.RadarConfig):
             cs_arr[yh_strat] = 1
 
             cs_arr[np.isnan(refl)] =-1
-            nlevs = np.shape(self.data[self.z_name].values)[0]
     #        print nlevs
             rpt = np.tile(cs_arr,(nlevs,1,1))
             #print np.shape(rpt)
@@ -2464,35 +2533,52 @@ class RadarData(RadarConfig.RadarConfig):
         #print 'shapes',np.shape(rntypetot)
         self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')     
 
-def composite(self, var,ts=0,map_on = True,res='10m'):
-    dat = np.squeeze(self.data[var].sel(d=sice(ts,ts+1)).values)
-    comp = dat.filled(fill_value=np.nan)
-    dzcomp = np.nanmax(comp,axis=0)
-    if not 'lat' in self.data.keys():
-        self.get_latlon_fromxy()
+    def composite(self, var,ts=0,map_on = True,res='10m'):
+        dat = np.squeeze(self.data[var].sel(d=slice(ts,ts+1)).values)
+        comp = dat.fill(np.nan)
+        dzcomp = np.nanmax(comp,axis=0)
+        if not 'lat' in self.data.keys():
+            self.get_latlon_fromxy()
         
-    lats = self.data['lat']
-    lons = self.data['lon']
+        lats = self.data['lat']
+        lons = self.data['lon']
     
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
-    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-    ax.coastlines(resolution=res)
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
+        from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+        ax.coastlines(resolution=res)
+        if var in self.lims.keys():
+            print( 'var:',var)
+            range_lim = self.lims[var][1] - self.lims[var][0]
+    #          print np.shape(data), np.shape(xdat),np.shape(ydat)
+    #            print 'in var',var
+            #print **kwargs
+            vmin=self.lims[var][0]
+            vmax=self.lims[var][1]
+            cmap=self.cmaps[var]
+        else:
+            print ('unrecognized var',var)
+            dat = self.data[var].data
+            dat[dat<-900.0]=np.nan
+            range_lim  = np.nanmax(dat) - np.nanmin(dat)
+            vmin=np.nanmin(dat)
+            vmax=np.nanmax(dat)
+            cmap = plt.cm.gist_ncar
+        
+        ax.set_extent([np.min(self.lons), np.max(lons), np.min(lats), np.max(lats)])
+        lon_formatter = LongitudeFormatter(number_format='.1f')
+        lat_formatter = LatitudeFormatter(number_format='.1f')
+        ax.xaxis.set_major_formatter(lon_formatter)
+        ax.yaxis.set_major_formatter(lat_formatter)
 
-    ax.set_extent([np.min(self.lons), np.max(lons), np.min(lats), np.max(lats)])
-    lon_formatter = LongitudeFormatter(number_format='.1f')
-    lat_formatter = LatitudeFormatter(number_format='.1f')
-    ax.xaxis.set_major_formatter(lon_formatter)
-    ax.yaxis.set_major_formatter(lat_formatter)
+        cb = ax.pcolormesh(lons,lats,dzcomp, vmin = vmin, vmax = vmax, cmap = cmap,transform=ccrs.PlateCarree())
+        plt.colorbar(cb)
+        # ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
-    cb = ax.pcolormesh(lons,lats,dzcomp, vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var],transform=ccrs.PlateCarree())
-    plt.colorbar(cb)
-    # ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-    # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                          linewidth=2, color='gray', alpha=0.5, linestyle='--')
 
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                      linewidth=2, color='gray', alpha=0.5, linestyle='--')
-
-    gl.xlabels_top = False
-    gl.ylabels_right = False
-    # ax.set_title('MC3E CSAPR {d:
+        gl.xlabels_top = False
+        gl.ylabels_right = False
+        # ax.set_title('MC3E CSAPR {d:

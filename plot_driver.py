@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-from polarris_config import get_data
+#from polarris_config import get_data
 import RadarData
 import GeneralFunctions as GF
 from matplotlib import colors
@@ -24,7 +24,8 @@ dayFormatter = DateFormatter('%H%M')      # e.g., 12
 hourFormatter = DateFormatter('%H')      # e.g., 12
 
 from matplotlib.colors import from_levels_and_colors
-
+import cartopy.crs as ccrs
+import matplotlib.ticker as ticker
 
 
 def label_subplots(fig, xoff = 0.0, yoff = 0.02, nlabels = None,**kwargs):
@@ -979,20 +980,35 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=rdat.date,r=rdat.radar_name,x=config['extra'],t=config['ptype'],y=config['y']),dpi=300)
         plt.clf()
         
-def subset_convstrat(data,rdata):
-    stratsub=data.sel(z=slice(2,3)).where(rdata.data['CSS'].sel(z=slice(1,2))==1)
-    convsub=data.sel(z=slice(2,3)).where(rdata.data['CSS'].sel(z=slice(1,2))==2)
-    allsub=data.sel(z=slice(2,3)).where(rdata.data['CSS'].sel(z=slice(1,2))>0)
+def subset_convstrat(data,rdata,zlev=1):
+    stratsub=data.sel(z=slice(zlev,zlev+1)).where(rdata.data['CSS'].sel(z=slice(zlev,zlev+1))==1)
+    convsub=data.sel(z=slice(zlev,zlev+1)).where(rdata.data['CSS'].sel(z=slice(zlev,zlev+1))==2)
+    allsub=data.sel(z=slice(zlev,zlev+1)).where(rdata.data['CSS'].sel(z=slice(zlev,zlev+1))>0)
     return stratsub,convsub,allsub
     
-def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ=''):
-    data.values[data.values<-50] = np.nan
+def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zlev=1,make_zeros=False,areas=False,domain_rel=False):
+    data.values[data.values<thresh] = np.nan
+    if make_zeros==True:
+        data = data.fillna(0.0)
     if cs == True:
-        sdat,cdat,adat = subset_convstrat(data,rdata)
+        
+        sdat,cdat,adat = subset_convstrat(data,rdata,zlev=zlev)
         print ('plotting')
-        ax.plot(np.array(tm),adat.where(adat>thresh).mean(dim=['z','y','x'],skipna=True),color='k',label='Total {e}'.format(e=typ),ls=ls)
-        ax.plot(np.array(tm),cdat.where(cdat>thresh).mean(dim=['z','y','x'],skipna=True),color='r',label='Conv {e}'.format(e=typ),ls=ls)
-        ax.plot(np.array(tm),sdat.where(sdat>thresh).mean(dim=['z','y','x'],skipna=True),color='b',label='strat {e}'.format(e=typ),ls=ls)
+        if areas == True:
+            if domain_rel == True:
+                gridsize = np.float(data.coords['x'].size*data.coords['y'].size)
+                print(gridsize,'gridsize')
+            else:
+                gridsize = adat.count(dim=['z','y','x'])
+            ax.plot(np.array(tm),adat.count(dim=['z','y','x'])/gridsize,color='k',label='Total {e}'.format(e=typ),ls=ls)
+            ax.plot(np.array(tm),cdat.count(dim=['z','y','x'])/gridsize,color='r',label='Conv {e}'.format(e=typ),ls=ls)
+            ax.plot(np.array(tm),sdat.count(dim=['z','y','x'])/gridsize,color='b',label='strat {e}'.format(e=typ),ls=ls)
+
+        else:
+            ax.plot(np.array(tm),adat.mean(dim=['z','y','x'],skipna=True),color='k',label='Total {e}'.format(e=typ),ls=ls)
+            ax.plot(np.array(tm),cdat.mean(dim=['z','y','x'],skipna=True),color='r',label='Conv {e}'.format(e=typ),ls=ls)
+            ax.plot(np.array(tm),sdat.mean(dim=['z','y','x'],skipna=True),color='b',label='strat {e}'.format(e=typ),ls=ls)
+        
         ax.legend(loc='best')
 
     else:
@@ -1209,8 +1225,11 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
         value_bins = np.linspace(rdata.lims[var][0], rdata.lims[var][1], 20)
         nbins = len(value_bins)
     else:
-        value_biles = np.arange(0,nbins+1,1)
-        
+        value_bins = np.arange(0,nbins+1,1)
+    
+    if 'd' in zvals.dims:
+        zvals=zvals.sel(d=0)
+    
     sz=len(zvals.values)
     print (sz,multiple)
     looped = np.arange(0, sz, multiple)
@@ -1242,7 +1261,8 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
     if hts is None:
         print ('please provide nominal heights to cfad_plot')
         return
-
+    if 'd' in hts.dims:
+        hts=hts.sel(d=0)
     if log:
         norm = colors.LogNorm(vmin=1e-5, vmax=1e2)
     else:
@@ -1255,9 +1275,10 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
+            print(np.shape(cfad_ma),np.shape(hts),'ln 1283')
             pc = ax.contourf(vbins[0:-1],hts,cfad_ma,levs,colors=cols,extend = 'both')
-        except (Exception, e):
-            print( 'Can not plot {v} with exception {e}'.format(e=e))
+        except Exception as e:
+            print( 'Can not plot with exception {e}'.format(e=e))
             return ax
     else:
 
@@ -1301,6 +1322,72 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
     return ax
 
-def plot_composite(rdata,var,time):
+def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
+    dat = rdata.data[var].sel(d=time)
+    cs_arr = rdata.data['CSS'].sel(d=time,z=2)
+    dat = np.squeeze(dat.values)
+    dzcomp = np.nanmax(dat,axis=0)
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
+    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+
+    #ax.stock_img()
+    if not rdata.lat_name in rdata.data.keys():
+        print('no Latitude. cAlculating....')
+        rdata.get_latlon_fromxy()
+        lats = rdata.data['lat']
+        lons = rdata.data['lon']
+    else:
+        if 'd' in rdata.data[rdata.lat_name].dims:
+            lats = rdata.data[rdata.lat_name].sel(d=time).values
+            lons= rdata.data[rdata.lon_name].sel(d=time).values
+        else:
+            lats = rdata.data[rdata.lat_name].values
+            lons= rdata.data[rdata.lon_name].values
+        
+    # Specifies the detail level of the map.
+    # Options are '110m' (default), '50m', and '10m'
+    ax.coastlines(resolution=resolution)
+
+    ax.set_extent([np.min(lons), np.max(lons), np.min(lats), np.max(lats)])
+    lon_formatter = LongitudeFormatter(number_format='.1f')
+    lat_formatter = LatitudeFormatter(number_format='.1f')
+    ax.xaxis.set_major_formatter(lon_formatter)
+    ax.yaxis.set_major_formatter(lat_formatter)
     
-    return
+    if var in rdata.lims.keys():
+        print( 'var:',var)
+        range_lim = rdata.lims[var][1] - rdata.lims[var][0]
+    #          print np.shape(data), np.shape(xdat),np.shape(ydat)
+    #            print 'in var',var
+        #print **kwargs
+        vmin=rdata.lims[var][0]
+        vmax=rdata.lims[var][1]
+        cmap=rdata.cmaps[var]
+    else:
+        print ('unrecognized var',var)
+        dat = rdata.data[var].data
+        dat[dat<-900.0]=np.nan
+        range_lim  = np.nanmax(dat) - np.nanmin(dat)
+        vmin=np.nanmin(dat)
+        vmax=np.nanmax(dat)
+        cmap = plt.cm.gist_ncar
+
+
+    cb = ax.pcolormesh(lons,lats,dzcomp, vmin =vmin,vmax=vmax,cmap=cmap,transform=ccrs.PlateCarree())
+    plt.colorbar(cb)
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+
+    if cs_over == True:
+        ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','crimson'],transform=ccrs.PlateCarree())
+
+
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=2, color='gray', alpha=0.5, linestyle='--')
+
+    gl.xlabels_top = False
+    gl.ylabels_right = False
+    
+    return fig,ax,dzcomp
