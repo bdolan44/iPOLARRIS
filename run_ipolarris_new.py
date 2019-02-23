@@ -87,7 +87,7 @@ if sys.argv[2:]:
 for i,d in enumerate(rdata.date):
     print('plotting composites by time....')
     fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
-
+    print('made composite')
     rtimematch = d
     ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
     plt.tight_layout()
@@ -96,14 +96,17 @@ for i,d in enumerate(rdata.date):
 
     print('plotting cappis at 1 km by time...')
     fig, ax = plt.subplots(1,1,figsize=(8,8))
-    whz = np.where(rdata.data['z']==config['z'])[0][0]
+    if 'd' in rdata.data[rdata.z_name].dims:
+        whz = np.where(rdata.data[rdata.z_name].sel(d=i).values==config['z'])[0][0]
+    else:
+        whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
     rdata.cappi(rdata.dz_name,z=whz,ts=i,contour='CS',ax=ax)
     ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
     plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
     plt.close()
 
     fig, ax = plt.subplots(1,1,figsize=(8,8))
-    whz = np.where(rdata.data['z']==config['z'])[0][0]
+#    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
     rdata.cappi(rdata.rr_name,z=whz,ts=i,contour='CS',ax=ax)
     ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
     plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
@@ -221,7 +224,7 @@ plt.close()
 cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
 
 fig,ax = plt.subplots(1,1,figsize=(10,10))
-ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name].values,vbins,ax,levels=True,cont=True)
+ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name],vbins,ax,levels=True,cont=True)
 ax.set_xlabel('Reflectivity')
 ax.set_ylabel('Height (km)')
 ax.set_title('TWP-ICE CFAD')
