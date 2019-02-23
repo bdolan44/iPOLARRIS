@@ -1038,8 +1038,10 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         wdn50 = wdn.quantile(1-q2,dim=['x','y','d'])
         wdn90 = wdn.quantile(1-q1,dim=['x','y','d'])
         wdn99 = wdn.quantile(1-q3,dim=['x','y','d'])                                               
-
-        zdat = z.values
+        if 'd' in z.dims:
+            zdat = z.sel(d=0).values        
+        else:
+            zdat = z.values
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
@@ -1057,7 +1059,10 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         wup90 = pdat.quantile(q1,dim=['x','y','d'])
         wup99 = pdat.quantile(q3,dim=['x','y','d'])
 
-        zdat = z.values
+        if 'd' in z.dims:
+            zdat = z.sel(d=0).values        
+        else:
+            zdat = z.values
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
@@ -1080,7 +1085,10 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
 
         wdn50 = wdn.mean(dim=['x','y','d'])
 
-        zdat = z.values
+        if 'd' in z.dims:
+            zdat = z.sel(d=0).values        
+        else:
+            zdat = z.values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.plot(wdn50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.legend(loc='best')
@@ -1091,7 +1099,10 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
         
     
         wup50 = pdat.mean(dim=['x','y','d'])
-        zdat = z.values
+        if 'd' in z.dims:
+            zdat = z.sel(d=0).values        
+        else:
+            zdat = z.values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.legend(loc='best')
 
@@ -1349,7 +1360,7 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
     # Specifies the detail level of the map.
     # Options are '110m' (default), '50m', and '10m'
     ax.coastlines(resolution=resolution)
-
+    print(np.min(lons),np.max(lons))
     ax.set_extent([np.min(lons), np.max(lons), np.min(lats), np.max(lats)])
     lon_formatter = LongitudeFormatter(number_format='.1f')
     lat_formatter = LatitudeFormatter(number_format='.1f')

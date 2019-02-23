@@ -309,8 +309,8 @@ def polarris_driver(configfile):
     if config['convert_Tk_Tc'] == True:
         rdata.convert_t()
     #print 'Calculating polarimetric fields like HID and rain...'
-    if config['pol_on'] == True:
-        rdata.calc_pol_analysis()
+    #if config['pol_on'] == True:
+    rdata.calc_pol_analysis()
 #    print(config['cs_z'],'in 312 cs_z')
     if config['mask_model'] == True:
         rdata.mask_model()
