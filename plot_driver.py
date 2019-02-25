@@ -1243,6 +1243,7 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
     
     sz=len(zvals.values)
     print (sz,multiple)
+    print('Shape data',np.shape(data))
     looped = np.arange(0, sz, multiple)
     cfad_out = np.zeros((sz//multiple, nbins-1))
 
@@ -1253,8 +1254,9 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
             dum = (data.sel(z=slice(v,v2)).values)
         except:
             dum = (data.sel(z=slice(vl,vl+multiple)).values)
+        print('shape dum', np.shape(dum))
         dum2 = np.where(np.isfinite(dum))
-        lev_hist, edges = np.histogram(dum[dum2], bins=value_bins, density=True) 
+        lev_hist, edges = np.histogram(np.ravel(dum[dum2]), bins=value_bins, density=True) 
         lev_hist = 100.0*lev_hist/np.sum(lev_hist)
         if np.max(lev_hist) > 0:
             cfad_out[ivl, :] = lev_hist

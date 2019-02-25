@@ -32,6 +32,7 @@ configfile = sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
 #config['image_dir'] ='./'
+print(config['extra1'],'EXTRA 1 is')
 #########################################
 
 if sys.argv[2:]:
