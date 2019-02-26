@@ -1337,8 +1337,12 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
 def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
     dat = rdata.data[var].sel(d=time)
-    cs_arr = rdata.data['CSS'].sel(d=time,z=2)
+    whbad = np.where(rdata.data['CSS'].sel(d=time).values<0)
+    dat[whbad] = np.nan
+    cs_arr = rdata.data['CSS'].sel(d=time,z=2).values
+    cs_arr = np.squeeze(cs_arr)
     dat = np.squeeze(dat.values)
+    dat = np.ma.masked_below(rdata.data[rdata.zdr_name].sel(d=time).values,-2)
     dzcomp = np.nanmax(dat,axis=0)
 
     fig = plt.figure(figsize=(10, 8))
