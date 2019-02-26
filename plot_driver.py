@@ -1251,10 +1251,10 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
         v = zvals.values[vl]
         v2 = zvals.values[vl+multiple]
         try:
-            dum = (data.sel(z=slice(v,v2)).values)
+            dum = np.squeeze(data.sel(z=slice(v,v2)).values)
         except:
-            dum = (data.sel(z=slice(vl,vl+multiple)).values)
-        print('shape dum', np.shape(dum))
+            dum = np.squeeze(data.sel(z=slice(vl,vl+multiple)).values)
+        #print('shape dum', np.shape(dum))
         dum2 = np.where(np.isfinite(dum))
         lev_hist, edges = np.histogram(np.ravel(dum[dum2]), bins=value_bins, density=True) 
         lev_hist = 100.0*lev_hist/np.sum(lev_hist)
@@ -1394,7 +1394,7 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
 
     if cs_over == True:
-        ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','crimson'],transform=ccrs.PlateCarree())
+        ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
 
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,

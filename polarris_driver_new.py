@@ -144,7 +144,7 @@ def polarris_driver(configfile):
                 numck = hasNumbers(vval)
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
                     numck = False
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or key.replace(" ", "") == 'extra1' or key.replace(" ", "") == 'ptype':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or  key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
                 #print numck
                 #print vval,key

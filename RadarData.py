@@ -1267,7 +1267,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         if title_flag:
             ax.set_title('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
-                    self.data[self.z_name].data[0][z_ind]), fontsize = 14)
+                    self.data[self.z_name].values[0][z_ind]), fontsize = 14)
 #        print type(dummy),dummy
         return dummy,xdat,ydat,data
 
@@ -2440,7 +2440,12 @@ class RadarData(RadarConfig.RadarConfig):
 
         lon_0 = self.lon_0
         lat_0 = self.lat_0
-        p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=self.lon_0)) 
+####Bea little careful here. you need to make sure you are in the correct hemispheres
+
+        if self.lat_0 > 0:
+            p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=self.lon_0)) 
+        else:
+            p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}e +lon_1 = {n}e +lat_1={t}s +lat_2=60s +lat_0={t}s'.format(t=self.lat_0,n=self.lon_0)) 
         xx, yy = np.meshgrid(self.data[self.x_name], self.data[self.y_name])
         lons, lats = p(xx*1000.,yy*1000.,inverse=True)
     

@@ -32,7 +32,7 @@ configfile = sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
 #config['image_dir'] ='./'
-print(config['extra1'],'EXTRA 1 is')
+print(config['extrax'],'EXTRA 1 is')
 #########################################
 
 if sys.argv[2:]:
@@ -92,7 +92,7 @@ for i,d in enumerate(rdata.date):
     rtimematch = d
     ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
     plt.tight_layout()
-    plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+    plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
 
     print('plotting cappis at 1 km by time...')
@@ -103,14 +103,14 @@ for i,d in enumerate(rdata.date):
         whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
     rdata.cappi(rdata.dz_name,z=whz,ts=i,contour='CS',ax=ax)
     ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
-    plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+    plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
 
     fig, ax = plt.subplots(1,1,figsize=(8,8))
 #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
     rdata.cappi(rdata.rr_name,z=whz,ts=i,contour='CS',ax=ax)
     ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
-    plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+    plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
   
 
@@ -120,7 +120,7 @@ for i,d in enumerate(rdata.date):
 # rtimematch = rdata.date[whdate[0][0]]
 # ax.set_title('C/S composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
 # plt.tight_layout()
-# plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+# plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 # plt.clf()
 
 ################################################################################
@@ -191,7 +191,7 @@ ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True
 ax.set_ylabel('Rain Rate (mm/hr)')
 ax.set_title('Precipitation Timeseries TWP-ICE')
 plt.tight_layout()
-plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 plt.close()
 
 
@@ -205,8 +205,32 @@ ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data
 ax.set_xlabel('Vertical velocity m/s')
 ax.set_title('Vertical velocity profiles TWP-ICE')
 plt.tight_layout()
-plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 plt.close()
+
+p99u,p90u,p50u,ht = rdata.percentile(wup=True)
+p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
+p99a,p90a,p50a,ht = rdata.percentile(wdown=True)
+
+file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),'w') 
+ 
+file.write("Updraft\n") 
+file.write("Height (km).    P99.    P90.     P50\n") 
+for i,h in enumerate(ht):
+    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99u[i],p2=p90u[i],p3=p50u[i])) 
+
+file.write("Downdraft\n") 
+file.write("Height (km).    P99.    P90.     P50\n") 
+for i,h in enumerate(ht):
+    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
+
+file.write("ALL\n") 
+file.write("Height (km).    P99.    P90.     P50\n") 
+for i,h in enumerate(ht):
+    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
+
+
+file.close()
 ################################################################################
 
 ################################################################################
@@ -216,7 +240,7 @@ ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name]
 ax.set_title('Vertical profile of reflectivity')
 ax.set_xlabel('Reflectivity')
 plt.tight_layout()
-plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 
 plt.close()
 ################################################################################
@@ -228,7 +252,7 @@ fig,ax = plt.subplots(1,1,figsize=(10,10))
 ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name],vbins,ax,levels=True,cont=True)
 ax.set_xlabel('Reflectivity')
 ax.set_ylabel('Height (km)')
-ax.set_title('TWP-ICE CFAD')
+ax.set_title('{c} CFAD'.format(c=rdata.exper))
 plt.tight_layout()
-plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extra1']),dpi=400)
+plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 plt.close()
