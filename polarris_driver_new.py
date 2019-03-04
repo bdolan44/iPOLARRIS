@@ -166,7 +166,8 @@ def polarris_driver(configfile):
     with open(config['radar_files'], 'r') as f:
         rfiles = f.read().splitlines()
     #rfiles= glob.glob('*.nc')
-    if config['exper'] == 'MC3E'  and config['mphys'] is 'obs':
+    print((config['exper']),(config['mphys']))
+    if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
 
         file = open(config['radar_files'], "r")

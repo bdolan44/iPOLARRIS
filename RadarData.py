@@ -326,12 +326,16 @@ class RadarData(RadarConfig.RadarConfig):
             self.data[k] = np.ma.masked_where(self.data[k] < -998.0,self.data[k])
 
     def mask_model(self):
-        self.data[self.zdr_name].values=np.ma.masked_less(self.data[self.zdr_name].values,-2)
+        whbad = np.where(self.data[self.zdr_name].values<-2)
+        self.data[self.zdr_name].values[whbad]=np.nan
+        whbad2 = np.where(self.data[self.dz_name].values<self.z_thresh)       
+        self.data[self.dz_name].values[whbad2]=np.nan
+#        self.data[self.zdr_name].values=np.ma.masked_beow(self.data[self.zdr_name].values,-2)
         mask_dat=[self.dz_name,self.zdr_name,self.vr_name,self.rr_name,self.kdp_name,self.w_name,self.u_name,self.v_name]
         for k in mask_dat:
             print(k)
-            self.data[k].values=np.ma.masked_where(np.isnan(self.data[self.zdr_name].values),self.data[k].values)
-        
+            self.data[k].values[whbad]=np.nan
+            self.data[k].values[whbad2]=np.nan
 
     def valid_vars(self):
         return np.intersect1d(self.pol_vars, self.data.keys())
@@ -1861,7 +1865,10 @@ class RadarData(RadarConfig.RadarConfig):
             t3 = 50
     #    print np.ma.min(np.ma.compressed(winds))
         # Time to make the percentile lists
-        height = self.data[self.z_name].data
+        if 'd' in self.data[self.z_name].dims:
+            height = self.data[self.z_name].sel(d=0).values
+        else:
+            height =self.data[self.z_name].values
         percentile_50 = np.zeros([np.size(height)])
         percentile_90 = np.zeros([np.size(height)])
         percentile_99 = np.zeros([np.size(height)])
