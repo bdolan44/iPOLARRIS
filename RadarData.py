@@ -336,12 +336,14 @@ class RadarData(RadarConfig.RadarConfig):
             self.y = y.values
             dx = np.average(np.diff(x.sel(d=0,y=0).values))
             dy = np.average(np.diff(y.sel(d=0,x=0).values))
+            self.dx = dx
+            self.dy = dy
             dummy=np.zeros_like(vrcomp)
             dummy[whmask] = 1
             radar_area = np.count_nonzero(dummy)*dy*dx
             self.radar_area = radar_area
         else:
-            self.radar_area = len(self.data[self.x_name].values)*len(self.data[self.y_name].values)   
+            self.radar_area = len(self.data[self.x_name].values)*len(self.data[self.y_name].values)*self.dx*self.dy  
 
     def mask_model(self):
      
