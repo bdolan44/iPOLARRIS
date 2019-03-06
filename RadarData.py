@@ -93,7 +93,6 @@ class RadarData(RadarConfig.RadarConfig):
         self.yind = 2
         self.xind = 3
         self.ntimes =1
-        self.radar_area()
         try:
             self.nhgts = np.shape(self.data[self.z_name].data)[self.zind][0]
         except:
@@ -101,6 +100,7 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.read_data_from_nc(self.radar_file)
         print ('calculating deltas')
         self.calc_deltas()
+        self.radar_area()
         self.rr_name = rr
         #print 'masking data'
         self.mask_dat()
@@ -328,7 +328,9 @@ class RadarData(RadarConfig.RadarConfig):
 
     def radar_area(self):
         #Define the radar coverage area. We can do this from radial velocity in the model
-        if self.mphys is not 'obs':
+        if self.mphys == 'obs':
+            self.radar_area = len(self.data[self.x_name].values)*len(self.data[self.y_name].values)*self.dx*self.dy  
+        else:
             vrcomp = self.data[self.vr_name].sel(d=0).values.max(axis=0)
             whmask = np.where(vrcomp > -50)
             x,y = self.convert_ll_to_xy(self.data[self.y_name],self.data[self.x_name])
@@ -342,8 +344,6 @@ class RadarData(RadarConfig.RadarConfig):
             dummy[whmask] = 1
             radar_area = np.count_nonzero(dummy)*dy*dx
             self.radar_area = radar_area
-        else:
-            self.radar_area = len(self.data[self.x_name].values)*len(self.data[self.y_name].values)*self.dx*self.dy  
 
     def mask_model(self):
      
@@ -363,9 +363,14 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def calc_deltas(self): # get grid sizes for x, y, z
+        if 'y' in self.data[self.x_name].dims:
             self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0).values)))
-            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0).values)))
+            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0).values)))        
             self.dz = np.average(np.abs(np.diff(self.data[self.z_name].sel(d=0).values)))
+        else:
+            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].values)))
+            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].values)))
+            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].values)))
             
 
 
