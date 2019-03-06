@@ -57,7 +57,7 @@ class RadarData(RadarConfig.RadarConfig):
             conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg']): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, conv=conv,temp=temp, x=x, y=y,lat_0=lat_0,lon_0=lon_0,lat_r=lat_r,lon_r=lon_r,
-                      z=z, u=u, v=v, w=w,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
+                      z=z, u=u, v=v, w=w,rr=rr,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
 
         # ********** initialize the data *********************
 #        self.data = {} 
@@ -93,6 +93,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.yind = 2
         self.xind = 3
         self.ntimes =1
+        self.radar_area()
         try:
             self.nhgts = np.shape(self.data[self.z_name].data)[self.zind][0]
         except:
@@ -325,17 +326,34 @@ class RadarData(RadarConfig.RadarConfig):
         for k in self.data.keys():
             self.data[k] = np.ma.masked_where(self.data[k] < -998.0,self.data[k])
 
+    def radar_area(self):
+        #Define the radar coverage area. We can do this from radial velocity in the model
+        if self.mphys is not 'obs':
+            vrcomp = self.data[self.vr_name].sel(d=0).values.max(axis=0)
+            whmask = np.where(vrcomp > -50)
+            x,y = self.convert_ll_to_xy(self.data[self.y_name],self.data[self.x_name])
+            self.x = x.values
+            self.y = y.values
+            dx = np.average(np.diff(x.sel(d=0,y=0).values))
+            dy = np.average(np.diff(y.sel(d=0,x=0).values))
+            dummy=np.zeros_like(vrcomp)
+            dummy[whmask] = 1
+            radar_area = np.count_nonzero(dummy)*dy*dx
+            self.radar_area = radar_area
+        else:
+            self.radar_area = len(self.data[self.x_name].values)*len(self.data[self.y_name].values)   
+
     def mask_model(self):
-        whbad = np.where(self.data[self.zdr_name].values<-2)
-        self.data[self.zdr_name].values[whbad]=np.nan
-        whbad2 = np.where(self.data[self.dz_name].values<self.z_thresh)       
-        self.data[self.dz_name].values[whbad2]=np.nan
-#        self.data[self.zdr_name].values=np.ma.masked_beow(self.data[self.zdr_name].values,-2)
+     
+        whmask2= np.where(self.data[self.vr_name].values < -50.)
+
         mask_dat=[self.dz_name,self.zdr_name,self.vr_name,self.rr_name,self.kdp_name,self.w_name,self.u_name,self.v_name]
         for k in mask_dat:
             print(k)
-            self.data[k].values[whbad]=np.nan
-            self.data[k].values[whbad2]=np.nan
+            dathold = self.data[k].values
+            dathold[whmask2]=np.nan
+            
+            self.data[k].values=dathold
 
     def valid_vars(self):
         return np.intersect1d(self.pol_vars, self.data.keys())
@@ -343,18 +361,9 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def calc_deltas(self): # get grid sizes for x, y, z
-        try:
-            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].data[0,:])))
-        except:
-            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].data)))
-        try:
-            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].data[:,0])))
-        except:
-            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].data)))
-        try:
-            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].data[:])))
-        except:
-            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].data)))
+            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0).values)))
+            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0).values)))
+            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].sel(d=0).values)))
             
 
 
@@ -1188,9 +1197,9 @@ class RadarData(RadarConfig.RadarConfig):
             if contour == 'CS':
 #                print 'contours!'
 
-                csvals = deepcopy((self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
+                csvals = deepcopy(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind)).values)
                 csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
-                print(np.ndim(np.squeeze(csvals.values))) 
+                #print(np.ndim(np.squeeze(csvals.values))) 
                 if np.ndim(np.squeeze(csvals)) == 3:
                     csvals = deepcopy((self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1))))
                     csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1))))
@@ -1198,9 +1207,9 @@ class RadarData(RadarConfig.RadarConfig):
                 print(type(csvals),'csvals')
                 mask = np.where(csdats.values >= 2)
                 strat = np.where(csdats.values == 1)
-                csvals.values[:] = 0
-                csvals.values[mask]=2
-                csvals.values[strat] = 1
+                csvals[:] = 0
+                csvals[mask]=2
+                csvals[strat] = 1
 #                print z_ind, z_ind+1
                 #Note: CS is the same at every level so we don't need to slice along z at the exact vert height....
                 print('csvals shape',np.shape(csvals))

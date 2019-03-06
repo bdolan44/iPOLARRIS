@@ -155,8 +155,8 @@ with open('{i}{e}_rr_condmean_stats.txt'.format(i=config['image_dir'],e=config['
 rrstratu_area,rrconvu_area,rrallu_area = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=-0.1,areas=True)
 rrstrat_area,rrconv_area,rrall_area = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=0.0,areas=True)
 
-grid_area=float(rdata.data.dims['x']*rdata.data.dims['y'])
-rain_area = rrall_area.values.astype(float)
+#grid_area=rdata.radar_area()
+rain_area = rdata.rain_area()
 import csv
 tformat = '%Y%m%d-%H%M%S'
 with open('{i}{e}_domain_area_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
@@ -165,7 +165,7 @@ with open('{i}{e}_domain_area_stats.txt'.format(i=config['image_dir'],e=config['
     for i,v in enumerate(rdata.date):
         print (v)
         tim = v.strftime(tformat)
-        dum =[tim,rrconvu_area[i].values/grid_area*100.,rrstratu_area[i].values/grid_area*100.,rrallu_area[i].values/grid_area*100.]
+        dum =[tim,rrconvu_area[i].values,rrstratu_area[i],rrallu_area[i]]
         v_writer.writerow(dum)
 
 tformat = '%Y%m%d-%H%M%S'
@@ -227,7 +227,7 @@ for i,h in enumerate(ht):
 file.write("ALL\n") 
 file.write("Height (km).    P99.    P90.     P50\n") 
 for i,h in enumerate(ht):
-    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
+    file.write("{h}   {p1}   {p2}   {p3}\n".format(h,p1=p99a[i],p2=p90a[i],p3=p50a[i])) 
 
 
 file.close()
