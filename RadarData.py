@@ -1196,30 +1196,31 @@ class RadarData(RadarConfig.RadarConfig):
 #            print 'Contour is not none',contour
             if contour == 'CS':
 #                print 'contours!'
-
-                csvals = deepcopy(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind)).values)
-                csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
-                #print(np.ndim(np.squeeze(csvals.values))) 
-                if np.ndim(np.squeeze(csvals)) == 3:
-                    csvals = deepcopy((self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1))))
-                    csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1))))
-               
-                print(type(csvals),'csvals')
-                mask = np.where(csdats.values >= 2)
-                strat = np.where(csdats.values == 1)
-                csvals[:] = 0
-                csvals[mask]=2
-                csvals[strat] = 1
+                print(np.shape(self.data[self.cs_name].sel(d=ts,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values))
+                csvals =np.squeeze(self.data[self.cs_name].sel(d=ts,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+#                 csvals = deepcopy(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind)).values)
+#                 csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
+#                 #print(np.ndim(np.squeeze(csvals.values))) 
+#                 if np.ndim(np.squeeze(csvals)) == 3:
+#                     csvals = deepcopy((self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1))))
+#                     csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind+1))))
+#                
+#                 print(type(csvals),'csvals')
+#                 mask = np.where(csdats.values >= 2)
+#                 strat = np.where(csdats.values == 1)
+#                 csvals[:] = 0
+#                 csvals[mask]=2
+#                 csvals[strat] = 1
 #                print z_ind, z_ind+1
                 #Note: CS is the same at every level so we don't need to slice along z at the exact vert height....
-                print('csvals shape',np.shape(csvals))
-                try:
-                    cs = np.squeeze(csdats.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
-                    print('cs shape',np.shape(cs))
-                    ax.contour(xdat, ydat, cs, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8,zorder=10)
-                except:
-                    cs = np.squeeze(csdats.sel(x=slice(xmini, xmaxi), y=slice(ymini, ymaxi)).values)
-                    ax.contour(xdat,ydat,cs,levels = [0,2],colors=['blue','k'],linewidths = [2],alpha = 0.8)
+#                print('csvals shape',np.shape(csvals))
+#                 try:
+#                     cs = np.squeeze(csdats.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+#                     print('cs shape',np.shape(cs))
+                ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8,zorder=10)
+#                 except:
+#                     cs = np.squeeze(csdats.sel(x=slice(xmini, xmaxi), y=slice(ymini, ymaxi)).values)
+#                     ax.contour(xdat,ydat,csvals,levels = [0,2],colors=['blue','k'],linewidths = [2],alpha = 0.8)
 
 
 
@@ -1276,11 +1277,15 @@ class RadarData(RadarConfig.RadarConfig):
                 self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
 #                print 'Error trying to plot vectors: {}'.format(e)
+        if 'd' in self.data[self.z_name].dims:
+            hts = self.data[self.z_name].sel(d=ts).values
+        else:
+            hts = self.data[self.z_name].values
 
 
         if title_flag:
             ax.set_title('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
-                    self.data[self.z_name].values[0][z_ind]), fontsize = 14)
+                    hts[z_ind]), fontsize = 14)
 #        print type(dummy),dummy
         return dummy,xdat,ydat,data
 
@@ -1291,7 +1296,7 @@ class RadarData(RadarConfig.RadarConfig):
         "6 panel CAPPI plot showing all the polarimetric variables and HID"
         
         # first, get the appropriate z index from the z that's wanted in altitude
-        z_ind = self.get_ind(z,self.data[self.z_name].data)
+        z_ind = self.get_ind(z,self.data[self.z_name].values)
         
         #print xlim, 'In cappi_multiplot'
         if xlim is None:
@@ -1368,8 +1373,12 @@ class RadarData(RadarConfig.RadarConfig):
 
         fig.tight_layout()
         fig.subplots_adjust(top = 0.94)
+        if 'd' in self.data[self.z_name].dims:
+            hts = self.data[self.z_name].sel(d=ts).values
+        else:
+            hts = self.data[self.z_name].values
         fig.suptitle('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
-                    self.data[self.z_name][z_ind]), fontsize = 18)
+                    hts[z_ind]), fontsize = 18)
 
 
         return fig #, ax
