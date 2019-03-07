@@ -91,6 +91,12 @@ for i,d in enumerate(rdata.date):
     print('made composite')
     rtimematch = d
     ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
+    minlat = config['ylim'][0]
+    maxlat = config['ylim'][1]
+    minlon = config['xlim'][0]
+    maxlon = config['xlim'][1]
+    ax.set_extent([minlon, maxlon, minlat,maxlat])
+
     plt.tight_layout()
     plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
@@ -149,6 +155,21 @@ with open('{i}{e}_rr_condmean_stats.txt'.format(i=config['image_dir'],e=config['
         dum =[tim,rrconv[i].values,rrstrat[i].values,rrall[i].values]
         v_writer.writerow(dum)
 
+conv = np.where(rdata.data[rdata.cs_name].values == 2)
+strat = np.where(rdata.data[rdata.cs_name].values == 1)
+hist, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values)),bins=np.logspace(-1,2.4,40))
+histc, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[conv])),bins=np.logspace(-1,2.4,40))
+hists, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[strat])),bins=np.logspace(-1,2.4,40))
+
+
+tformat = '%Y%m%d-%H%M%S'
+with open('{i}{e}_rr_histgram_{m}.txt'.format(i=config['image_dir'],e=config['exper'],m=config['mphys']), mode='w') as csv_file:
+    v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
+    v_writer.writerow(['Date', 'Con', 'Strat', 'Tot'])
+    for i,v in enumerate(eg[:-1]):
+        dum =[v,histc[i],hists[i],hist[i]]
+        v_writer.writerow(dum)
+
 
 ###Areas
 
@@ -175,7 +196,7 @@ with open('{i}{e}_rel_frequency_stats.txt'.format(i=config['image_dir'],e=config
     for i,v in enumerate(rdata.date):
         print( v)
         tim = v.strftime(tformat)
-        dum =[tim,rrconv[i].values/rain_area*100.,rrstrat[i].values/rain_area*100.,rrall[i].values/rain_area*100.]
+        dum =[tim,rrconv[i].values*rdata.dx*rdata.dy/rain_area*100.,rrstrat[i].values*rdata.dx*rdata.dy/rain_area*100.,rrall[i].values*rdata.dx*rdata.dy/rain_area*100.]
         v_writer.writerow(dum)
 
 

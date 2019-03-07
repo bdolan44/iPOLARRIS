@@ -594,6 +594,8 @@ class RadarData(RadarConfig.RadarConfig):
             if use_temp and hasattr(self, 'T'):
                #print ('Using T!')
                tdum = self.T[v,...]
+               
+               #print(type(tdum),'tdum is')
                #print('T:',np.shape(tdum))
             else:
                tdum = None
@@ -609,7 +611,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.scores=np.array(scores)
         #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
-        dzmask = np.where(np.logical_or(self.data[self.dz_name].values <=zthresh, np.isnan(self.data[self.dz_name].values)))
+        dzmask = np.where(np.isnan(self.data[self.dz_name].values)))
 #            # set the hid
 #        self.hid = np.argmax(scores, axis=1)+1
         hid = np.array(hid,dtype='float64')
@@ -620,7 +622,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #       = try:
 #         #           print 'Trying to mask HID!'
-        self.hid = np.ma.masked_where(dzmask==True,self.hid)
+#        self.hid = np.ma.masked_where(dzmask==True,self.hid)
         
 #         self.hid = np.ma.masked_where(self.T.mask,self.hid)
 #         self.hid = np.ma.masked_where(self.data[self.dz_name].mask,self.hid)
