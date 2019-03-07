@@ -231,7 +231,7 @@ plt.close()
 
 p99u,p90u,p50u,ht = rdata.percentile(wup=True)
 p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
-p99a,p90a,p50a,ht = rdata.percentile(wdown=True)
+p99a,p90a,p50a,ht = rdata.percentile(wdown=False)
 
 file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),'w') 
  

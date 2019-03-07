@@ -363,7 +363,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def calc_deltas(self): # get grid sizes for x, y, z
-        if 'y' in self.data[self.x_name].dims:
+        if 'd' in self.data[self.x_name].dims:
             self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0).values)))
             self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0).values)))        
             self.dz = np.average(np.abs(np.diff(self.data[self.z_name].sel(d=0).values)))
@@ -2414,7 +2414,6 @@ class RadarData(RadarConfig.RadarConfig):
         print('dat min:',data.values.min())
             
         if cs_flag is not False:
-            
             datstrat = data.where(self.data[self.cs_name].sel(z=slice(1,2))==1)
             datconv = data.where(self.data[self.cs_name].sel(z=slice(1,2))==2)
             datall = data.where(self.data[self.cs_name].sel(z=slice(1,2))>0)       
@@ -2423,9 +2422,10 @@ class RadarData(RadarConfig.RadarConfig):
                 datconv_ts= datconv.mean(dim=['z','y','x'],skipna=True)
                 datall_ts= datall.mean(dim=['z','y','x'],skipna=True)
             else:
-                datstrat_ts = datstrat.count(dim=['z','y','x'])
-                datconv_ts = datconv.count(dim=['z','y','x'])
-                datall_ts = datall.count(dim=['z','y','x'])
+                cssum =(self.data[self.cs_name].max(dim='z',skipna=True))
+                datstrat_ts = cssum.where(cssum==1).count(dim=['y','x'])
+                datconv_ts = cssum.where(cssum==2).count(dim=['y','x'])
+                datall_ts = cssum.where(cssum>0).count(dim=['y','x'])
             
             return datstrat_ts,datconv_ts,datall_ts
         else:
@@ -2527,9 +2527,11 @@ class RadarData(RadarConfig.RadarConfig):
 #             print 'zlev',zlev
 #            print('zlev for shy is:',zlev)
 #            refl=np.squeeze(self.data[self.dz_name].sel(z=slice(zlev,zlev+1),d=q)).values
-            print('zlev',zlev)
-            refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
-            refl = np.max(np.squeeze(self.data[self.dz_name].sel(d=q).values),axis=0)
+            #print('zlev',zlev)
+            #refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
+            refl = np.nanmax(np.squeeze(self.data[self.dz_name].sel(d=q).values),axis=0)
+            if q==0:
+                self.refl = refl
             print ('refl shape',np.shape(refl))
             #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
             #refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
@@ -2537,7 +2539,7 @@ class RadarData(RadarConfig.RadarConfig):
 #             if len(np.shape(refl)) >= 3:
 #                 print 'len is 3+'
 #                 refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=slice(zlev,zlev+1)).values)
-            refl.setflags(write=1)
+#            refl.setflags(write=1)
 #             refl[(np.isnan(refl))] = -99999.9
 #             refl_missing_val = -99999.9
             #print self.data[self.dz_name].min()
@@ -2562,7 +2564,7 @@ class RadarData(RadarConfig.RadarConfig):
                 lat2d = lat
                 lon2d = lon
 
-            print(np.shape(lat2d),np.shape(lon2d))                
+#            print(np.shape(lat2d),np.shape(lon2d))                
             yh_cs, yh_cc, yh_bkgnd = shy.conv_strat_latlon(refl, lat2d, lon2d, self.zconv, method='SYH', sm_rad=2,a=8, b=64)
             cs_arr = np.full(yh_cs.shape, np.nan)
             yh_conv = (yh_cs == 3) | (yh_cs == 4) | (yh_cs == 5)| (yh_cs == 2) | (yh_cs == 1)
@@ -2571,17 +2573,23 @@ class RadarData(RadarConfig.RadarConfig):
             cs_arr[yh_conv] = 2
             cs_arr[yh_strat] = 1
 
-            cs_arr[np.isnan(refl)] =-1
+#            cs_arr[np.isnan(refl)] =-1
     #        print nlevs
             rpt = np.tile(cs_arr,(nlevs,1,1))
             #print np.shape(rpt)
             #print np.nanmax(rpt)
             rntypetot.append(rpt)
+            
+
         #self.def_convstrat()
         #np.array(rntypetot)[np.isnan(self.data[self.dz_name].values)] =-1
         #print 'shapes',np.shape(rntypetot)
-        self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')     
-
+        self.add_field((self.data[self.dz_name].dims,np.array(rntypetot)), 'CSS')
+        mask=np.where(np.isnan(self.data[self.dz_name].values))
+        hold = self.data['CSS'].values
+        hold[mask] =np.nan
+        self.data['CSS'].values = hold     
+    
     def composite(self, var,ts=0,map_on = True,res='10m'):
         dat = np.squeeze(self.data[var].sel(d=slice(ts,ts+1)).values)
         comp = dat.fill(np.nan)

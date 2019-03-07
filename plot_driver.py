@@ -981,9 +981,10 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.clf()
         
 def subset_convstrat(data,rdata,zlev=1):
-    stratsub=data.sel(z=slice(zlev,zlev+1)).where(rdata.data['CSS'].sel(z=slice(zlev,zlev+1))==1)
-    convsub=data.sel(z=slice(zlev,zlev+1)).where(rdata.data['CSS'].sel(z=slice(zlev,zlev+1))==2)
-    allsub=data.sel(z=slice(zlev,zlev+1)).where(rdata.data['CSS'].sel(z=slice(zlev,zlev+1))>0)
+    cssum =(rdata.data[rdata.cs_name].max(dim='z'))
+    stratsub=data.sel(z=slice(zlev,zlev+1)).where(cssum==1)
+    convsub=data.sel(z=slice(zlev,zlev+1)).where(cssum==2)
+    allsub=data.sel(z=slice(zlev,zlev+1)).where(cssum>0)
     return stratsub,convsub,allsub
     
 def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zlev=1,make_zeros=False,areas=False,domain_rel=False):
@@ -1339,7 +1340,7 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
     dat = deepcopy(rdata.data[var].sel(d=time))
     whbad = np.where(rdata.data['CSS'].sel(d=time).values<0)
     dat.values[whbad] = np.nan
-    cs_arr = rdata.data['CSS'].sel(d=time,z=2).values
+    cs_arr = np.nanmax(np.squeeze(rdata.data['CSS'].sel(d=time).values),axis=0)
     cs_arr = np.squeeze(cs_arr)
     dat = np.squeeze(dat.values)
 #    dat = np.ma.masked_below(rdata.data[rdata.zdr_name].sel(d=time).values,-2)
