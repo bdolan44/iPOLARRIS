@@ -611,7 +611,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.scores=np.array(scores)
         #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
-        dzmask = np.where(np.isnan(self.data[self.dz_name].values)))
+        dzmask = np.where(np.isnan(self.data[self.dz_name].values))
 #            # set the hid
 #        self.hid = np.argmax(scores, axis=1)+1
         hid = np.array(hid,dtype='float64')
@@ -2529,6 +2529,7 @@ class RadarData(RadarConfig.RadarConfig):
 #            refl=np.squeeze(self.data[self.dz_name].sel(z=slice(zlev,zlev+1),d=q)).values
             print('zlev',zlev)
             refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
+            refl = np.max(np.squeeze(self.data[self.dz_name].sel(d=q).values),axis=0)
             print ('refl shape',np.shape(refl))
             #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
             #refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
