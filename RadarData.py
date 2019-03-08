@@ -572,7 +572,7 @@ class RadarData(RadarConfig.RadarConfig):
         print("running pol rain")
         if self.mphys == 'obs':
             self.calc_qr_pol()
-        self.calc_rr_pol(**kwargs)
+            self.calc_rr_pol(**kwargs)
 
 
 #############################################################################################################

@@ -142,7 +142,7 @@ def polarris_driver(configfile):
                 key, val, comment = line.split('==')
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'extrax' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'drop_vars' or key.replace(" ", "") == 'extrax' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
                     numck = False
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or  key.replace(" ", "") == 'ptype' or key.replace(" ", "") == 'extrax':
                     vval = vval.strip("''")
@@ -163,6 +163,7 @@ def polarris_driver(configfile):
                     config[(key.replace(" ", ""))] = vval
             
     print(config['radar_files'])
+    drop_vars=config['drop_vars']
     with open(config['radar_files'], 'r') as f:
         rfiles = f.read().splitlines()
     #rfiles= glob.glob('*.nc')
@@ -194,6 +195,10 @@ def polarris_driver(configfile):
     except:
         print('Dims do not need renaming')
 
+
+    if drop_vars == True:
+        print("dropping extra variables for memory!")
+        rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
     lon_0 = config['lon']
     lat_0 = config['lat']
 
