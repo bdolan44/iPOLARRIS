@@ -323,22 +323,22 @@ def polarris_driver(configfile):
         rdata.hid[whvi] = 3
     
  
-    ###Do some quick masking of the data####
-    mask = np.zeros([rdata.data.dims['d'],rdata.data.dims['z'],rdata.data.dims['y'],rdata.data.dims['x']])
-    whbad = np.logical_or(np.logical_or(np.logical_or(np.logical_or(rdata.data[rdata.dz_name].values>-20.,rdata.data[rdata.zdr_name].values>-2.),rdata.data[rdata.kdp_name].values<10.),rdata.data[rdata.zdr_name].values<10.),rdata.data[rdata.dz_name].values<70.)
-    whbad2= np.where(~whbad)
-    mask[whbad] = 1
-    if np.nanmin(rdata.data['CSS'].values)<1.:
-        mask[rdata.data['CSS'].values<=0] = 0
-    else:
-        mask[np.isnan(rdata.data['CSS'].values)]=0
-
-    rdata.data['CSS'] = rdata.data['CSS'].where(mask ==1)
-    rdata.data[rdata.dz_name].values[whbad2] = np.nan
-    rdata.data[rdata.zdr_name].values[whbad2] = np.nan
-    rdata.data[rdata.kdp_name].values[whbad2] = np.nan
-    rdata.data[rdata.rho_name].values[whbad2] = np.nan
-    rdata.data[rdata.w_name].values[whbad2] = np.nan
+    #Do some quick masking of the data####
+#     mask = np.zeros([rdata.data.dims['d'],rdata.data.dims['z'],rdata.data.dims['y'],rdata.data.dims['x']])
+#     whbad = np.logical_or(np.logical_or(np.logical_or(np.logical_or(rdata.data[rdata.dz_name].values>-20.,rdata.data[rdata.zdr_name].values>-2.),rdata.data[rdata.kdp_name].values<10.),rdata.data[rdata.zdr_name].values<10.),rdata.data[rdata.dz_name].values<70.)
+#     whbad2= np.where(~whbad)
+#     mask[whbad] = 1
+#     if np.nanmin(rdata.data['CSS'].values)<1.:
+#         mask[rdata.data['CSS'].values<=0] = 0
+#     else:
+#         mask[np.isnan(rdata.data['CSS'].values)]=0
+# 
+#     rdata.data['CSS'] = rdata.data['CSS'].where(mask ==1)
+#     rdata.data[rdata.dz_name].values[whbad2] = np.nan
+#     rdata.data[rdata.zdr_name].values[whbad2] = np.nan
+#     rdata.data[rdata.kdp_name].values[whbad2] = np.nan
+#     rdata.data[rdata.rho_name].values[whbad2] = np.nan
+#     rdata.data[rdata.w_name].values[whbad2] = np.nan
 
 
     return rdata, config

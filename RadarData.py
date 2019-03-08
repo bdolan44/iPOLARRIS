@@ -611,7 +611,7 @@ class RadarData(RadarConfig.RadarConfig):
             hiddum[whbad] = -1
             hid.append(hiddum)
 #        print "Returned to RadarData"
-        self.scores=np.array(scores)
+#        self.scores=np.array(scores)
         #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
         dzmask = np.where(np.isnan(self.data[self.dz_name].values))
