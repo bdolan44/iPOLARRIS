@@ -570,7 +570,8 @@ class RadarData(RadarConfig.RadarConfig):
     def calc_pol_analysis(self,**kwargs):
         self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh)
         print("running pol rain")
-        self.calc_qr_pol()
+        if self.mphys == 'obs':
+            self.calc_qr_pol()
         self.calc_rr_pol(**kwargs)
 
 
@@ -598,11 +599,11 @@ class RadarData(RadarConfig.RadarConfig):
 #             drhold =np.squeeze(self.data[self.zdr_name].sel(d=v)).values
 #             kdhold = np.squeeze(self.data[self.kdp_name].sel(d=v)).values
 #             rhhold = np.squeeze(self.data[self.rho_name].sel(d=v)).values
-            print('shape holds',np.shape(dzhold))
+#            print('shape holds',np.shape(dzhold))
             if use_temp and hasattr(self, 'T'):
                #print ('Using T!')
                tdum = self.T[v,...]
-               print('shape tdum',type(tdum))
+#               print('shape tdum',type(tdum))
                
                #print(type(tdum),'tdum is')
                #print('T:',np.shape(tdum))
@@ -611,7 +612,7 @@ class RadarData(RadarConfig.RadarConfig):
 
             scoresdum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=np.squeeze(self.data[self.zdr_name].sel(d=v)).values, rho=np.squeeze(self.data[self.rho_name].sel(d=v)).values, 
                                 kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum)
-            scores.append(scoresdum)
+#            scores.append(scoresdum)
             hiddum = np.argmax(scoresdum,axis=0)+1
             whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
             dzmask = np.where(np.isnan(dzhold))
