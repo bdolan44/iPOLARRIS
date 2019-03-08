@@ -594,40 +594,43 @@ class RadarData(RadarConfig.RadarConfig):
         scores=[]
         print ("Unfortunately need to run HID by time")
         for v in tqdm(range(len(self.data[self.dz_name]))):
-            dzhold =self.data[self.dz_name].sel(d=v).values
-            drhold =self.data[self.zdr_name].sel(d=v).values
-            kdhold = self.data[self.kdp_name].sel(d=v).values
-            rhhold = self.data[self.rho_name].sel(d=v).values
-  
+            dzhold =np.squeeze(self.data[self.dz_name].sel(d=v)).values
+#             drhold =np.squeeze(self.data[self.zdr_name].sel(d=v)).values
+#             kdhold = np.squeeze(self.data[self.kdp_name].sel(d=v)).values
+#             rhhold = np.squeeze(self.data[self.rho_name].sel(d=v)).values
+            print('shape holds',np.shape(dzhold))
             if use_temp and hasattr(self, 'T'):
                #print ('Using T!')
                tdum = self.T[v,...]
+               print('shape tdum',type(tdum))
                
                #print(type(tdum),'tdum is')
                #print('T:',np.shape(tdum))
             else:
                tdum = None
 
-            scoresdum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=drhold, rho=rhhold, 
-                                kdp=kdhold, band=self.hid_band, use_temp=True, T=tdum)
+            scoresdum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=np.squeeze(self.data[self.zdr_name].sel(d=v)).values, rho=np.squeeze(self.data[self.rho_name].sel(d=v)).values, 
+                                kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum)
             scores.append(scoresdum)
             hiddum = np.argmax(scoresdum,axis=0)+1
-            whbad = np.logical_and(hiddum ==1,tdum <-5.0)
+            whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
+            dzmask = np.where(np.isnan(dzhold))
             hiddum[whbad] = -1
+            hiddum = np.array(hiddum,dtype='float64')
+            hiddum[dzmask] =np.nan
             hid.append(hiddum)
 #        print "Returned to RadarData"
 #        self.scores=np.array(scores)
         #print 'np.shape self.scores',np.shape(self.scores)
 #         #       self.data[self.dz_name].values[bad] = np.nan
-        dzmask = np.where(np.isnan(self.data[self.dz_name].values))
+#        dzmask = np.where(np.isnan(self.data[self.dz_name].values))
 #            # set the hid
 #        self.hid = np.argmax(scores, axis=1)+1
-        hid = np.array(hid,dtype='float64')
-        print('dzmask shape',np.shape(dzmask))
-        hid[dzmask] = np.nan
+#        print('dzmask shape',np.shape(dzmask))
+ #       hid[dzmask] = np.nan
         self.hid = np.array(hid)
-        dzmask=0.0
-        print ('setting bad hid with Drizzle, T<-5')
+#        dzmask=0.0
+#        print ('setting bad hid with Drizzle, T<-5')
 
 #       = try:
 #         #           print 'Trying to mask HID!'
