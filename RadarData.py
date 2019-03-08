@@ -344,6 +344,8 @@ class RadarData(RadarConfig.RadarConfig):
             dummy[whmask] = 1
             radar_area = np.count_nonzero(dummy)*dy*dx
             self.radar_area = radar_area
+            
+            dummy = 0.0
 
     def mask_model(self):
      
@@ -356,6 +358,7 @@ class RadarData(RadarConfig.RadarConfig):
             dathold[whmask2]=np.nan
             
             self.data[k].values=dathold
+            dathold = 0.0
 
     def valid_vars(self):
         return np.intersect1d(self.pol_vars, self.data.keys())
@@ -618,6 +621,7 @@ class RadarData(RadarConfig.RadarConfig):
         print('dzmask shape',np.shape(dzmask))
         hid[dzmask] = np.nan
         self.hid = np.array(hid)
+        dzmask=0.0
         print ('setting bad hid with Drizzle, T<-5')
 
 #       = try:
