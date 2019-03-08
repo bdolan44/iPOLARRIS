@@ -90,7 +90,7 @@ for i,d in enumerate(rdata.date):
     fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
     print('made composite')
     rtimematch = d
-    ax.set_title('DBZ composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
+    ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,m=rdata.radar_name))
     minlat = config['ylim'][0]
     maxlat = config['ylim'][1]
     minlon = config['xlim'][0]

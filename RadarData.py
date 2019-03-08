@@ -2532,7 +2532,7 @@ class RadarData(RadarConfig.RadarConfig):
             refl = np.nanmax(np.squeeze(self.data[self.dz_name].sel(d=q).values),axis=0)
             if q==0:
                 self.refl = refl
-            print ('refl shape',np.shape(refl))
+#            print ('refl shape',np.shape(refl))
             #print np.shape(self.data[self.dz_name].sel(d=slice(q,q+1),z=slice(zlev,zlev+1)))
             #refl = np.squeeze(self.data[self.dz_name].sel(d=q,z=zlev)).values
             #print 'refl shape',np.shape(refl),type(refl)
