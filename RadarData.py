@@ -335,11 +335,11 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             vrcomp = self.data[self.vr_name].sel(d=0).max(axis=0).values
             whmask = np.where(vrcomp > -50)
-            x,y = self.convert_ll_to_xy(self.data[self.y_name],self.data[self.x_name])
+            x,y = self.convert_ll_to_xy(self.data[self.y_name].sel(d=0),self.data[self.x_name].sel(d=0))
             self.x = x.values
             self.y = y.values
-            dx = np.average(np.diff(x.sel(d=0,y=0)))
-            dy = np.average(np.diff(y.sel(d=0,x=0)))
+            dx = np.average(np.diff(x.sel(y=0)))
+            dy = np.average(np.diff(y.sel(x=0)))
             self.dx = dx
             self.dy = dy
             dummy=np.zeros_like(vrcomp)
