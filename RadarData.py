@@ -100,10 +100,12 @@ class RadarData(RadarConfig.RadarConfig):
 #            self.read_data_from_nc(self.radar_file)
         print ('calculating deltas')
         self.calc_deltas()
+        print ('calculating rain area')
         self.radar_area()
         self.rr_name = rr
         #print 'masking data'
-        self.mask_dat()
+        #print('masking data')
+        #self.mask_dat()
         if remove_diffatt == True:
             self.corr_zdr()
 #        self.raintype_calc()
@@ -331,21 +333,23 @@ class RadarData(RadarConfig.RadarConfig):
         if self.mphys == 'obs':
             self.radar_area = len(self.data[self.x_name].values)*len(self.data[self.y_name].values)*self.dx*self.dy  
         else:
-            vrcomp = self.data[self.vr_name].sel(d=0).values.max(axis=0)
+            vrcomp = self.data[self.vr_name].sel(d=0).max(axis=0).values
             whmask = np.where(vrcomp > -50)
             x,y = self.convert_ll_to_xy(self.data[self.y_name],self.data[self.x_name])
             self.x = x.values
             self.y = y.values
-            dx = np.average(np.diff(x.sel(d=0,y=0).values))
-            dy = np.average(np.diff(y.sel(d=0,x=0).values))
+            dx = np.average(np.diff(x.sel(d=0,y=0)))
+            dy = np.average(np.diff(y.sel(d=0,x=0)))
             self.dx = dx
             self.dy = dy
             dummy=np.zeros_like(vrcomp)
             dummy[whmask] = 1
             radar_area = np.count_nonzero(dummy)*dy*dx
             self.radar_area = radar_area
+            print('radar _area',radar_area)
             
             dummy = 0.0
+            vrcomp = 0.0
 
     def mask_model(self):
      
@@ -367,9 +371,10 @@ class RadarData(RadarConfig.RadarConfig):
 
     def calc_deltas(self): # get grid sizes for x, y, z
         if 'd' in self.data[self.x_name].dims:
-            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0).values)))
-            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0).values)))        
-            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].sel(d=0).values)))
+            print,'calc deltas'
+            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0))))
+            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0))))        
+            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].sel(d=0))))
         else:
             self.dx = np.average(np.abs(np.diff(self.data[self.x_name].values)))
             self.dy = np.average(np.abs(np.diff(self.data[self.y_name].values)))

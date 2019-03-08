@@ -134,7 +134,7 @@ def hasNumbers(inputString):
 def polarris_driver(configfile):
 
     config = {}
-
+    print('ready to roll')
     with open(configfile[0]) as f:
         for line in f:
             #print line
@@ -289,7 +289,7 @@ def polarris_driver(configfile):
         rvar[config['vname']] = (['d','z','y','x'],vnew)
         rvar[config['convname']] = (['d','z','y','x'],conv)
 
-
+    print('sending data to RadarData!')
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
                                                   kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                                   u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],
@@ -308,12 +308,14 @@ def polarris_driver(configfile):
 
 
     if config['convert_Tk_Tc'] == True:
+        print('converting T')
         rdata.convert_t()
     #print 'Calculating polarimetric fields like HID and rain...'
     #if config['pol_on'] == True:
     rdata.calc_pol_analysis()
 #    print(config['cs_z'],'in 312 cs_z')
     if config['mask_model'] == True:
+        print('masking model data')
         rdata.mask_model()
     rdata.calc_cs_shy(cs_z=config['cs_z'])
     rdata.raintype=rdata.data['CSS'].values#    rdata.set_hid()
