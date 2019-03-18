@@ -42,7 +42,10 @@ if sys.argv[2:]:
     print('calculating CFAD differences')
 
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=True,cscfad=False)
-    
+    ax[0].set_title(rdata.exper)
+    ax[1].set_title(rdata2.exper)
+    ax[2].set_title("{e} - {v}".format(e=rdata.exper,v=rdata2.exper))    
+    plt.suptitle("Reflectivity")
     
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,'Z$_{dr}$',config,config2,bins=np.arange(-2,8,0.2),savefig=True,cscfad=False)
     
@@ -76,204 +79,204 @@ if sys.argv[2:]:
 
 #rdata.data.keys()
 
+else:
+    ################################################################################
+    ##Plot a composite reflectivity at a given time.
 
-################################################################################
-##Plot a composite reflectivity at a given time.
 
+    #tdate = datetime.datetime(2011,5,23,22,00)
+    # tdate = datetime.datetime(2006,1,23,18,0,0)
+    # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
+    print('In run_ipolarris...running the COMPOSITE figs.')
+    for i,d in enumerate(rdata.date):
+        print('plotting composites by time....')
+        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
+        print('made composite')
+        rtimematch = d
+        ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name))
+        minlat = config['ylim'][0]
+        maxlat = config['ylim'][1]
+        minlon = config['xlim'][0]
+        maxlon = config['xlim'][1]
+        ax.set_extent([minlon, maxlon, minlat,maxlat])
 
-#tdate = datetime.datetime(2011,5,23,22,00)
-# tdate = datetime.datetime(2006,1,23,18,0,0)
-# whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-print('In run_ipolarris...running the COMPOSITE figs.')
-for i,d in enumerate(rdata.date):
-    print('plotting composites by time....')
-    fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
-    print('made composite')
-    rtimematch = d
-    ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name))
-    minlat = config['ylim'][0]
-    maxlat = config['ylim'][1]
-    minlon = config['xlim'][0]
-    maxlon = config['xlim'][1]
-    ax.set_extent([minlon, maxlon, minlat,maxlat])
+        plt.tight_layout()
+        plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.close()
 
-    plt.tight_layout()
-    plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-    plt.close()
+        print('plotting cappis at 1 km by time...')
+        fig, ax = plt.subplots(1,1,figsize=(8,8))
+        if 'd' in rdata.data[rdata.z_name].dims:
+            whz = np.where(rdata.data[rdata.z_name].sel(d=i).values==config['z'])[0][0]
+        else:
+            whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
+        rdata.cappi(rdata.dz_name,z=whz,ts=i,contour='CS',ax=ax)
+        ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
+        plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.close()
 
-    print('plotting cappis at 1 km by time...')
-    fig, ax = plt.subplots(1,1,figsize=(8,8))
-    if 'd' in rdata.data[rdata.z_name].dims:
-        whz = np.where(rdata.data[rdata.z_name].sel(d=i).values==config['z'])[0][0]
-    else:
-        whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-    rdata.cappi(rdata.dz_name,z=whz,ts=i,contour='CS',ax=ax)
-    ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
-    plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-    plt.close()
-
-    fig, ax = plt.subplots(1,1,figsize=(8,8))
-#    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-    rdata.cappi(rdata.rr_name,z=whz,ts=i,contour='CS',ax=ax)
-    ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
-    plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-    plt.close()
+        fig, ax = plt.subplots(1,1,figsize=(8,8))
+    #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
+        rdata.cappi(rdata.rr_name,z=whz,ts=i,contour='CS',ax=ax)
+        ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
+        plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.close()
   
 
-# tdate = datetime.datetime(2006,1,23,18,00)
-# whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-# fig, ax = plot_driver.plot_composite(rdata,rdata.cs_name,whdate[0][0])
-# rtimematch = rdata.date[whdate[0][0]]
-# ax.set_title('C/S composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
-# plt.tight_layout()
-# plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-# plt.clf()
+    # tdate = datetime.datetime(2006,1,23,18,00)
+    # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
+    # fig, ax = plot_driver.plot_composite(rdata,rdata.cs_name,whdate[0][0])
+    # rtimematch = rdata.date[whdate[0][0]]
+    # ax.set_title('C/S composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
+    # plt.tight_layout()
+    # plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    # plt.clf()
 
-################################################################################
-##Calculate a timeseries for writing out
-rrstratu,rrconvu,rrallu = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=-0.1)
-rrstrat,rrconv,rrall = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=0.0)
+    ################################################################################
+    ##Calculate a timeseries for writing out
+    rrstratu,rrconvu,rrallu = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=-0.1)
+    rrstrat,rrconv,rrall = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=0.0)
 
-import csv
-tformat = '%Y%m%d-%H%M%S'
-with open('{i}{e}_rr_uncondmean_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
-    v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
-    v_writer.writerow(['Date', 'Unc_Conv_RR', 'Unc_Strat_RR', 'Unc_Tot_RR'])
-    for i,v in enumerate(rdata.date):
-        print( v)
-        tim = v.strftime(tformat)
-        dum =[tim,rrconvu[i].values,rrstratu[i].values,rrallu[i].values]
-        v_writer.writerow(dum)
+    import csv
+    tformat = '%Y%m%d-%H%M%S'
+    with open('{i}{e}_rr_uncondmean_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
+        v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
+        v_writer.writerow(['Date', 'Unc_Conv_RR', 'Unc_Strat_RR', 'Unc_Tot_RR'])
+        for i,v in enumerate(rdata.date):
+            print( v)
+            tim = v.strftime(tformat)
+            dum =[tim,rrconvu[i].values,rrstratu[i].values,rrallu[i].values]
+            v_writer.writerow(dum)
 
-tformat = '%Y%m%d-%H%M%S'
-with open('{i}{e}_rr_condmean_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
-    v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
-    v_writer.writerow(['Date', 'Conv_RR', 'Strat_RR', 'Tot_RR'])
-    for i,v in enumerate(rdata.date):
-        print (v)
-        tim = v.strftime(tformat)
-        dum =[tim,rrconv[i].values,rrstrat[i].values,rrall[i].values]
-        v_writer.writerow(dum)
+    tformat = '%Y%m%d-%H%M%S'
+    with open('{i}{e}_rr_condmean_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
+        v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
+        v_writer.writerow(['Date', 'Conv_RR', 'Strat_RR', 'Tot_RR'])
+        for i,v in enumerate(rdata.date):
+            print (v)
+            tim = v.strftime(tformat)
+            dum =[tim,rrconv[i].values,rrstrat[i].values,rrall[i].values]
+            v_writer.writerow(dum)
 
-conv = np.where(rdata.data[rdata.cs_name].values == 2)
-strat = np.where(rdata.data[rdata.cs_name].values == 1)
-hist, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values)),bins=np.logspace(-1,2.4,40))
-histc, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[conv])),bins=np.logspace(-1,2.4,40))
-hists, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[strat])),bins=np.logspace(-1,2.4,40))
-
-
-tformat = '%Y%m%d-%H%M%S'
-with open('{i}{e}_rr_histgram_{m}.txt'.format(i=config['image_dir'],e=config['exper'],m=config['mphys']), mode='w') as csv_file:
-    v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
-    v_writer.writerow(['Date', 'Con', 'Strat', 'Tot'])
-    for i,v in enumerate(eg[:-1]):
-        dum =[v,histc[i],hists[i],hist[i]]
-        v_writer.writerow(dum)
+    conv = np.where(rdata.data[rdata.cs_name].values == 2)
+    strat = np.where(rdata.data[rdata.cs_name].values == 1)
+    hist, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values)),bins=np.logspace(-1,2.4,40))
+    histc, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[conv])),bins=np.logspace(-1,2.4,40))
+    hists, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[strat])),bins=np.logspace(-1,2.4,40))
 
 
-###Areas
-
-rrstratu_area,rrconvu_area,rrallu_area = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=-0.1,areas=True)
-rrstrat_area,rrconv_area,rrall_area = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=0.0,areas=True)
-
-#grid_area=rdata.radar_area()
-rain_area = rdata.radar_area
-import csv
-tformat = '%Y%m%d-%H%M%S'
-with open('{i}{e}_domain_area_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
-    v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
-    v_writer.writerow(['Date', 'Unc_Con', 'Unc_Strat', 'Unc_Tot'])
-    for i,v in enumerate(rdata.date):
-        print (v)
-        tim = v.strftime(tformat)
-        dum =[tim,rrconvu_area[i].values.astype(float)*rdata.dx*rdata.dy,rrstratu_area[i].values.astype(float)*rdata.dx*rdata.dy,rrallu_area[i].values.astype(float)*rdata.dx*rdata.dy]
-        v_writer.writerow(dum)
-
-tformat = '%Y%m%d-%H%M%S'
-with open('{i}{e}_rel_frequency_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
-    v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
-    v_writer.writerow(['Date', 'Conv', 'Strat', 'Tot'])
-    for i,v in enumerate(rdata.date):
-        print( v)
-        tim = v.strftime(tformat)
-        dum =[tim,rrconv[i].values*rdata.dx*rdata.dy/rain_area*100.,rrstrat[i].values*rdata.dx*rdata.dy/rain_area*100.,rrall[i].values*rdata.dx*rdata.dy/rain_area*100.]
-        v_writer.writerow(dum)
+    tformat = '%Y%m%d-%H%M%S'
+    with open('{i}{e}_rr_histgram_{m}.txt'.format(i=config['image_dir'],e=config['exper'],m=config['mphys']), mode='w') as csv_file:
+        v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
+        v_writer.writerow(['Date', 'Con', 'Strat', 'Tot'])
+        for i,v in enumerate(eg[:-1]):
+            dum =[v,histc[i],hists[i],hist[i]]
+            v_writer.writerow(dum)
 
 
+    ###Areas
+
+    rrstratu_area,rrconvu_area,rrallu_area = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=-0.1,areas=True)
+    rrstrat_area,rrconv_area,rrall_area = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2,cs_flag=True,thresh=0.0,areas=True)
+
+    #grid_area=rdata.radar_area()
+    rain_area = rdata.radar_area
+    import csv
+    tformat = '%Y%m%d-%H%M%S'
+    with open('{i}{e}_domain_area_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
+        v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
+        v_writer.writerow(['Date', 'Unc_Con', 'Unc_Strat', 'Unc_Tot'])
+        for i,v in enumerate(rdata.date):
+            print (v)
+            tim = v.strftime(tformat)
+            dum =[tim,rrconvu_area[i].values.astype(float)*rdata.dx*rdata.dy,rrstratu_area[i].values.astype(float)*rdata.dx*rdata.dy,rrallu_area[i].values.astype(float)*rdata.dx*rdata.dy]
+            v_writer.writerow(dum)
+
+    tformat = '%Y%m%d-%H%M%S'
+    with open('{i}{e}_rel_frequency_stats.txt'.format(i=config['image_dir'],e=config['exper']), mode='w') as csv_file:
+        v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
+        v_writer.writerow(['Date', 'Conv', 'Strat', 'Tot'])
+        for i,v in enumerate(rdata.date):
+            print( v)
+            tim = v.strftime(tformat)
+            dum =[tim,rrconv[i].values*rdata.dx*rdata.dy/rain_area*100.,rrstrat[i].values*rdata.dx*rdata.dy/rain_area*100.,rrall[i].values*rdata.dx*rdata.dy/rain_area*100.]
+            v_writer.writerow(dum)
 
 
-################################################################################
-##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
-## The conditional rain rate is achieved by sending threshold = 0.
-fig,ax = plt.subplots(1,1,figsize=(10,10))
-ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=0,make_zeros=False)
-ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,ls='--',typ='uncond',make_zeros=True,zlev=0)
-
-ax.set_ylabel('Rain Rate (mm/hr)')
-ax.set_title('Precipitation Timeseries TWP-ICE')
-plt.tight_layout()
-plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-plt.close()
 
 
-############################################################################
+    ################################################################################
+    ##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
+    ## The conditional rain rate is achieved by sending threshold = 0.
+    fig,ax = plt.subplots(1,1,figsize=(10,10))
+    ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=0,make_zeros=False)
+    ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,ls='--',typ='uncond',make_zeros=True,zlev=0)
 
-################################################################################
-##Next let's make quantile (50,90,99) plots of the vertical velocity. This splits it by up and down, but you can turn split_updn == False
-fig,ax = plt.subplots(1,1,figsize=(10,10))
-ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
-ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
-ax.set_xlabel('Vertical velocity m/s')
-ax.set_title('Vertical velocity profiles TWP-ICE')
-plt.tight_layout()
-plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-plt.close()
+    ax.set_ylabel('Rain Rate (mm/hr)')
+    ax.set_title('Precipitation Timeseries TWP-ICE')
+    plt.tight_layout()
+    plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.close()
 
-p99u,p90u,p50u,ht = rdata.percentile(wup=True)
-p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
-p99a,p90a,p50a,ht = rdata.percentile(wdown=False)
 
-file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),'w') 
+    ############################################################################
+
+    ################################################################################
+    ##Next let's make quantile (50,90,99) plots of the vertical velocity. This splits it by up and down, but you can turn split_updn == False
+    fig,ax = plt.subplots(1,1,figsize=(10,10))
+    ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
+    ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
+    ax.set_xlabel('Vertical velocity m/s')
+    ax.set_title('Vertical velocity profiles TWP-ICE')
+    plt.tight_layout()
+    plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.close()
+
+    p99u,p90u,p50u,ht = rdata.percentile(wup=True)
+    p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
+    p99a,p90a,p50a,ht = rdata.percentile(wdown=False)
+
+    file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),'w') 
  
-file.write("Updraft\n") 
-file.write("Height (km).    P99.    P90.     P50\n") 
-for i,h in enumerate(ht):
-    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99u[i],p2=p90u[i],p3=p50u[i])) 
+    file.write("Updraft\n") 
+    file.write("Height (km).    P99.    P90.     P50\n") 
+    for i,h in enumerate(ht):
+        file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99u[i],p2=p90u[i],p3=p50u[i])) 
 
-file.write("Downdraft\n") 
-file.write("Height (km).    P99.    P90.     P50\n") 
-for i,h in enumerate(ht):
-    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
+    file.write("Downdraft\n") 
+    file.write("Height (km).    P99.    P90.     P50\n") 
+    for i,h in enumerate(ht):
+        file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
 
-file.write("ALL\n") 
-file.write("Height (km).    P99.    P90.     P50\n") 
-for i,h in enumerate(ht):
-    file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99a[i],p2=p90a[i],p3=p50a[i])) 
+    file.write("ALL\n") 
+    file.write("Height (km).    P99.    P90.     P50\n") 
+    for i,h in enumerate(ht):
+        file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99a[i],p2=p90a[i],p3=p50a[i])) 
 
 
-file.close()
-################################################################################
+    file.close()
+    ################################################################################
 
-################################################################################
-##Next let's make mean vertical profile of reflectivity
-fig,ax = plt.subplots(1,1,figsize=(10,10))
-ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name],ax,split_updn=False,lab='dz',thresh=-50)
-ax.set_title('Vertical profile of reflectivity')
-ax.set_xlabel('Reflectivity')
-plt.tight_layout()
-plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    ################################################################################
+    ##Next let's make mean vertical profile of reflectivity
+    fig,ax = plt.subplots(1,1,figsize=(10,10))
+    ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name],ax,split_updn=False,lab='dz',thresh=-50)
+    ax.set_title('Vertical profile of reflectivity')
+    ax.set_xlabel('Reflectivity')
+    plt.tight_layout()
+    plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 
-plt.close()
-################################################################################
-##Next let's make a reflectivity CFAD
+    plt.close()
+    ################################################################################
+    ##Next let's make a reflectivity CFAD
 
-cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
+    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
 
-fig,ax = plt.subplots(1,1,figsize=(10,10))
-ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name],vbins,ax,levels=True,cont=True)
-ax.set_xlabel('Reflectivity')
-ax.set_ylabel('Height (km)')
-ax.set_title('{c} CFAD'.format(c=rdata.exper))
-plt.tight_layout()
-plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-plt.close()
+    fig,ax = plt.subplots(1,1,figsize=(10,10))
+    ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name],vbins,ax,levels=True,cont=True)
+    ax.set_xlabel('Reflectivity')
+    ax.set_ylabel('Height (km)')
+    ax.set_title('{c} CFAD'.format(c=rdata.exper))
+    plt.tight_layout()
+    plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.close()

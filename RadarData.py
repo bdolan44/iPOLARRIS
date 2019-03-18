@@ -1687,6 +1687,7 @@ class RadarData(RadarConfig.RadarConfig):
             sz=np.shape(self.data[self.z_name].sel(d=0).values)[0]
             hts = np.squeeze(self.data[self.z_name].sel(d=0).values)
         else:
+            sz=np.shape(self.data[self.z_name].values)[0]
             hts=np.squeeze(self.data[self.z_name].values)
         
         #print( np.shape(sz),sz, multiple)
@@ -2052,7 +2053,7 @@ class RadarData(RadarConfig.RadarConfig):
         
         
         data = self.data[self.hid_name].sel(z=slice(above,below)).values
-        msk = (np.less(self.data[self.dz_name].values, -900))
+        msk = (np.less(self.data[self.dz_name].sel(z=slice(above,below)).values, -900))
         data[msk] = -1
         #print 'vhv dat',np.shape(data)
         # Not sure if I need this here.....
