@@ -94,9 +94,9 @@ class RadarData(RadarConfig.RadarConfig):
         self.xind = 3
         self.ntimes =1
         try:
-            self.nhgts = np.shape(self.data[self.z_name].data)[self.zind][0]
+            self.nhgts = np.shape(self.data[self.z_name].values)[self.zind][0]
         except:
-            self.nhgts = np.shape(self.data[self.z_name].data)
+            self.nhgts = np.shape(self.data[self.z_name].values)
 #            self.read_data_from_nc(self.radar_file)
         print ('calculating deltas')
         self.calc_deltas()
@@ -320,8 +320,8 @@ class RadarData(RadarConfig.RadarConfig):
 
     def convert_t(self):    
         # if want to pass a dictionary already
-        self.T=np.ma.masked_less(self.T,0)
-        self.T = self.T-273.15
+        self.T.values=np.ma.masked_less(self.T.values,0)
+        self.T.values = self.T.values-273.15
         
 #############################################################################################################
     def set_masks(self):
@@ -353,7 +353,7 @@ class RadarData(RadarConfig.RadarConfig):
 
     def mask_model(self):
      
-        whmask2= np.where(self.data[self.vr_name].values < -50.)
+        whmask2= np.where(np.logical_or(self.data[self.vr_name] < -50.,self.data[self.dz_name]<=0))
 
         mask_dat=[self.dz_name,self.zdr_name,self.vr_name,self.rr_name,self.kdp_name,self.w_name,self.u_name,self.v_name]
         for k in mask_dat:
@@ -387,6 +387,7 @@ class RadarData(RadarConfig.RadarConfig):
 
     def add_field(self, in_array, name, pol_var=False):
         "Add some field to the radar object and give it a name"
+#        self.data[name] = (['d','z','y','x'],in_array)
         self.data[name] = in_array
         if pol_var:
             self.add_pol_var(name)
@@ -614,6 +615,7 @@ class RadarData(RadarConfig.RadarConfig):
                                 kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum)
 #            scores.append(scoresdum)
             hiddum = np.argmax(scoresdum,axis=0)+1
+            print(np.shape(tdum),'tdum')
             whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
             dzmask = np.where(np.isnan(dzhold))
             hiddum[whbad] = -1

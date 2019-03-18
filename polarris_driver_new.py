@@ -139,6 +139,7 @@ def polarris_driver(configfile):
         for line in f:
             #print line
             if not line.startswith("#"):
+                #print('line',line)
                 key, val, comment = line.split('==')
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
@@ -317,11 +318,12 @@ def polarris_driver(configfile):
         rdata.convert_t()
     #print 'Calculating polarimetric fields like HID and rain...'
     #if config['pol_on'] == True:
-    rdata.calc_pol_analysis()
-#    print(config['cs_z'],'in 312 cs_z')
     if config['mask_model'] == True:
         print('masking model data')
         rdata.mask_model()
+        
+    rdata.calc_pol_analysis()
+#    print(config['cs_z'],'in 312 cs_z')
     rdata.calc_cs_shy(cs_z=config['cs_z'])
     rdata.raintype=rdata.data['CSS'].values#    rdata.set_hid()
     
