@@ -93,10 +93,11 @@ class RadarData(RadarConfig.RadarConfig):
         self.yind = 2
         self.xind = 3
         self.ntimes =1
-        try:
-            self.nhgts = np.shape(self.data[self.z_name].values)[self.zind][0]
-        except:
-            self.nhgts = np.shape(self.data[self.z_name].values)
+#         if 'd' in self.data[self.z_name].dims:
+#             self.nhgts = np.shape(self.data[self.z_name].values)[self.zind][0]
+#         except:
+#             self.nhgts = np.shape(self.data[self.z_name].values)
+        self.nhgts = self.data[self.dz_name].sizes['z']
 #            self.read_data_from_nc(self.radar_file)
         print ('calculating deltas')
         self.calc_deltas()
@@ -1845,7 +1846,7 @@ class RadarData(RadarConfig.RadarConfig):
         if above is None:
             above = 0
         if below is None:
-            below = self.nhgts[0]
+            below = self.nhgts#[0]
         
         datax = self.data[varx].sel(z=slice(above,below)).values
         datay = self.data[vary].sel(z=slice(above,below)).values
@@ -2033,7 +2034,7 @@ class RadarData(RadarConfig.RadarConfig):
             above = 0
         if below is None:
             #print self.nhgts[0]
-            below = self.nhgts[0]
+            below = self.nhgts#[0]
 
         #bot_index, top_index = self._get_ab_incides(above=above, below=below)
         #data = self._pick_data(self.data[self.hid_name].data, pick)
@@ -2051,8 +2052,10 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             mask = np.where(self.raintype < 100)
         
-        
+#        print(below,above)
         data = self.data[self.hid_name].sel(z=slice(above,below)).values
+        
+#        print('datashape',data.shape,above,below)
         msk = (np.less(self.data[self.dz_name].sel(z=slice(above,below)).values, -900))
         data[msk] = -1
         #print 'vhv dat',np.shape(data)
@@ -2066,8 +2069,18 @@ class RadarData(RadarConfig.RadarConfig):
         hts = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
         #print np.shape(vol)
         #print self.data[self.z_name].data.shape[1]
-        looped = np.arange(0, int(self.data[self.z_name].values.shape[0]), multiple)
-        #print looped,multiple
+        if 'd' in self.data[self.z_name].dims:
+#            print('in d version of looped')
+            looped = np.arange(0, int(self.data[self.z_name].values.shape[1]), multiple)
+#            print('looped',looped)
+            vol = np.zeros(int(self.data[self.z_name].values.shape[1]/multiple))
+            hts = np.zeros(int(self.data[self.z_name].values.shape[1]/multiple))
+        else:
+            looped = np.arange(0, int(self.data[self.z_name].values.shape[0]), multiple)
+            vol = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
+            hts = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
+            
+#        print (looped,multiple)
         for vi,vl in enumerate(looped):
             lev_hid = data[:,vl:vl+multiple,...] # go to vl+multiple cuz not inclusive
             #print 'lev_hid',np.shape(lev_hid)
@@ -2077,7 +2090,10 @@ class RadarData(RadarConfig.RadarConfig):
             this_hid_vol = where_this_hid[0].shape[0]
             vol[vi] += this_hid_vol
             #print self.data[self.z_name].data[0][vl+multiple]
-        hts = self.data[self.z_name].values[looped]
+        if 'd' in self.data[self.z_name].dims:
+            hts = self.data[self.z_name].sel(d=0).values[looped]
+        else:
+            hts = self.data[self.z_name].values[looped]
 
         if cscfad == 'convective' or cscfad == 'stratiform':
             self.data[self.hid_name].values = holddat
