@@ -431,7 +431,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
 def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None):
     r1cdf,r1bins,r1ht = rdata1.cfad(var1,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     r2cdf,r2bins,r2ht = rdata2.cfad(var2,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
-    
+    print('In plot_driver, csfad is ',cscfad)
     if n1 is None:
         n1 = rdata1.exper
     if n2 is None:
@@ -450,7 +450,7 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
     axf[1].set_xlabel('{l} bin'.format(l=lonvar))
     axf[2].set_xlabel('{l} bin'.format(l=lonvar))
     if savefig == True:
-        if cscfad is not None:
+        if cscfad is not False:
             plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config1['image_dir'],c=cscfad,x=config1['extra'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
         else:
             plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}_{x}.png'.format(d=config1['image_dir'],x=config1['extra'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
@@ -537,7 +537,7 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
     cb3= plt.colorbar(cb,ax=axf[2])
     cb3.set_label('Relative difference (%)')
     cb3.set_ticks(np.linspace(-1.*nor,nor,9))
-    print('nor',nor)
+#    print('nor',nor)
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
     if typ == 'drc' or typ == 'drs' or typ == 'dr':

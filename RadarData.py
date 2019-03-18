@@ -615,7 +615,7 @@ class RadarData(RadarConfig.RadarConfig):
                                 kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum)
 #            scores.append(scoresdum)
             hiddum = np.argmax(scoresdum,axis=0)+1
-            print(np.shape(tdum),'tdum')
+#            print(np.shape(tdum),'tdum')
             whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
             dzmask = np.where(np.isnan(dzhold))
             hiddum[whbad] = -1
@@ -1718,7 +1718,7 @@ class RadarData(RadarConfig.RadarConfig):
            print ('in strat',type(self.data[var].data))
         else:
            mask = np.where(self.raintype > 100)
-           print('entering deep copy')
+     #      print('entering deep copy')
            holddat = deepcopy(self.data[var].values)
            self.data[var].values[mask] = np.nan
         #print('ready to go in loop!')
@@ -2507,7 +2507,7 @@ class RadarData(RadarConfig.RadarConfig):
     def calc_cs_shy(self,cs_z=2.0):
         print ('Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
-        print(cs_z,'cs_z in 2424')
+#        print(cs_z,'cs_z in 2424')
         for q in tqdm(range(self.data.dims['d'])):
             if self.lat_name in self.data.keys():
 #                         lat = self.data[self.lat_name].sel(d=q).values

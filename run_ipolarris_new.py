@@ -84,7 +84,7 @@ if sys.argv[2:]:
 #tdate = datetime.datetime(2011,5,23,22,00)
 # tdate = datetime.datetime(2006,1,23,18,0,0)
 # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-
+print('In run_ipolarris...running the COMPOSITE figs.')
 for i,d in enumerate(rdata.date):
     print('plotting composites by time....')
     fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
