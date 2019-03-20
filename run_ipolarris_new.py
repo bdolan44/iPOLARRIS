@@ -278,10 +278,10 @@ else:
     ################################################################################
     ##Next let's make a reflectivity CFAD
 
-    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
-
+#    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
+    cfaddat,vbins,r1ht = rdata.cfad(rdata.data[rdata.dz_name],ret_z=1,z_resolution=1.0,nbins=40,cscfad=False)
     fig,ax = plt.subplots(1,1,figsize=(10,10))
-    ax = plot_driver.plot_cfad(cfaddat,rdata.data[rdata.z_name],vbins,ax,levels=True,cont=True)
+    ax = plot_driver.plot_cfad(cfaddat,r1ht,vbins,ax,levels=True,cont=True)
     ax.set_xlabel('Reflectivity')
     ax.set_ylabel('Height (km)')
     ax.set_title('{c} CFAD'.format(c=rdata.exper))
