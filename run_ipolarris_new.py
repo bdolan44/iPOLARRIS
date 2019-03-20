@@ -285,7 +285,7 @@ else:
     cfad1_all = np.sum(cfaddat,axis=0)/dat1cnt
     
     fig,ax = plt.subplots(1,1,figsize=(10,10))
-    fig, ax = GF.cfad_plot('DZ',cfad=cfad1_all, hts = r1ht,  bins = vbins,ax=ax,cfad_on = 0,rconf = config,tspan = iconfig['date'],maxval=20,cont=True,levels = True)
+    fig, ax = GF.cfad_plot('DZ',cfad=cfad1_all, hts = r1ht,  bins = vbins,ax=ax,cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True)
 
     ax.set_xlabel('Reflectivity')
     ax.set_ylabel('Height (km)')
