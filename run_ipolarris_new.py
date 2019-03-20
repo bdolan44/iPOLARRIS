@@ -221,7 +221,7 @@ else:
     ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,ls='--',typ='uncond',make_zeros=True,zlev=0)
 
     ax.set_ylabel('Rain Rate (mm/hr)')
-    ax.set_title('Precipitation Timeseries TWP-ICE')
+    ax.set_title('Precipitation Timeseries ')
     plt.tight_layout()
     plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
@@ -235,7 +235,7 @@ else:
     ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
     ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
     ax.set_xlabel('Vertical velocity m/s')
-    ax.set_title('Vertical velocity profiles TWP-ICE')
+    ax.set_title('Vertical velocity profiles')
     plt.tight_layout()
     plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
@@ -280,8 +280,12 @@ else:
 
 #    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
     cfaddat,vbins,r1ht = rdata.cfad(rdata.dz_name,ret_z=1,z_resolution=1.0,value_bins=np.arange(0,82,2),cscfad=False)
+    dat1cnt = np.shape(cfaddat)[0]
+
+    cfad1_all = np.sum(cfaddat,axis=0)/dat1cnt
+    
     fig,ax = plt.subplots(1,1,figsize=(10,10))
-    fig, ax = GF.cfad_plot('DZ',cfad=cfaddat, hts = r1ht,  bins = vbins,ax=ax,cfad_on = 0,rconf = config,tspan = iconfig['date'],maxval=20,cont=True,levels = True)
+    fig, ax = GF.cfad_plot('DZ',cfad=cfad1_all, hts = r1ht,  bins = vbins,ax=ax,cfad_on = 0,rconf = config,tspan = iconfig['date'],maxval=20,cont=True,levels = True)
 
     ax.set_xlabel('Reflectivity')
     ax.set_ylabel('Height (km)')
