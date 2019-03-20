@@ -41,12 +41,15 @@ if sys.argv[2:]:
 
     print('calculating CFAD differences')
 
-    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=True,cscfad=False)
+    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=False,cscfad=False)
     ax[0].set_title(rdata.exper)
     ax[1].set_title(rdata2.exper)
     ax[2].set_title("{e} - {v}".format(e=rdata.exper,v=rdata2.exper))    
     plt.suptitle("Reflectivity")
-    
+    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config['image_dir'],c='ALL',x=config['extrax'],e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
+    plt.close()
+
+
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,'Z$_{dr}$',config,config2,bins=np.arange(-2,8,0.2),savefig=True,cscfad=False)
     
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,'K$_{dp}$',config,config2,bins=np.arange(-2,6,0.2),savefig=True,cscfad=False)
@@ -111,14 +114,19 @@ else:
         else:
             whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
         rdata.cappi(rdata.dz_name,z=whz,ts=i,contour='CS',ax=ax)
-        ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
+        ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'].values[2]))
+        ax.set_xlim(config['xlim'][0],config['xlim'][1])
+        ax.set_ylim(config['ylim'][0],config['ylim'][1])
+#        ax.set_extent([minlon, maxlon, minlat,maxlat])
         plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
         plt.close()
 
         fig, ax = plt.subplots(1,1,figsize=(8,8))
     #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
         rdata.cappi(rdata.rr_name,z=whz,ts=i,contour='CS',ax=ax)
-        ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'][2]))
+        ax.set_xlim(config['xlim'][0],config['xlim'][1])
+        ax.set_ylim(config['ylim'][0],config['ylim'][1])
+        ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'].values[2]))
         plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
         plt.close()
   
