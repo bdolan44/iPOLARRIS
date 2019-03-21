@@ -280,12 +280,9 @@ else:
 
 #    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
     cfaddat,vbins,r1ht = rdata.cfad(rdata.dz_name,ret_z=1,z_resolution=1.0,value_bins=np.arange(0,82,2),cscfad=False)
-    dat1cnt = np.shape(cfaddat)[0]
 
-    cfad1_all = np.sum(cfaddat,axis=0)/dat1cnt
-    
     fig,ax = plt.subplots(1,1,figsize=(10,10))
-    fig, ax = GF.cfad_plot('DZ',cfad=cfad1_all, hts = r1ht,  bins = vbins,ax=ax,cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True)
+    ax = plot_driver.plot_cfad(cfaddat, hts = r1ht,  vbins = vbins,ax=ax,cfad_on = 0,tspan = config['date'],maxval=20,cont=True,levels = True)
 
     ax.set_xlabel('Reflectivity')
     ax.set_ylabel('Height (km)')

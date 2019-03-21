@@ -1275,8 +1275,11 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
     if hts is None:
         print ('please provide nominal heights to cfad_plot')
         return
-    if 'd' in hts.dims:
-        hts=hts.sel(d=0)
+    try:
+        if 'd' in hts.dims:
+            hts=hts.sel(d=0)
+    except AttributeError as e:
+        hts=hts
     if log:
         norm = colors.LogNorm(vmin=1e-5, vmax=1e2)
     else:
@@ -1284,6 +1287,7 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
     # plot the CFAD
     cfad_ma = np.ma.masked_where(cfad==0, cfad)
+    print('CFAD shape',np.shape(cfad_ma))
 
     if cont is True:
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
