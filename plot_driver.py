@@ -1006,6 +1006,9 @@ def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zl
             ax.plot(np.array(tm),sdat.count(dim=['z','y','x'])/gridsize,color='b',label='strat {e}'.format(e=typ),ls=ls)
 
         else:
+            print('lottin data')
+            print(tm)
+            print(np.nanmax(adat))
             ax.plot(np.array(tm),adat.mean(dim=['z','y','x'],skipna=True),color='k',label='Total {e}'.format(e=typ),ls=ls)
             ax.plot(np.array(tm),cdat.mean(dim=['z','y','x'],skipna=True),color='r',label='Conv {e}'.format(e=typ),ls=ls)
             ax.plot(np.array(tm),sdat.mean(dim=['z','y','x'],skipna=True),color='b',label='strat {e}'.format(e=typ),ls=ls)
@@ -1020,7 +1023,7 @@ def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zl
     d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
     ax.set_xlabel('Time (UTC)')
 
-    return ax
+    return ax,adat,cdat,sdat
 
 def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=False,ls = '-',typ=''):
     if split_updn == True:
@@ -1398,18 +1401,25 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
 
 
     cb = ax.pcolormesh(lons,lats,dzcomp, vmin =vmin,vmax=vmax,cmap=cmap,transform=ccrs.PlateCarree())
-    plt.colorbar(cb)
+    cbt = plt.colorbar(cb)
+    cbt.set_label(var)
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
-
     if cs_over == True:
         ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
 
+    for tick in ax.xaxis.get_major_ticks():
+                    tick.label.set_fontsize(22) 
+    for tick in ax.yaxis.get_major_ticks():
+                    tick.label.set_fontsize(22) 
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=2, color='gray', alpha=0.5, linestyle='--')
 
     gl.xlabels_top = False
     gl.ylabels_right = False
+    gl.xlabel_style = {'size': 16, 'color': 'gray','rotation':-15}
+    gl.ylabel_style = {'size': 16, 'color': 'gray'}#,'rotation':-15}
+
     
-    return fig,ax#,dzcomp
+    return fig,ax,gl#,dzcomp

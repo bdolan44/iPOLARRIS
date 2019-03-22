@@ -1195,7 +1195,7 @@ class RadarData(RadarConfig.RadarConfig):
 #        print xdat[xmax]
 #        data[dzmask] =np.nan
         data = np.ma.masked_where(~np.isfinite(data),data)
-        print(np.max(data))
+        #print(np.max(data))
 #        print 'about to do plotting, ln 1113'
         if var in self.lims.keys():
             print( 'var:',var)
@@ -1203,7 +1203,7 @@ class RadarData(RadarConfig.RadarConfig):
   #          print np.shape(data), np.shape(xdat),np.shape(ydat)
 #            print 'in var',var
             #print **kwargs
-            print(np.min(xdat),np.min(ydat),np.shape(data),np.max(data))
+            #print(np.min(xdat),np.min(ydat),np.shape(data),np.max(data))
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
         else:
@@ -1221,7 +1221,7 @@ class RadarData(RadarConfig.RadarConfig):
 #            print 'Contour is not none',contour
             if contour == 'CS':
 #                print 'contours!'
-                print(np.shape(self.data[self.cs_name].sel(d=ts,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values))
+                #print(np.shape(self.data[self.cs_name].sel(d=ts,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values))
                 csvals =np.squeeze(self.data[self.cs_name].sel(d=ts,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
 #                 csvals = deepcopy(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind)).values)
 #                 csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
@@ -1260,9 +1260,10 @@ class RadarData(RadarConfig.RadarConfig):
         if labels:
             cb = fig.colorbar(dummy, ax=ax, fraction=0.03, pad=0.03, format=cb_format)
             if var in self.lims.keys():
+                #print('in the var lims loop')
                 cb.set_label(' '.join([self.names[var], self.units[var]]).strip())
                 if var != self.vr_name:
-                    cb.set_ticks(np.arange(self.lims[var][0], self.lims[var][1]+self.delta[var], self.delta[var]))
+                    #cb.set_ticks(np.arange(self.lims[var][0], self.lims[var][1]+self.delta[var], self.delta[var]))
                     cb.set_ticklabels(self.ticklabels[var])
 
             else:
@@ -1283,7 +1284,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
-            print('setting min and max',xmin,xmax,ymin,ymax)
+            #print('setting min and max',xmin,xmax,ymin,ymax)
             ax.axis([xmin, xmax, ymin, ymax])
 #            if labels:
 #                 ax.set_xlabel('Longitude')
