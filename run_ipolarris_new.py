@@ -218,7 +218,7 @@ else:
     ## The conditional rain rate is achieved by sending threshold = 0.
     fig,ax = plt.subplots(1,1,figsize=(10,10))
     ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=1,make_zeros=False)
-    ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=1,ls='--',typ='uncond',make_zeros=True,zlev=0)
+    ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=1,ls='--',typ='uncond',make_zeros=True)#,zlev=0)
 
     ax.set_ylabel('Rain Rate (mm/hr)')
     ax.set_title('Precipitation Timeseries ')
