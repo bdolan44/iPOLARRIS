@@ -95,7 +95,7 @@ class RadarConfig(object):
             else:
                 tmf = dt.datetime.strftime(tm[0],fmt)
         else:
-            tmf = dt.datetime.strftime(self.date,fmt)
+            tmf = dt.datetime.strftime(np.array(self.date)[0],fmt)
         #print tmf
         return tmf
 
