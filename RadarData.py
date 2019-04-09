@@ -1201,8 +1201,10 @@ class RadarData(RadarConfig.RadarConfig):
         #z_ind = np.argmin(np.abs(z - self.data[self.z_name].data))
 #        z_ind = self.get_ind(z,self.data[self.z_name].values)
         if ts is not None:
-            tmind = np.where(np.array(self.date)==ts)[0][0]
-        
+            try:
+                tmind = np.where(np.array(self.date)==ts)[0][0]
+            except IndexError as e:
+                tmind = np.where(np.array(self.date)==ts)[0]
 
 
         if z is None:
