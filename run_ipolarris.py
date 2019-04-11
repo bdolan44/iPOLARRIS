@@ -91,7 +91,7 @@ else:
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
     print('In run_ipolarris...running the COMPOSITE figs.')
-    for i,d in enumerate(rdata.date):
+    for i,d in enumerate(np.array(rdata.date)):
         print('plotting composites by time....')
         fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
         print('made composite')
@@ -114,7 +114,7 @@ else:
         else:
             whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
         rdata.cappi(rdata.dz_name,z=whz,ts=d,contour='CS',ax=ax)
-        ax.set_title('CAPPI DZ {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'].values[whz]))
+        ax.set_title('CAPPI DZ {t:%Y%m%d_%M%H%S} {h} km'.format(t=d,h=rdata.data['z'].values[whz]))
         ax.set_xlim(config['xlim'][0],config['xlim'][1])
         ax.set_ylim(config['ylim'][0],config['ylim'][1])
 #        ax.set_extent([minlon, maxlon, minlat,maxlat])
