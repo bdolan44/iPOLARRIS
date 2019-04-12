@@ -754,6 +754,7 @@ def make_single_pplots(rdat,flags,config,y=None):
     print ('in make_singl_pplots')
     tspan= [rdat.date[0],rdat.date[-1]]
     tms = np.array(rdat.date)
+    #print('DATES',np.array(rdat.date))
     tstart = tspan[0]
 #    print ts
 #    print rdat.exper
