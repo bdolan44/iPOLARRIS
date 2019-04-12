@@ -1042,7 +1042,7 @@ class RadarData(RadarConfig.RadarConfig):
             if vectors:
 #                 try:
 #                     print( zlim,xlim,ts,res)
-                    self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=tmind,res=res)
+                    self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
 #                 except Exception as e:
 #                     print ('Error trying to plot xsec vectors: {}'.format(e))
 
@@ -1412,7 +1412,7 @@ class RadarData(RadarConfig.RadarConfig):
         if vectors is not None:
 #            try:
 #                print 'RadarDAta 1177:', res,z,ax
-                self.plan_vector(ax=ax, z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
+                self.plan_vector(ax=ax, ts=ts,z=z,res=res,thresh_dz=thresh_dz,xlim=xlim,ylim=ylim)
 #            except Exception, e:
 #                print 'Error trying to plot vectors: {}'.format(e)
         if 'd' in self.data[self.z_name].dims:
