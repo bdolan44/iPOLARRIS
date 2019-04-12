@@ -1389,7 +1389,7 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
     # Specifies the detail level of the map.
     # Options are '110m' (default), '50m', and '10m'
     ax.coastlines(resolution=resolution)
-    print(np.min(lons),np.max(lons))
+#    print(np.min(lons),np.max(lons))
     ax.set_extent([np.min(lons), np.max(lons), np.min(lats), np.max(lats)])
     lon_formatter = LongitudeFormatter(number_format='.1f')
     lat_formatter = LatitudeFormatter(number_format='.1f')

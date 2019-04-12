@@ -889,7 +889,7 @@ class RadarData(RadarConfig.RadarConfig):
         if ts is None:
             ts=self.date[0]
         tmind = np.where(np.array(self.date) == ts)[0][0]
-#        print(tmind,'tmind')
+        #print(tmind,'tmind in xsec')
         tsi = 0
 #        print('ts in xsec is ',type(np.array(ts)))
         if ax is None:
@@ -1066,6 +1066,7 @@ class RadarData(RadarConfig.RadarConfig):
             print('Recieved no time. Using 1st time')
             ts=np.array(self.date)[0]
         tmind = np.where(np.array(self.date) == ts)[0]
+        #print('tmind in xsec_multiplod',tmind)
         
         tsi = 0
         if y is None:
@@ -1435,10 +1436,12 @@ class RadarData(RadarConfig.RadarConfig):
         
         # first, get the appropriate z index from the z that's wanted in altitude
         if ts is not None:
-            tmind = np.where(np.array(self.date)==ts)[0][0]
-        
+            try:
+                tmind = np.where(np.array(self.date)==ts)[0][0]
+            except:    
+                tmind = np.where(np.array(self.date)==ts)[0]
 
-
+   #     print('tmind in cappi-multi',tmind)
         if z is None:
             z_ind = 2
             
@@ -1561,10 +1564,13 @@ class RadarData(RadarConfig.RadarConfig):
 
     def xsec_vector(self, y=None, xlim=None,zlim=None,ts=None,ax=None, res=2.0, ht_offset=0.2, **kwargs):
         if ts is None:
-            tmind=self.date[0]
+            print('xsec_vector got no time')
+            ts=self.date[0]
             tsi = 0
-        else:
-            tmind = ts
+        try:
+            tmind = np.where(np.array(self.date)==ts)[0][0]
+        except:    
+            tmind = np.where(np.array(self.date)==ts)[0]
 #         else:
 #             print 'Check your dates!', ts
 #        print 'ts:',ts
