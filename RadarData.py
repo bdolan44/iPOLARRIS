@@ -1218,7 +1218,7 @@ class RadarData(RadarConfig.RadarConfig):
                 z_ind = self.get_ind(z,self.data[self.z_name].values)
 
 #        print('xlims 1203',xlim,tmind)
-        print('xlim is',xlim)
+ #       print('xlim is',xlim)
         if xlim is None:
             xmint, xmaxt = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
             xlim = [xmint,xmaxt]
