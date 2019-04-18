@@ -451,9 +451,9 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
     axf[2].set_xlabel('{l} bin'.format(l=lonvar))
     if savefig == True:
         if cscfad is not False:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config1['image_dir'],c=cscfad,x=config1['extra'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config1['image_dir'],c=cscfad,x=config1['extrax'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
         else:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}_{x}.png'.format(d=config1['image_dir'],x=config1['extra'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}_{x}.png'.format(d=config1['image_dir'],x=config1['extrax'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
         return fig, axf
     else:
         return fig,axf
