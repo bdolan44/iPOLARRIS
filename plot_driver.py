@@ -428,7 +428,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         plt.savefig('{d}{e1}_{e2}_wr_comp_{x}.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,x=config['extrax'],t=config['ptype']),dpi=300)
         plt.clf()
 
-def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None):
+def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False):
     r1cdf,r1bins,r1ht = rdata1.cfad(var1,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     r2cdf,r2bins,r2ht = rdata2.cfad(var2,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     print('In plot_driver, csfad is ',cscfad)
@@ -440,7 +440,7 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
         n3 = '{a}-{b}'.format(a=rdata1.exper,b=rdata2.exper)
     
     
-    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,n1=n1,n2=n2,n3=n3,typ='dz')
+    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,n1=n1,n2=n2,n3=n3,typ='dz',nor=nor)
     if cscfad is not False:
         plt.suptitle('{c} {l}'.format(c=cscfad,l=lonvar),y=1.05,fontsize=30)
     else:
@@ -458,7 +458,7 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
     else:
         return fig,axf
 
-def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False):
+def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False,nor=False):
     fig, ax = plt.subplots(1,3,figsize=(18,8))
     axf = ax.flatten()
 
@@ -521,19 +521,26 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
     maxa = np.nanpercentile(np.abs(cfad_ma),98)
     levels=np.linspace(-1*maxa,maxa,50)
-#    print typ, maxa
-    if typ=='w':
-        maxa = np.around(np.nanpercentile(np.abs(cfad_ma), 96),decimals=1)
-        nor = np.around(np.nanpercentile(np.abs(cfad_ma),93),decimals=1)
-        delt = np.around((maxa+maxa)/50,decimals=2)
-        print( maxa,nor,delt)
-        levels = np.arange(-1 * maxa, maxa+delt, delt)
-        cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
+    
+    if nor is False:
+    #    print typ, maxa
+        if typ=='w':
+            maxa = np.around(np.nanpercentile(np.abs(cfad_ma), 96),decimals=1)
+            nor = np.around(np.nanpercentile(np.abs(cfad_ma),93),decimals=1)
+            delt = np.around((maxa+maxa)/50,decimals=2)
+            print( maxa,nor,delt)
+            levels = np.arange(-1 * maxa, maxa+delt, delt)
+            cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
 
+        else:
+            nor = np.around(np.nanpercentile(np.abs(cfad_ma),98),decimals=1)
+            cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
     else:
-        nor = np.around(np.nanpercentile(np.abs(cfad_ma),98),decimals=1)
+        nor=nor
         cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
 
+    
+    
     cb3= plt.colorbar(cb,ax=axf[2])
     cb3.set_label('Relative difference (%)')
     cb3.set_ticks(np.linspace(-1.*nor,nor,9))
