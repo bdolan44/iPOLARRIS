@@ -429,6 +429,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         plt.clf()
 
 def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False):
+    ###Pass a value for nor in order to normalize the colorbar over a standard range rather than normalization across values within the data. To normalize within the data, pass a value of False
     r1cdf,r1bins,r1ht = rdata1.cfad(var1,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     r2cdf,r2bins,r2ht = rdata2.cfad(var2,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     print('In plot_driver, csfad is ',cscfad)
@@ -459,6 +460,7 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
         return fig,axf
 
 def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False,nor=False):
+    ###Pass a value for nor in order to normalize the colorbar over a standard range rather than normalization across values within the data. To normalize within the data, pass a value of False
     fig, ax = plt.subplots(1,3,figsize=(18,8))
     axf = ax.flatten()
 
