@@ -86,15 +86,15 @@ def find_snd_match(config):
         for line in f:
             dat = (line)
             rdum.append(foo(dat))
-
+    #print('sfiles:',config['sfiles'])
     slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
     sdates=[]
     for v,sname in enumerate(slist):
 
         base = os.path.basename(sname)
 #            print base
-        radcdate=np.str(base[13:13+9])
-
+        radcdate=np.str(base[13:13+10])
+        #print('radcdate',radcdate)
         dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['sdate_format'])
         sdates.append(dates)
 
@@ -105,7 +105,6 @@ def find_snd_match(config):
         base = os.path.basename(cname)
         radcdate=np.str(base[config['doff']:config['doff']+15])
         dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
-        #print dates, etime,stime
         if (dates >= config['etime']) and (dates <= config['stime']):
             #print cname
             #now find a sounding match
@@ -208,6 +207,7 @@ def polarris_driver(configfile):
 
     if config['snd_on'] == True:
         smatch = find_snd_match(config)
+        #print("rfiles",rfiles[0])
         sfile = smatch[rfiles[0]]
         print('matching sounding')
     else:
@@ -221,7 +221,6 @@ def polarris_driver(configfile):
         dformat = config['wdate_format']
         base = os.path.basename(d)
         radcdate=np.str(base[config['time_parse'][0]:config['time_parse'][1]])
-    #    print radcdate
         date=datetime.datetime.strptime(radcdate,dformat)
         tm.append(date)
 
@@ -299,7 +298,7 @@ def polarris_driver(configfile):
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
                                                   kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
                                                   u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],
-                                                  rr=config['rr_name'],band = 'C',vr = config['vr_name'],lat_r=lat_r,lon_r=lon_r,
+                                                  rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=lat_r,lon_r=lon_r,
                                                   y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=lat_0,lon_0=lon_0,
                                                   exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
                                                   z_thresh=0,conv_types =  config['conv_types'],

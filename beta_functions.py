@@ -153,7 +153,7 @@ def get_beta_set(filename, factor=1.0):
 ################################
 
 def get_mbf_sets_summer(use_temp=True, plot_flag=False, n_types=10,
-                        temp_factor=1, band='S', fdir='./beta_function_parameters/', verbose=False,
+                        temp_factor=1, band='S', fdir=CSV_DIR, verbose=False,
                         pdir='./'):
     """
     Define structures to hold the beta function parameters for each input
@@ -194,6 +194,7 @@ def get_mbf_sets_summer(use_temp=True, plot_flag=False, n_types=10,
 
     #Horizontal Reflectivity (Zh)
     fname = band + '-band_Reflectivity.csv'
+    print("beat functions",fdir, fname)
     Zh_set = get_beta_set(fdir+fname)
 
     #Differential Reflectivity (Zdr)

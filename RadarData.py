@@ -553,8 +553,9 @@ class RadarData(RadarConfig.RadarConfig):
 
         """This will take the sounding data and interpolate it to the radar coordinates"""
         self.gridded_height = np.zeros(self.data[self.dz_name].shape)
+        #print(self.x)
         for i in range(self.data[self.z_name].shape[0]):
-                 self.gridded_height[:,i,:,:] = self.data[self.z_name][i]
+                 self.gridded_height[:,:,i,...] = self.data[self.z_name][i]
 
         self.T = np.interp(self.gridded_height, self.snd_height, self.snd_temp)
 
@@ -563,7 +564,7 @@ class RadarData(RadarConfig.RadarConfig):
 
     def get_T_height(self, temp, interp=False):
         temp_index = np.argmin(np.abs(self.T[:,0,0] - temp))
-        return self.gridded_height[:,0,0][temp_index]
+        return self.gridded_height[0,:,0,0][temp_index]
 
 
 #############################################################################################################
