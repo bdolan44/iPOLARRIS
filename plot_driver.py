@@ -452,9 +452,9 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
     axf[2].set_xlabel('{l} bin'.format(l=lonvar))
     if savefig == True:
         if cscfad is not False:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config1['image_dir'],c=cscfad,x=config1['extrax'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.{p}'.format(p=config['ptype'],d=config1['image_dir'],c=cscfad,x=config1['extrax'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
         else:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}_{x}.png'.format(d=config1['image_dir'],x=config1['extrax'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}_{x}.{p}'.format(p=config['ptype'],d=config1['image_dir'],x=config1['extrax'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
         return fig, axf
     else:
         return fig,axf
@@ -1248,9 +1248,9 @@ def plot_hid_comparison_cfad(rdata1,rdata2,z_res=1.0,config=None,n1=None,n2=None
     plt.tight_layout()
     if savefig == True:
         if cscfad is not None:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}_HID_{x}.png'.format(d=config['image_dir'],c=cscfad,x=config['extrax'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}_HID_{x}.{p}'.format(p=config['ptype'],d=config['image_dir'],c=cscfad,x=config['extrax'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
         else:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_HID_{x}.png'.format(d=config['image_dir'],x=config['extrax'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_HID_{x}.{p}'.format(p=config['ptype'],d=config['image_dir'],x=config['extrax'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
         return fig, axf
     else:
         return fig,axf

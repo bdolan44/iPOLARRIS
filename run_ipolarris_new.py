@@ -46,7 +46,7 @@ if sys.argv[2:]:
     ax[1].set_title(rdata2.exper)
     ax[2].set_title("{e} - {v}".format(e=rdata.exper,v=rdata2.exper))    
     plt.suptitle("Reflectivity")
-    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.png'.format(d=config['image_dir'],c='ALL',x=config['extrax'],e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
+    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.{p}'.format(d=config['image_dir'],c='ALL',p=config['ptype'],x=config['extrax'],e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
     plt.close()
 
 
@@ -104,7 +104,7 @@ else:
         ax.set_extent([minlon, maxlon, minlat,maxlat])
 
         plt.tight_layout()
-        plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
         plt.close()
 
         print('plotting cappis at 1 km by time...')
@@ -118,7 +118,7 @@ else:
         ax.set_xlim(config['xlim'][0],config['xlim'][1])
         ax.set_ylim(config['ylim'][0],config['ylim'][1])
 #        ax.set_extent([minlon, maxlon, minlat,maxlat])
-        plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
         plt.close()
 
         fig, ax = plt.subplots(1,1,figsize=(8,8))
@@ -127,7 +127,7 @@ else:
         ax.set_xlim(config['xlim'][0],config['xlim'][1])
         ax.set_ylim(config['ylim'][0],config['ylim'][1])
         ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'].values[2]))
-        plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
         plt.close()
   
 
@@ -137,7 +137,7 @@ else:
     # rtimematch = rdata.date[whdate[0][0]]
     # ax.set_title('C/S composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
     # plt.tight_layout()
-    # plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.png'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    # plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     # plt.clf()
 
     ################################################################################
@@ -223,7 +223,7 @@ else:
     ax.set_ylabel('Rain Rate (mm/hr)')
     ax.set_title('Precipitation Timeseries ')
     plt.tight_layout()
-    plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.savefig('{i}Precip_timeseries_convstrat_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
 
 
@@ -237,7 +237,7 @@ else:
     ax.set_xlabel('Vertical velocity m/s')
     ax.set_title('Vertical velocity profiles')
     plt.tight_layout()
-    plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
 
     p99u,p90u,p50u,ht = rdata.percentile(wup=True)
@@ -272,7 +272,7 @@ else:
     ax.set_title('Vertical profile of reflectivity')
     ax.set_xlabel('Reflectivity')
     plt.tight_layout()
-    plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.savefig('{i}MeanProfile_refl_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
 
     plt.close()
     ################################################################################
@@ -288,5 +288,5 @@ else:
     ax.set_ylabel('Height (km)')
     ax.set_title('{c} CFAD'.format(c=rdata.exper))
     plt.tight_layout()
-    plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.png'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
     plt.close()
