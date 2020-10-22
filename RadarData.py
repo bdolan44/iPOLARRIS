@@ -54,7 +54,7 @@ class RadarData(RadarConfig.RadarConfig):
     def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',conv='Con',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',lat_r=None,lon_r=None,
             radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,lat_0 = 0.0,lon_0=90.0,
-            conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg']): 
+            conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg'],return_scores=False): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, conv=conv,temp=temp, x=x, y=y,lat_0=lat_0,lon_0=lon_0,lat_r=lat_r,lon_r=lon_r,
                       z=z, u=u, v=v, w=w,rr=rr,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
@@ -72,6 +72,7 @@ class RadarData(RadarConfig.RadarConfig):
         self.conv_types = conv_types
         self.strat_types = strat_types
         self.mixed_types = mixed_types
+        self.return_scores=return_scores
         self.band = band
         self.mixr=mixr
         self.lat_0 = lat_0
@@ -571,7 +572,7 @@ class RadarData(RadarConfig.RadarConfig):
    ############ Here is calling CSU radartools for HID, RR, etc... ############################
 #############################################################################################################
     def calc_pol_analysis(self,**kwargs):
-        self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh)
+        self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh,return_scores=self.return_scores)
         print("running pol rain")
         if self.mphys == 'obs':
             self.calc_qr_pol()
@@ -613,10 +614,10 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                tdum = None
 
-            scoresdum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=np.squeeze(self.data[self.zdr_name].sel(d=v)).values, rho=np.squeeze(self.data[self.rho_name].sel(d=v)).values, 
-                                kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum)
+            hiddum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=np.squeeze(self.data[self.zdr_name].sel(d=v)).values, rho=np.squeeze(self.data[self.rho_name].sel(d=v)).values, 
+                                kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum, return_scores=self.return_scores)
 #            scores.append(scoresdum)
-            hiddum = np.argmax(scoresdum,axis=0)+1
+            #hiddum = np.argmax(scoresdum,axis=0)+1
 #            print(np.shape(tdum),'tdum')
             whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
             dzmask = np.where(np.isnan(dzhold))
@@ -671,12 +672,19 @@ class RadarData(RadarConfig.RadarConfig):
 
                 z_c=0.0014297
                 z_m=0.6729
-            if self.exper == 'TWPICE': 
+            elif self.exper == 'TWPICE': 
                 k_c= 0.89191
                 k_m=0.6529
 
                 z_c=0.00194
                 z_m=0.5957
+            else:
+                k_c= 1.4195
+                k_m=0.7489
+
+                z_c=0.0014297
+                z_m=0.6729
+           
         elif self.band == 'S' or self.band == 's':
             if self.exper == 'MC3E':
                 k_c= 1.4489
@@ -684,14 +692,22 @@ class RadarData(RadarConfig.RadarConfig):
 
                 z_c=0.0019393
                 z_m=0.592032
-            if self.exper == 'TWPICE': 
+            elif self.exper == 'TWPICE': 
                 k_c= 2.559
                 k_m=0.76687
 
                 z_c=0.0014377
                 z_m=0.66743
+            else:
+                print("No ice-mass coefficients for your project. Using MC3E relations")
+                k_c= 1.4489
+                k_m=0.6589
+                z_c=0.0014297
+                z_m=0.6729
+
         else:
-            print ('Your wavelength has not been run yet! Please return to fundamentals.')
+            print('Problem in ice-mass. No criteria (wavelength or project)')
+            #print ('Your wavelength has not been run yet! Please return to fundamentals.')
             return
             
 
@@ -703,7 +719,13 @@ class RadarData(RadarConfig.RadarConfig):
         dbzzz = np.ma.masked_where(kdppp.mask,dbzz)
 
         M_Kdp = k_c*(kdppp**k_m)
-
+        
+        kdpp =0.0
+        kdppp = 0.0
+        dbzz = 0.0
+        dbzzz = 0.0
+        
+        print('Masking data')
         kdp_notmet = np.ma.masked_greater_equal(self.data[self.kdp_name].values,0.2)
         dbz_notmet = np.ma.masked_where(kdp_notmet.mask,self.data[self.dz_name].values)
 
@@ -716,15 +738,23 @@ class RadarData(RadarConfig.RadarConfig):
         linz = 10.**(dbz_notmettt/10.)  # for method w/o HID
         M_Z = z_c*(linz**z_m)
     
+        dbz_notmett = 0.0
+        kdp_notmett = 0.0
+        dbz_notmettt=0.0
+        kdp_notmettt=0.0
+        
+        print('got Kdp')
+        
         M_Z.set_fill_value(0.0)
         M_Kdp.set_fill_value(0.0)
         lwccc = M_Z.filled()+M_Kdp.filled()
         qrr = lwccc/1.225
         qrr = np.ma.masked_less_equal(qrr,0.0)
 
+        print("Made through calculations, saving data")
         self.add_field((self.data[self.dz_name].dims,qrr,), 'rqr')
 
-    
+        print('saved data')
     def calc_rr_pol(self,band=None):
 
 #        import pydisdrometer as pyd
@@ -793,6 +823,22 @@ class RadarData(RadarConfig.RadarConfig):
                 a=azdrk_coeff=94.1082
                 b=bzdrk_coeff=0.9337
                 c=czdrk_coeff=-1.9350
+            else:
+                print('Specific rain rate coefficients not avialable for your project. Using MC3E')
+                k_c=35.77975
+                k_m=0.767
+
+                z_c=0.017850
+                z_m=0.6817
+            
+                azzdr_coeff=0.00463
+                bzzdr_coeff=0.9539
+                czzdr_coeff=-3.9243
+            
+                a=azdrk_coeff=96.8418
+                b=bzdrk_coeff=0.965216
+                c=czdrk_coeff=-1.9881
+                
         else:
             print ('Sorry, your wavelength has not been run yet! Return to first principles!')
             return
@@ -1210,13 +1256,15 @@ class RadarData(RadarConfig.RadarConfig):
 
 
         if z is None:
+            print('zin in 1258 is None. assuming 2')
             z_ind = 2
             
         else:
             if 'd' in self.data[self.z_name].dims:
-#                print('getting z-ind')
+                print('getting z-ind')
                 z_ind = self.get_ind(z,np.squeeze(self.data[self.z_name].sel(d=tmind).values))
             else:
+                print('no d, getting z_ind 1266, z ',z)
                 z_ind = self.get_ind(z,self.data[self.z_name].values)
 
 #        print('xlims 1203',xlim,tmind)
@@ -1336,6 +1384,8 @@ class RadarData(RadarConfig.RadarConfig):
             if contour == 'CS':
 #                print 'contours!'
                 #print(np.shape(self.data[self.cs_name].sel(d=ts,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values))
+                print('CS keys',self.cs_name,tmind,z_ind,xmini,xmaxi,ymini,ymaxi)
+                print(self.data[self.cs_name].dims)
                 csvals =np.squeeze(self.data[self.cs_name].sel(d=tmind,z=z_ind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
 #                 csvals = deepcopy(self.data[var].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind)).values)
 #                 csdats = deepcopy((self.data[self.cs_name].sel(d=slice(ts,ts+1),z=slice(z_ind,z_ind))))
@@ -2755,12 +2805,22 @@ class RadarData(RadarConfig.RadarConfig):
 
         lon_0 = self.lon_0
         lat_0 = self.lat_0
+    
 ####Bea little careful here. you need to make sure you are in the correct hemispheres
-
-        if self.lat_0 > 0:
-            p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=self.lon_0)) 
-        else:
-            p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}e +lon_1 = {n}e +lat_1={t}s +lat_2=60s +lat_0={t}s'.format(t=self.lat_0,n=self.lon_0)) 
+        print('lat / lon:',lat_0,lon_0)
+        p = Proj('+proj=lcc +lon_0={n} +lon_1 = {n} +lat_1={t} +lat_2={t} +lat_0={t}'.format(t=self.lat_0,n=self.lon_0)) 
+#         if self.lat_0 > 0:
+#             if self.lon_0 > 0:
+#                 p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}e +lon_1 = {n}e +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=self.lon_0)) 
+#             else:
+#                 print('trying lat lon')
+#                 lon_0 = np.abs(self.lon_0)
+#                 p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=lon_0)) 
+#         else:
+#             if self.lon_0 > 0:            
+#                 p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}e +lon_1 = {n}e +lat_1={t}s +lat_2=60s +lat_0={t}s'.format(t=self.lat_0,n=self.lon_0)) 
+#             else:
+#                 p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}s +lat_2=60s +lat_0={t}s'.format(t=self.lat_0,n=self.lon_0)) 
         xx, yy = np.meshgrid(self.data[self.x_name], self.data[self.y_name])
         lons, lats = p(xx*1000.,yy*1000.,inverse=True)
     
@@ -2811,6 +2871,7 @@ class RadarData(RadarConfig.RadarConfig):
             #print('zlev',zlev)
             #refl=np.squeeze(self.data[self.dz_name].sel(z=zlev,d=q)).values
             refl = np.nanmax(np.squeeze(self.data[self.dz_name].sel(d=q).values),axis=0)
+#            print('shape for shy:',np.shape(refl),np.shape(self.data[self.dz_name].values))
             if q==0:
                 self.refl = refl
 #            print ('refl shape',np.shape(refl))
