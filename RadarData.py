@@ -585,7 +585,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
    # Just a wrapper on the CSU radartools HID function
-    def set_hid(self, band=None, use_temp=False, name='HID',zthresh = -9999.0):
+    def set_hid(self, band=None, use_temp=False, name='HID',zthresh = -9999.0,return_scores=False):
         #        print zthresh
         #        print self.dz_name
         #       bad = self.data[self.dz_name].where(self.data[self.dz_name].values<zthresh)
