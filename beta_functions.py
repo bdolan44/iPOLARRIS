@@ -194,7 +194,7 @@ def get_mbf_sets_summer(use_temp=True, plot_flag=False, n_types=10,
 
     #Horizontal Reflectivity (Zh)
     fname = band + '-band_Reflectivity.csv'
-    print("beat functions",fdir, fname)
+    #print("beat functions",fdir, fname)
     Zh_set = get_beta_set(fdir+fname)
 
     #Differential Reflectivity (Zdr)

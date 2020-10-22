@@ -231,38 +231,41 @@ else:
 
     ################################################################################
     ##Next let's make quantile (50,90,99) plots of the vertical velocity. This splits it by up and down, but you can turn split_updn == False
-    fig,ax = plt.subplots(1,1,figsize=(10,10))
-    ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
-    ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
-    ax.set_xlabel('Vertical velocity m/s')
-    ax.set_title('Vertical velocity profiles')
-    plt.tight_layout()
-    plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-    plt.close()
+    if rdata.w_name is not None:
+        fig,ax = plt.subplots(1,1,figsize=(10,10))
+        ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
+        ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
+        ax.set_xlabel('Vertical velocity m/s')
+        ax.set_title('Vertical velocity profiles')
+        plt.tight_layout()
+        plt.savefig('{i}Quantile_vvel_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+        plt.close()
 
-    p99u,p90u,p50u,ht = rdata.percentile(wup=True)
-    p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
-    p99a,p90a,p50a,ht = rdata.percentile(wdown=False)
+        p99u,p90u,p50u,ht = rdata.percentile(wup=True)
+        p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
+        p99a,p90a,p50a,ht = rdata.percentile(wdown=False)
 
-    file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),'w') 
+        file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir'],e=rdata.exper,m=rdata.mphys),'w') 
  
-    file.write("Updraft\n") 
-    file.write("Height (km).    P99.    P90.     P50\n") 
-    for i,h in enumerate(ht):
-        file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99u[i],p2=p90u[i],p3=p50u[i])) 
+        file.write("Updraft\n") 
+        file.write("Height (km).    P99.    P90.     P50\n") 
+        for i,h in enumerate(ht):
+            file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99u[i],p2=p90u[i],p3=p50u[i])) 
 
-    file.write("Downdraft\n") 
-    file.write("Height (km).    P99.    P90.     P50\n") 
-    for i,h in enumerate(ht):
-        file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
+        file.write("Downdraft\n") 
+        file.write("Height (km).    P99.    P90.     P50\n") 
+        for i,h in enumerate(ht):
+            file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99d[i],p2=p90d[i],p3=p50d[i])) 
 
-    file.write("ALL\n") 
-    file.write("Height (km).    P99.    P90.     P50\n") 
-    for i,h in enumerate(ht):
-        file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99a[i],p2=p90a[i],p3=p50a[i])) 
+        file.write("ALL\n") 
+        file.write("Height (km).    P99.    P90.     P50\n") 
+        for i,h in enumerate(ht):
+            file.write("{h}   {p1}   {p2}   {p3}\n".format(h=h,p1=p99a[i],p2=p90a[i],p3=p50a[i])) 
 
 
-    file.close()
+        file.close()
+    else:
+        print("No vertical velocity data.")
     ################################################################################
 
     ################################################################################

@@ -190,6 +190,7 @@ def conv_strat_latlon(dbz, lat2d, lon2d, CoreThresh=42.0, method='SYH', a=8, b=6
 
     # not sure how this is gonna work with nans?
     #print 'shape sm_rad',sm_rad,np.shape(zlin)
+#    print('shy shape:',np.shape(zlin),sm_rad)
     bkgnd_lin = ndi.median_filter(zlin, size=(sm_rad, sm_rad), mode='nearest')
 #    bkgnd_lin = ndi.gaussian_filter(zlin, (sm_rad, sm_rad))
 

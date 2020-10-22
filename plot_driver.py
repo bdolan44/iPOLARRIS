@@ -782,10 +782,10 @@ def make_single_pplots(rdat,flags,config,y=None):
         axf = ax.flatten()
 
         if config['wname'] in rdat.data.variables.keys():
-            rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-        rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
+            dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
+        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
         plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
@@ -796,10 +796,10 @@ def make_single_pplots(rdat,flags,config,y=None):
             axf = ax.flatten()
 
             if config['wname'] in rdat.data.variables.keys():
-                rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
-            rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
-            rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
-            rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
+                dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
+            dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
+            dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
+            dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
             extrahold = config['extrax']
             config['extrax']='{e}_convective'.format(e=extrahold)
             plt.tight_layout()
@@ -811,10 +811,10 @@ def make_single_pplots(rdat,flags,config,y=None):
             fig, ax = plt.subplots(2,2,figsize=(18,12))
             axf = ax.flatten()
             if config['wname'] in rdat.data.variables.keys():
-                rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
-            rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
-            rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
-            rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
+                dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
+            dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
+            dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
+            dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
             extrahold = config['extrax']
             config['extrax']='{e}_stratiform'.format(e=extrahold)
             plt.tight_layout()
@@ -968,8 +968,10 @@ def make_single_pplots(rdat,flags,config,y=None):
             #y=-12.5
             print ("xsec_multi")
             if config['xsec_multi'] == True:
-                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
-    
+                if rdat.w_name is not None:
+                    fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+                else:
+                    fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
                 #plt.tight_layout()
                 nvars = len(eval(config['rhi_vars']))
                 if nvars <=6:
@@ -1314,13 +1316,13 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
     # plot the CFAD
     cfad_ma = np.ma.masked_where(cfad==0, cfad)
-    print('CFAD shape',np.shape(cfad_ma))
+    #print('CFAD shape',np.shape(cfad_ma))
 
     if cont is True:
         levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
         cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
-            print(np.shape(cfad_ma),np.shape(hts),'ln 1283')
+            #print(np.shape(cfad_ma),np.shape(hts),'ln 1283')
             pc = ax.contourf(vbins[0:-1],hts,cfad_ma,levs,colors=cols,extend = 'both')
         except Exception as e:
             print( 'Can not plot with exception {e}'.format(e=e))
