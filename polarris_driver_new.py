@@ -120,7 +120,18 @@ def find_snd_match(config):
 def foo(s1):
     return '{}'.format(s1.rstrip())
 
+def reduce_dim(ds):    
+    t1= ds['time'][0].values
 
+    for v in ds.data_vars.keys():
+        try:
+            ds[v]=ds[v].sel(time=t1).drop('time')
+        except ValueError as e:
+            pass
+#            print(e)
+#            print(v)
+    return(ds)
+    
 from matplotlib.dates import DateFormatter,HourLocator
 dayFormatter = DateFormatter('%H%M')      # e.g., 12
 hourFormatter = DateFormatter('%H')      # e.g., 12
@@ -187,7 +198,7 @@ def polarris_driver(configfile):
         rvar = xr.concat((rvar1,rvar2),dim='d')
         rfiles =list(np.append(rf1,rf2))
     else:
-        rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d')
+        rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
     try:
         rvar = rvar.rename({'x0':'x'})
         rvar = rvar.rename({'y0':'y'})
