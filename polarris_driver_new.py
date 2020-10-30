@@ -120,9 +120,12 @@ def find_snd_match(config):
 def foo(s1):
     return '{}'.format(s1.rstrip())
 
-def reduce_dim(ds):    
-    t1= ds['time'][0].values
-
+def reduce_dim(ds):
+    try:
+        t1= ds['time'][0].values
+    except KeyError as ke:
+        print(f"{ke} skipping preprocessing")
+        return(ds)
     for v in ds.data_vars.keys():
         try:
             ds[v]=ds[v].sel(time=t1).drop('time')
