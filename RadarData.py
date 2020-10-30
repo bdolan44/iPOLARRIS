@@ -41,7 +41,8 @@ from tqdm import tqdm
 
 #import analysis_tools as AT
 #import lightning_tools as LT
-from CSU_RadarTools.csu_radartools import csu_fhc
+#from CSU_RadarTools.csu_radartools import csu_fhc
+import csu_fhc
 import general_tools as gentools
 import RadarConfig
 
