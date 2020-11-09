@@ -999,9 +999,11 @@ class RadarData(RadarConfig.RadarConfig):
                 zmin, zmax = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
                 zlim = [zmin,zmax]
                 if 'd' in self.data[self.z_name].dims:
+                    print('getting z mini, zmaxi')
                     zmini = self.get_ind(zlim[0],self.data[self.z_name].sel(d=tmind).values)
                     zmaxi = self.get_ind(zlim[1],self.data[self.z_name].sel(d=tmind).values)
                 else:
+                    print('d is not in dims')
                     zmini = self.get_ind(zlim[0],self.data[self.z_name].values)
                     zmaxi = self.get_ind(zlim[1],self.data[self.z_name].values)
             else:
@@ -1009,8 +1011,6 @@ class RadarData(RadarConfig.RadarConfig):
                 zmaxi = zlim[1]
             xmin, xmax = xlim
             zmin, zmax = zlim
-            print('xmin,xmax',xmini,xmaxi)
-            print('zmin,zmax',zmini,zmaxi)
             # now actually doing the plotting
 
             #print self.data[self.x_name].shape, self.data[self.z_name].shape, self.data[var][:,y_ind,:].shape
@@ -1027,7 +1027,6 @@ class RadarData(RadarConfig.RadarConfig):
                 data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y_ind,x=slice(xmini,xmaxi)))
             else:
                 data = (self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y,x=slice(xlim[0],xlim[1])).values)
-                print('1027',np.shape(data),xmini,xmaxi,y_ind,tmind,np.shape(self.data[var]))
     #         if np.shape(data) > 2:
     #             data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi)).data)
 
@@ -1051,7 +1050,6 @@ class RadarData(RadarConfig.RadarConfig):
                 zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
             data = np.ma.masked_less(data,-900.0)
             data = np.ma.masked_where(~np.isfinite(data),data)
-            print('1046',np.shape(data))
     #        print np.shape(data)
             #print np.shape(data),np.shape(xdat),np.shape(zdat)
             #print np.shape(xdat),np.shape(zdat)
@@ -1164,7 +1162,10 @@ class RadarData(RadarConfig.RadarConfig):
                 xmini, xmaxi = xlim
         if zlim is None:
             print("trying to get Z limits",self.data[self.z_name].values.min(),self.data[self.z_name].values.max())
-            zmini, zmaxi = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
+            zmini = 0
+            zmaxi = -1
+            
+  #          zmini, zmaxi = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
             zlim = [zmini,zmaxi]
         else:
             zmini = zlim[0]
