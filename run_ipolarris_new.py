@@ -113,12 +113,12 @@ else:
             try:
                 whz = np.where(rdata.data[rdata.z_name].sel(d=i).values==config['z'])[0][0]
             except IndexError as ie:
-                print('checking z...',rdata.data[rdata.z_name].sel(d=i).values)
-                whz = np.where(np.isclose(rdata.data[rdata.z_name].sel(d=i).values,config['z'],rtol=0.5))[0][0]
+                #print('checking z...',rdata.data[rdata.z_name].sel(d=i).values)
+                zdiffs = np.median(np.diff(rdata.data[rdata.z_name].values))
+                whz = np.where(np.isclose(rdata.data[rdata.z_name].sel(d=i).values,config['z'],rtol=zdiffs))[0][0]
                 
         else:
             whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-        print("WHZ in run_ipolarris 120:",whz,config['z'])
         rdata.cappi(rdata.dz_name,z=whz,ts=d,contour='CS',ax=ax)
         ax.set_title('CAPPI DZ {t:%Y%m%d_%M%H%S} {h} km'.format(t=d,h=rdata.data['z'].values[whz]))
         ax.set_xlim(config['xlim'][0],config['xlim'][1])
