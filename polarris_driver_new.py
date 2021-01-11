@@ -201,7 +201,13 @@ def polarris_driver(configfile):
         rvar = xr.concat((rvar1,rvar2),dim='d')
         rfiles =list(np.append(rf1,rf2))
     else:
-        rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
+#        rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d')#coords=['x','y','z'],data_vars=['zhh01','zdr01'])#,preprocess=reduce_dim)
+        try:
+            rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
+        except ValueError as ve:
+            print(ve, "trying nesting")
+            rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)#coords=['x','y','z'],data_vars=['zhh01','zdr01'])#,preprocess=reduce_dim)
+            
     try:
         rvar = rvar.rename({'x0':'x'})
         rvar = rvar.rename({'y0':'y'})
@@ -231,7 +237,7 @@ def polarris_driver(configfile):
 
     tm = []
     for d in rfiles:
-        #print d
+        print(d)
         dformat = config['wdate_format']
         base = os.path.basename(d)
         radcdate=np.str(base[config['time_parse'][0]:config['time_parse'][1]])
