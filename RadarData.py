@@ -995,6 +995,9 @@ class RadarData(RadarConfig.RadarConfig):
                             xmaxi = self.get_ind(xlim[1],self.data[self.x_name].values)
                 else:
                     xmini, xmaxi = xlim
+
+
+
             if zlim is None:
                 zmin, zmax = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
                 zlim = [zmin,zmax]
@@ -1012,6 +1015,15 @@ class RadarData(RadarConfig.RadarConfig):
             xmin, xmax = xlim
             zmin, zmax = zlim
             # now actually doing the plotting
+            ##Adding this here because if the x and y are in reverse order, the indices do not work with the slice.
+#             ylimtest = [ymin,ymax]
+#             #when these are negative latitudes, then the 0th value is > the 1st value
+#             ymin,ymax = [np.min(ylimtest),np.max(ylimtest)]
+
+            ##Adding this here because if the x and y are in reverse order, the indices do not work with the slice.
+            xlimtest = [xmini,xmaxi]
+            #when these are negative latitudes, then the 0th value is > the 1st value
+            xmini,xmaxi = [np.min(xlimtest),np.max(xlimtest)]
 
             #print self.data[self.x_name].shape, self.data[self.z_name].shape, self.data[var][:,y_ind,:].shape
             #print self.data[self.z_name]
@@ -1038,7 +1050,7 @@ class RadarData(RadarConfig.RadarConfig):
                     xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
                     
             else:
-                if 'd' is self.data[self.x_name].dims:
+                if 'd' in self.data[self.x_name].dims:
                     xdat = np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi)))
                 else:
                     xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)))
@@ -1050,8 +1062,7 @@ class RadarData(RadarConfig.RadarConfig):
                 zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
             data = np.ma.masked_less(data,-900.0)
             data = np.ma.masked_where(~np.isfinite(data),data)
-    #        print np.shape(data)
-            #print np.shape(data),np.shape(xdat),np.shape(zdat)
+            print (np.shape(data),np.shape(xdat),np.shape(zdat),'ln 1053')
             #print np.shape(xdat),np.shape(zdat)
     #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
             if var in self.lims.keys():
@@ -1262,7 +1273,6 @@ class RadarData(RadarConfig.RadarConfig):
             except IndexError as e:
                 tmind = np.where(np.array(self.date)==ts)[0]
 
-
         if z is None:
             print('zin in 1258 is None. assuming 2')
             z_ind = 2
@@ -1280,7 +1290,9 @@ class RadarData(RadarConfig.RadarConfig):
  #       print('xlim is',xlim)
         if xlim is None:
             xmint, xmaxt = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
-            xlim = [xmint,xmaxt]
+            xlimtest = [xmint,xmaxt]
+            #when these are negative latitudes, then the 0th value is > the 1st value
+            xlim = [np.min(xlimtest),np.max(xlimtest)]
         if self.x_name == 'longitude':
             if 'd' in self.data[self.x_name].dims:
                 if 'y' in self.data[self.x_name].dims:
@@ -1298,11 +1310,16 @@ class RadarData(RadarConfig.RadarConfig):
                     xmini = self.get_ind(xlim[0],self.data[self.x_name].values)
                     xmaxi = self.get_ind(xlim[1],self.data[self.x_name].values)
         else:
-            xmini, xmaxi = xlim
+            xmini = np.min(xlim)
+            xmaxi = np.max(xlim)
         
         xmin, xmax = xlim
 
         if ylim is None:
+            ymint, ymaxt = self.data[self.y_name].values.min(), self.data[self.y_name].values.max()
+            ylimtest = [ymint,ymaxt]
+            #when these are negative latitudes, then the 0th value is > the 1st value
+            ylim = [np.min(ylimtest),np.max(ylimtest)]
  #           print 'ylim is None!'
             if self.y_name == 'latitude':
                 ymint, ymaxt = self.data[self.y_name].values.min(), self.data[self.y_name].values.max()
@@ -1314,18 +1331,26 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 ymini, ymaxi = self.data[self.y_name].values.min(), self.data[self.y_name].values.max()
         else:
-            if self.y_name == 'latitude':
-#                print 'trying to get indices'
                 ymini = self.get_ind(ylim[0],self.data[self.y_name].sel(d=tmind).values[:,0])
                 ymaxi = self.get_ind(ylim[1],self.data[self.y_name].sel(d=tmind).values[:,0])
                 ymin = ylim[0]
                 ymax = ylim[1]
 
-            else:
-                ymini, ymaxi = ylim
-                ymin = ylim[0]
-                ymax = ylim[1]
-             
+ #            else:
+#                 
+#                 ymini, ymaxi = ylim
+#                 ymin = ylim[0]
+#                 ymax = ylim[1]
+#              
+        ##Adding this here because if the x and y are in reverse order, the indices do not work with the slice.
+        ylimtest = [ymini,ymaxi]
+        #when these are negative latitudes, then the 0th value is > the 1st value
+        ymini,ymaxi = [np.min(ylimtest),np.max(ylimtest)]
+
+        ##Adding this here because if the x and y are in reverse order, the indices do not work with the slice.
+        xlimtest = [xmini,xmaxi]
+        #when these are negative latitudes, then the 0th value is > the 1st value
+        xmini,xmaxi = [np.min(xlimtest),np.max(xlimtest)]
 #        ts=self.date
         tsi = 0
 
@@ -1341,7 +1366,9 @@ class RadarData(RadarConfig.RadarConfig):
 #        print(xmini,xmaxi,ymini,ymaxi)
 #        print('tmind 1264',tmind,z_ind)
 #        print('1325',self.data.keys(),var)
-        z_ind=self.get_ind(z,self.data[self.z_name])
+        
+        ###COMMENTING OUT FOR GCE. LET'S SEE WHAT HAPPENS. BD 1/11/2021
+        #z_ind=self.get_ind(z,self.data[self.z_name])
         data = np.squeeze(self.data[var].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
         if np.ndim(data) == 3:
             data = np.squeeze(self.data[var].sel(d=tmind,z=slice(z_ind,z_ind),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
@@ -1356,10 +1383,10 @@ class RadarData(RadarConfig.RadarConfig):
 #         if len(np.shape(data)) > 2:
 # #            print 'data shape is wrong!',np.shape(data)
 #             data = data[0,...]
+        
         if 'd' in self.data[self.x_name].dims:
             xdat = np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
             ydat = np.squeeze(self.data[self.y_name].sel(d=tmind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
-#            print(xdat,ydat,'y anx x')
         else:
             xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)).values)#,y=slice(ymini,ymaxi)).values)
             ydat = np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi)).values)
@@ -1372,7 +1399,6 @@ class RadarData(RadarConfig.RadarConfig):
 #        print 'about to do plotting, ln 1113'
         if var in self.lims.keys():
             range_lim = self.lims[var][1] - self.lims[var][0]
-  #          print np.shape(data), np.shape(xdat),np.shape(ydat)
 #            print 'in var',var
             #print **kwargs
             #print(np.min(xdat),np.min(ydat),np.shape(data),np.max(data))

@@ -119,6 +119,7 @@ else:
                 
         else:
             whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
+        print('whz in run 122',whz)
         rdata.cappi(rdata.dz_name,z=whz,ts=d,contour='CS',ax=ax)
         ax.set_title('CAPPI DZ {t:%Y%m%d_%M%H%S} {h} km'.format(t=d,h=rdata.data['z'].values[whz]))
         ax.set_xlim(config['xlim'][0],config['xlim'][1])
