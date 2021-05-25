@@ -15,6 +15,7 @@ dr_name == ZDR                      ==#Name of the differential reflectivity fie
 kd_name == KDP                      ==#Name of the Kdp field
 rh_name == RHO                      ==#Name of the RhoHV field
 rr_name == RR                       ==#Name of the Rain rate / precipitation field
+vr_name == VR 		           ==
 t_name == T                        ==#Name of the temperature field
 uname == U                         ==#Name of the zonal wind field
 vname == V                         ==#Name of the meridional wind field
