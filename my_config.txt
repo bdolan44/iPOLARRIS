@@ -19,6 +19,7 @@ t_name == T                        ==#Name of the temperature field
 uname == U                         ==#Name of the zonal wind field
 vname == V                         ==#Name of the meridional wind field
 wname == Wvar                         ==#Name of the vertical wind field
+convname == None 		      ==
 xname == x                            ==#Name of the zonal directional variable
 yname == y                            ==#Name of the meridional directional variables
 zname == z                            ==#Name of the vertical level field
