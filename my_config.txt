@@ -110,4 +110,5 @@ comb_vicr == True                       ==# Combine VI with CR for plotting.
 cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
 cappi_vectres == 5               ==#Defined the vector skip for cappi plots.
 rhi_vectres == [6,2]             ==#Defines the [x,z] skip for rhi plots
+drop_vars == False		==#
 #
