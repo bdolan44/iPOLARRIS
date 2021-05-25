@@ -124,7 +124,7 @@ def reduce_dim(ds):
     try:
         t1= ds['time'][0].values
     except KeyError as ke:
-        print(f"{ke} skipping preprocessing")
+        #print(f"{ke} skipping preprocessing")
         return(ds)
     for v in ds.data_vars.keys():
         try:
