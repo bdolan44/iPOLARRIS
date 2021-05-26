@@ -1106,7 +1106,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
 def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=-50):
     if split_updn == True:
         
-        pdat=data.load()
+        pdat=data.load().copy()
         pdat.values[pdat.values<-100] = np.nan
         
         wup = pdat.where(data>0)
@@ -1125,7 +1125,7 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
         ax.legend(loc='best')
 
     else:
-        pdat =data.load()
+        pdat =data.load().copy()
         pdat.values[pdat.values<thresh] = np.nan
         
     
