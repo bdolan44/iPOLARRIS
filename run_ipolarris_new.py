@@ -101,7 +101,7 @@ else:
         maxlat = config['ylim'][1]
         minlon = config['xlim'][0]
         maxlon = config['xlim'][1]
-        ax.set_extent([minlon, maxlon, minlat,maxlat])
+        #ax.set_extent([minlon, maxlon, minlat,maxlat])
 
         plt.tight_layout()
         plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
