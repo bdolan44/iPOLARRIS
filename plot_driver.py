@@ -1047,7 +1047,7 @@ def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zl
 
     ax.xaxis.set_major_formatter(hourFormatter)
     ax.xaxis.set_major_locator(HourLocator(interval=1))
-    d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+    #d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
     ax.set_xlabel('Time (UTC)')
 
     return ax#,adat,cdat,sdat
