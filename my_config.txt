@@ -1,5 +1,5 @@
 ###############Set up variable names and how to read the data###############
-extrax = antho ==
+extrax == antho ==
 extra == 'antho' ==#This will be appended to all output files as an identifier.
 date == '20151203'                   ==#This is the date of the case
 ptype == 'png'                        ==#This is the type of output images
@@ -15,7 +15,7 @@ dz_name == REF                      ==#Name of the reflectivity field
 dr_name == ZDR                      ==#Name of the differential reflectivity field
 kd_name == KDP                      ==#Name of the Kdp field
 rh_name == RHO                      ==#Name of the RhoHV field
-rr_name == RR                       ==#Name of the Rain rate / precipitation field
+rr_name == None                       ==#Name of the Rain rate / precipitation field
 vr_name == VEL 		           ==
 t_name == T                        ==#Name of the temperature field
 uname == None                         ==#Name of the zonal wind field
@@ -106,7 +106,7 @@ y==10.                                 ==#Lat of the y cross-section for RHI
 #xlim == [-99,-95.5]                     ==#lat / lon zoom for CAPPIS
 #ylim == [35.0,37.5]                     ==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
-z == 2.0                                ==#Height of the CAPPIs
+z == 2.5                                ==#Height of the CAPPIs
 cvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
 rvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
 skip == 2                                  ==#Number of vectors to skip for the vector plots.
