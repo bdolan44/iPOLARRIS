@@ -1,6 +1,6 @@
 ###############Set up variable names and how to read the data###############
-extrax == antho 		    ==
-extra == 'antho'                      ==#This will be appended to all output files as an identifier.
+extrax = antho ==
+extra == 'antho' ==#This will be appended to all output files as an identifier.
 date == '20151203'                   ==#This is the date of the case
 ptype == 'png'                        ==#This is the type of output images
 image_dir == r'./iPOLARRIS_images_test/' ==   #Image directory (output)
@@ -36,8 +36,8 @@ trange == np.arange(20,-60,-5)        ==#Range of thresholds for plotting temper
 doff == 4                             ==#offset for date timestamp in radar filename
 rdadd == 19                           ==#number of characteric in timestamp on radar file.
 time_parse==[4,19]              ==#more time formatting.
-etime == datetime.datetime(2015,12,03,00,00)      ==#end of analysis time of interest
-stime == datetime.datetime(2015,12,03,01,00)    ==#start time of analysis of interest
+stime == datetime.datetime(2015,12,03,00,00)    ==#start time of analysis of interest
+etime == datetime.datetime(2015,12,03,01,00)      ==#end of analysis time of interest
 cs_z == 2.0                         ==#Level to determine Convective / stratiform designation.
 zconv == 40                         ==#Zconv threshold in raintyping algorithm.
 conv_types == ['ISO_CONV_CORE','CONVECTIVE','ISO_CS_CORE']      ==#Which Powell et al. types to consider in convective CFADS
