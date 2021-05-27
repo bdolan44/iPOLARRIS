@@ -93,7 +93,7 @@ else:
     print('In run_ipolarris...running the COMPOSITE figs.')
     for i,d in enumerate(np.array(rdata.date)):
         print('plotting composites by time....')
-        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
+        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False)
         print('made composite')
         rtimematch = d
         ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name))
