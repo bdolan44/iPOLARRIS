@@ -2035,6 +2035,7 @@ class RadarData(RadarConfig.RadarConfig):
 #             tei = self.get_ind(te,np.array(self.date))
 # 
 #        print 'cscfad',cscfad
+
         if cscfad == 'convective':
             #mask = np.where(self.raintype != 2)
            mask= np.where(self.raintype != 2)
@@ -2050,7 +2051,10 @@ class RadarData(RadarConfig.RadarConfig):
            mask = np.where(self.raintype > 100)
      #      print('entering deep copy')
            holddat = deepcopy(self.data[var].values)
-           self.data[var].values[mask] = np.nan
+           holddat2 = deepcopy(self.data[var].values)
+           holddat2[mask] = np.nan
+           #self.data[var].values[mask] = np.nan
+           self.data[var].values = holddat2
         #print('ready to go in loop!')
         # if left blank, check the whole thing
         for ivl, vl in (enumerate(tqdm(looped[:-1]))):
