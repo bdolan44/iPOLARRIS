@@ -601,8 +601,7 @@ class RadarData(RadarConfig.RadarConfig):
         scores=[]
         print ("Unfortunately need to run HID by time")
         for v in tqdm(range(len(self.data[self.dz_name]))):
-            dzhold =self.data[self.dz_name].values
-#            dzhold =np.squeeze(self.data[self.dz_name].sel(d=v)).values
+            dzhold =np.squeeze(self.data[self.dz_name].sel(d=v)).values
 #             drhold =np.squeeze(self.data[self.zdr_name].sel(d=v)).values
 #             kdhold = np.squeeze(self.data[self.kdp_name].sel(d=v)).values
 #             rhhold = np.squeeze(self.data[self.rho_name].sel(d=v)).values
