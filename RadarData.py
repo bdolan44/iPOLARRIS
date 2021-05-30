@@ -609,7 +609,6 @@ class RadarData(RadarConfig.RadarConfig):
             if use_temp and hasattr(self, 'T'):
                #print ('Using T!')
                tdum = self.T[v,...]
-#               print('shape tdum',type(tdum))
                
                #print(type(tdum),'tdum is')
                #print('T:',np.shape(tdum))
@@ -621,7 +620,9 @@ class RadarData(RadarConfig.RadarConfig):
 #            scores.append(scoresdum)
             #hiddum = np.argmax(scoresdum,axis=0)+1
 #            print(np.shape(tdum),'tdum')
-            whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
+            #whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
+            if tdum == None: whbad = np.where(np.logical_and(hiddum == 1,tdum == None))
+            else: np.where(np.logical_and(hiddum == 1,tdum < -5.0))
             dzmask = np.where(np.isnan(dzhold))
             hiddum[whbad] = -1
             hiddum = np.array(hiddum,dtype='float64')
