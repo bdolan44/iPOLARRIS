@@ -124,7 +124,7 @@ def reduce_dim(ds):
     try:
         t1= ds['time'][0].values
     except KeyError as ke:
-        print(f"{ke} skipping preprocessing")
+        #print(f"{ke} skipping preprocessing")
         return(ds)
     for v in ds.data_vars.keys():
         try:
@@ -207,6 +207,7 @@ def polarris_driver(configfile):
 #        except ValueError as ve:
             print("trying nesting")
             rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
+            #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
     try:
         rvar = rvar.rename({'x0':'x'})
         rvar = rvar.rename({'y0':'y'})
@@ -214,7 +215,6 @@ def polarris_driver(configfile):
     except:
         print('Dims do not need renaming')
     print('Current dimensions:',rvar.dims)
-
     if drop_vars == True:
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])

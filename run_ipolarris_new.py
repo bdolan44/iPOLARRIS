@@ -93,7 +93,7 @@ else:
     print('In run_ipolarris...running the COMPOSITE figs.')
     for i,d in enumerate(np.array(rdata.date)):
         print('plotting composites by time....')
-        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
+        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False)
         print('made composite')
         rtimematch = d
         ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name))
@@ -101,7 +101,7 @@ else:
         maxlat = config['ylim'][1]
         minlon = config['xlim'][0]
         maxlon = config['xlim'][1]
-        ax.set_extent([minlon, maxlon, minlat,maxlat])
+        #ax.set_extent([minlon, maxlon, minlat,maxlat])
 
         plt.tight_layout()
         plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)

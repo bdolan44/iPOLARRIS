@@ -609,7 +609,6 @@ class RadarData(RadarConfig.RadarConfig):
             if use_temp and hasattr(self, 'T'):
                #print ('Using T!')
                tdum = self.T[v,...]
-#               print('shape tdum',type(tdum))
                
                #print(type(tdum),'tdum is')
                #print('T:',np.shape(tdum))
@@ -621,7 +620,9 @@ class RadarData(RadarConfig.RadarConfig):
 #            scores.append(scoresdum)
             #hiddum = np.argmax(scoresdum,axis=0)+1
 #            print(np.shape(tdum),'tdum')
-            whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
+            #whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
+            if tdum == None: whbad = np.where(np.logical_and(hiddum == 1,tdum == None))
+            else: np.where(np.logical_and(hiddum == 1,tdum < -5.0))
             dzmask = np.where(np.isnan(dzhold))
             hiddum[whbad] = -1
             hiddum = np.array(hiddum,dtype='float64')
@@ -2035,6 +2036,7 @@ class RadarData(RadarConfig.RadarConfig):
 #             tei = self.get_ind(te,np.array(self.date))
 # 
 #        print 'cscfad',cscfad
+
         if cscfad == 'convective':
             #mask = np.where(self.raintype != 2)
            mask= np.where(self.raintype != 2)
@@ -2050,7 +2052,10 @@ class RadarData(RadarConfig.RadarConfig):
            mask = np.where(self.raintype > 100)
      #      print('entering deep copy')
            holddat = deepcopy(self.data[var].values)
-           self.data[var].values[mask] = np.nan
+           holddat2 = deepcopy(self.data[var].values)
+           holddat2[mask] = np.nan
+           #self.data[var].values[mask] = np.nan
+           self.data[var].values = holddat2
         #print('ready to go in loop!')
         # if left blank, check the whole thing
         for ivl, vl in (enumerate(tqdm(looped[:-1]))):
