@@ -21,7 +21,7 @@ ptype == 'png' == # Output figure file extenstion (i.e. .png, .jpg, ...)
 #--------------------------
 #------ Output Flags ------
 #--------------------------
-plot_int == True == # FA) Turn on plotting of integrated parameters over the whole time frame
+plot_int == False == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs == False == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
 cfad_mpanel_flag == False == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
@@ -101,7 +101,7 @@ t_name == T                        ==#Name of the temperature field
 uname == None                         ==#Name of the zonal wind field
 vname == None                         ==#Name of the meridional wind field
 wname == None                         ==#Name of the vertical wind field
-convname == None 		      ==
+convname == None 		      ==#Name of 
 xname == x                            ==#Name of the zonal directional variable
 yname == y                            ==#Name of the meridional directional variables
 zname == z                            ==#Name of the vertical level field
