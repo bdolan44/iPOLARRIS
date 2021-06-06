@@ -1,40 +1,41 @@
-import numpy as np
-import os
+#===================================================
+#============== RUN_IPOLARRIS_NEW.PY ===============
+#===================================================
+
+# Import core Python packages
+from collections import OrderedDict
+import datetime
 import glob
-from netCDF4 import Dataset
 import matplotlib
 matplotlib.use('Agg')
+from netCDF4 import Dataset
+import numpy as np
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
-import xarray as xr
-
-import numpy as np
-
-import RadarData
-import datetime
-
-import RadarConfig
-import plot_driver
-#from polarris_config import run_exper
-#from polarris_config import get_data
+import sys
 import warnings
 warnings.filterwarnings('ignore')
+import xarray as xr
+
+# Import iPOLARRIS functions
 import GeneralFunctions as GF
-from skewPy import SkewT
-from collections import OrderedDict
 from polarris_driver_new import polarris_driver
-import os
-import sys
+import plot_driver
+import RadarData
+import RadarConfig
+from skewPy import SkewT
 
+#--------------- Main Program ----------------
 
-configfile = sys.argv[1:]
+configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
 #config['image_dir'] ='./'
-print(config['extrax'],'EXTRA 1 is')
-#########################################
+#print(config['extrax'],'EXTRA 1 is')
 
+# If a second argument is passed for WRF config file, produce a bunch of comparison plots!
 if sys.argv[2:]:
     configfile1 = sys.argv[2:]
     rdata2, config2 = polarris_driver(configfile1)
