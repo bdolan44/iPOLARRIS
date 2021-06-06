@@ -5,8 +5,9 @@ Released: May 2017
 Last Modified: June 2021
 bdolan@atmos.colostate.edu
 """
-import datetime
 from __future__ import print_function
+
+import datetime
 import glob
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
