@@ -1,21 +1,23 @@
 """
-This is the configruation file for setting up iPOLARRIS. Herein, the speicifcs of the dataset need to be defined such as the experiment, location and type of reading, etc.
-Written by Brenda Dolan
-May 2017
+This is the configruation file for setting up iPOLARRIS. Herein, the specifics of the dataset need to be defined such as the experiment, location and type of reading, etc.
+Written by Brenda Dolan (CSU) and Anthony Di Stefano (UBC)
+Released: May 2017
+Last Modified: June 2021
 bdolan@atmos.colostate.edu
 """
+import datetime
 from __future__ import print_function
 import glob
-import os
-import sys
-import re
-from netCDF4 import Dataset
-import pandas as pd
-import xarray as xr
-import RadarData
-import datetime
 import matplotlib.pyplot as plt
+from netCDF4 import Dataset
 import numpy as np
+import os
+import pandas as pd
+import re
+import sys
+import xarray as xr
+
+import RadarData
 import GeneralFunctions as GF
 import RadarConfig
 import plot_driver
@@ -146,8 +148,8 @@ def hasNumbers(inputString):
 
 def polarris_driver(configfile):
 
-    config = {}
-    print('ready to roll')
+    config = {} # Load variable for config file data
+    #print('ready to roll')
     with open(configfile[0]) as f:
         for line in f:
             #print line
@@ -231,8 +233,6 @@ def polarris_driver(configfile):
         print('matching sounding')
     else:
         smatch = None
-
-
 
     tm = []
     for d in rfiles:
