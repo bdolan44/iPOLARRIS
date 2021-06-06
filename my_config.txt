@@ -1,8 +1,9 @@
 #################### MY_CONFIG.TXT #################
-#
+
 #-------------------
 #------ Input ------
 #-------------------
+
 date == '20151203' == # Date of the case
 etime == datetime.datetime(2015,12,03,01,00) == # End time of analysis of interest
 extra == '' == # This will be appended to all output files as an identifier.
@@ -11,16 +12,18 @@ radar_files == './obs.txt' == # List of radar files to read in
 stime == datetime.datetime(2015,12,03,00,00) == # Start time of analysis of interest
 type == 'obs' == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 wdate_format == %Y%m%d_%H%M%S == # Format of the date/time in the radar file name
-#
+
 #--------------------
 #------ Output ------
 #--------------------
+
 image_dir == './iPOLARRIS_images_test/' == # Output figure directory
 ptype == 'png' == # Output figure file extenstion (i.e. .png, .jpg, ...)
-#
+
 #--------------------------
 #------ Output Flags ------
 #--------------------------
+
 plot_int == False == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs == False == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
@@ -38,20 +41,22 @@ cappi_multi == False == # FM)
 xsec_multi == False == # FN)
 plot_cs == False == # FO) Plot seperate Convective and stratiform CFADs
 ks == ['cfad_mpanel_flag','hid_cfad_flag','joint_flag','cfad_individ_flag','hid_prof','all_cappi','all_xsec','up_width','qr_cappi','qr_rhi'] == # FP) list of flags
-#
+
 #------------------------
 #------ Radar Info ------
 #------------------------
+
 alt == 354 == # Altitude of the radar
 band == S == # Radar band: X, C OR S. Note: needs to be capital letter.
 exper == 'KLGX' == # Radar location
 lat == 47.116806 == # Latitude of the radar station
 lon == -124.10625 == # Longitude of the radar station
 radarname == SPOL == # 
-#
+
 #------------------------
 #------ Radar File ------
 #------------------------
+
 doff == 4 == # Offset for date timestamp in radar filename
 dz_name == REF == # Name of the reflectivity field
 dr_name == ZDR == # Name of the differential reflectivity field
@@ -61,35 +66,38 @@ rh_name == RHO == # Name of the RhoHV field
 rr_name == None == # Name of the Rain rate / precipitation field
 time_parse == [4,19] == # More time formatting
 vr_name == VEL == # Name of radial velocity field
-#
+
 #-----------------------------
 #------ WRF Output File ------
 #-----------------------------
+
 mphys == obs == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
-#
+
 #--------------------------
 #------ Doppler File ------
 #--------------------------
+
 dd_on == False == # Set this to loop through separate dual-Doppler files (e.g. for obs)
-#
+
 dd_files == '/Users/bdolan/scratch/gitlab/iPOLARRIS/obs_TWP_dd_20060123.txt' == # Location of dual-Doppler files
 ddadd == 4 == # Number of characters in the timestamp
 ddate_format == %Y%m%d_%H%M == # Format for the dual-Doppler file date
 ddoff == 12 == # Offset for dual-Doppler timestamp in filename
 rdate_format == %Y%m%d_%H%M%S == # Format for the radar file date
-#
+
 #---------------------------
 #------ Sounding File ------
 #---------------------------
+
 snd_on == False == # Set this to loop through separate dual-Doppler files (e.g. for obs)
-#
+
 ad == config['date']+'_' == # Extra characters
 sdate_format == %Y%m%d%H == # Sounding file date format
 sfiles == '/Volumes/rawah/data/jib/MC3E_darwin_analysis/' == # Sounding file directory
 sstat == DWN == # Sounding station identification
-#
-#
-#
+
+
+
 #------------------------------------
 #------ Flags if type == 'wrf' ------
 #------------------------------------
