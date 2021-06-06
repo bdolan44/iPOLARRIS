@@ -36,6 +36,7 @@ rdata, config = polarris_driver(configfile)
 #print(config['extrax'],'EXTRA 1 is')
 
 # If a second argument is passed for WRF config file, produce a bunch of comparison plots!
+# More comments in this section TBD!
 if sys.argv[2:]:
     configfile1 = sys.argv[2:]
     rdata2, config2 = polarris_driver(configfile1)
@@ -87,8 +88,7 @@ else:
     ################################################################################
     ##Plot a composite reflectivity at a given time.
 
-
-    #tdate = datetime.datetime(2011,5,23,22,00)
+    # tdate = datetime.datetime(2011,5,23,22,00)
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
     print('In run_ipolarris...running the COMPOSITE figs.')
