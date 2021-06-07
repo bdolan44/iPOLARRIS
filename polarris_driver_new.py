@@ -192,7 +192,7 @@ def polarris_driver(configfile):
     #input()
 
     # =====
-    # (2) 
+    # (2) Find input radar files and concatenate the data. Rename x, y, z variables. 
     # =====
 
     print('Finding and concatenating radar files in '+config['radar_files']+'...')
@@ -226,11 +226,7 @@ def polarris_driver(configfile):
 #        except ValueError as ve:
         rfiles = glob.glob(config['radar_files']+"*")
         rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
-            #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
-    
-    time.sleep(3)
-    print('Radar files ready.\n')
-    input()
+        #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
 
     try:
         rvar = rvar.rename({'x0':'x'})
@@ -238,23 +234,19 @@ def polarris_driver(configfile):
         rvar = rvar.rename({'z0':'z'})
     except:
         print('Dims do not need renaming')
-    print('Current dimensions:',rvar.dims)
+    #print('Current dimensions:',rvar.dims)
+    
     if drop_vars == True:
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
-    lon_0 = config['lon']
-    lat_0 = config['lat']
+ 
+    time.sleep(3)
+    print('Radar files ready.\n')
+    input()
 
-    lat_r = config['lat']
-    lon_r = config['lon']
-
-    if config['snd_on'] == True:
-        smatch = find_snd_match(config)
-        #print("rfiles",rfiles[0])
-        sfile = smatch[rfiles[0]]
-        print('matching sounding')
-    else:
-        smatch = None
+    # =====
+    # (3)  
+    # =====
 
     tm = []
     for d in rfiles:
@@ -336,15 +328,17 @@ def polarris_driver(configfile):
         rvar[config['convname']] = (['d','z','y','x'],conv)
 
     print('sending data to RadarData!')
-    rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
-                                                  kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
-                                                  u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],
-                                                  rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=lat_r,lon_r=lon_r,
-                                                  y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=lat_0,lon_0=lon_0,
-                                                  exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
-                                                  z_thresh=0,conv_types =  config['conv_types'],
-                                                   strat_types = config['strat_types'])
-                                               
+    
+    rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'])
+
+    if config['snd_on'] == True:
+        smatch = find_snd_match(config)
+        #print("rfiles",rfiles[0])
+        sfile = smatch[rfiles[0]]
+        print('matching sounding')
+    else:
+        smatch = None
+                                          
     if smatch is not None:
         print ('Smatch',sfile)
         snd = SkewT.Sounding(sfile)
