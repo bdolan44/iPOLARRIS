@@ -17,6 +17,7 @@ import pandas as pd
 import re
 import sys
 import xarray as xr
+import time
 
 import RadarData
 import GeneralFunctions as GF
@@ -155,7 +156,7 @@ def polarris_driver(configfile):
 
     config = {} # Load variable for config file data
     #print('ready to roll')
-    print('Reading '+str(configfile[0])+'...')
+    print('\nReading '+str(configfile[0])+'...')
     with open(configfile[0]) as f:
         lines = [l for l in (line.strip() for line in f) if l] # NEW! Allow new lines in config file - can be skipped over!
         for line in lines: #f:
@@ -185,6 +186,8 @@ def polarris_driver(configfile):
                 else:
                     config[(key.replace(" ", ""))] = vval
     
+    time.sleep(3)
+    print('Read-in complete.\n')
     #print(config)
     #input()
 
@@ -192,13 +195,10 @@ def polarris_driver(configfile):
     # (2) 
     # =====
 
-    print(config['radar_files'])
+    print('Finding and concatenating radar files in '+config['radar_files']+'...')
     drop_vars=config['drop_vars']
     #with open(config['radar_files'], 'r') as f:
     #    rfiles = f.read().splitlines()
-    rfiles = glob.glob(config['radar_files']+"*")
-    print(rfiles)
-    input()
     
     print((config['exper']),(config['mphys']))
     if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
@@ -224,9 +224,14 @@ def polarris_driver(configfile):
 #            print('trying to read normally')
 #            rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim,combine='by_coords')
 #        except ValueError as ve:
-            print("trying nesting")
-            rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
+        rfiles = glob.glob(config['radar_files']+"*")
+        rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
             #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
+    
+    time.sleep(3)
+    print('Radar files ready.\n')
+    input()
+
     try:
         rvar = rvar.rename({'x0':'x'})
         rvar = rvar.rename({'y0':'y'})
