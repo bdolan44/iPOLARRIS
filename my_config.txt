@@ -8,7 +8,7 @@ date            == '20151203'                           == # Date of the case
 etime           == datetime.datetime(2015,12,03,01,00)  == # End time of analysis of interest
 extra           == ''                                   == # This will be appended to all output files as an identifier.
 extrax          == ''                                   == # This will be appended to all output files as an identifier.
-radar_files     == './obs.txt'                          == # List of radar files to read in
+radar_files     == '/Users/adistefano/rad/test/'        == # Input directory of radar files to read in
 stime           == datetime.datetime(2015,12,03,00,00)  == # Start time of analysis of interest
 type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 wdate_format    == %Y%m%d_%H%M%S                        == # Format of the date/time in the radar file name
@@ -124,8 +124,8 @@ conv_types == ['ISO_CONV_CORE','CONVECTIVE','ISO_CS_CORE']      ==#Which Powell 
 strat_types == ['WEAK_ECHO','STRATIFORM','ISO_CONV_FRINGE']     ==#Which Powell et al. types to consider in stratiform CFADS
 mixed_types == ['UNCERTAIN']                                    ==#Which types to not include in either convective or stratiform but will be considered in totals).
 zdr_offset == 0.6                    ==#Add any Zdr offset here. Value will be SUBTRACTED from the zdr values.
-mask_model == False		==
-drop_vars == False 		==
+mask_model == False ==
+drop_vars == False ==
 #
 #######Set up some variables related to the observations ###################
 ## lat/lon of the radar
