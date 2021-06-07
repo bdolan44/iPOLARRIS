@@ -242,20 +242,23 @@ def polarris_driver(configfile):
  
     time.sleep(3)
     print('Radar files ready.\n')
-    input()
 
     # =====
-    # (3)  
+    # (3) Get datetime objects from radar file names.
     # =====
 
     tm = []
     for d in rfiles:
-        print(d)
+        #print(d)
         dformat = config['wdate_format']
         base = os.path.basename(d)
         radcdate=np.str(base[config['time_parse'][0]:config['time_parse'][1]])
         date=datetime.datetime.strptime(radcdate,dformat)
         tm.append(date)
+
+    # =====
+    # (4) 
+    # =====
 
     if config['dd_on']==True:
         with open(config['dd_files'], 'r') as f:
@@ -328,7 +331,8 @@ def polarris_driver(configfile):
         rvar[config['convname']] = (['d','z','y','x'],conv)
 
     print('sending data to RadarData!')
-    
+    input()
+
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'])
 
     if config['snd_on'] == True:
