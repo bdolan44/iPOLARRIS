@@ -149,7 +149,10 @@ def hasNumbers(inputString):
 
 def polarris_driver(configfile):
 
+    # =====
     # (1) Read in config file line by line.
+    # =====
+
     config = {} # Load variable for config file data
     #print('ready to roll')
     print('Reading '+str(configfile[0])+'...')
@@ -181,12 +184,22 @@ def polarris_driver(configfile):
                             config[(key.replace(" ", ""))] = vval
                 else:
                     config[(key.replace(" ", ""))] = vval
-            
+    
+    #print(config)
+    #input()
+
+    # =====
+    # (2) 
+    # =====
+
     print(config['radar_files'])
     drop_vars=config['drop_vars']
-    with open(config['radar_files'], 'r') as f:
-        rfiles = f.read().splitlines()
-    #rfiles= glob.glob('*.nc')
+    #with open(config['radar_files'], 'r') as f:
+    #    rfiles = f.read().splitlines()
+    rfiles = glob.glob(config['radar_files']+"*")
+    print(rfiles)
+    input()
+    
     print((config['exper']),(config['mphys']))
     if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
