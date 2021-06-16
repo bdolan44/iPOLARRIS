@@ -5,12 +5,15 @@
 #-------------------
 
 date            == '20151203'                           == # Date of the case
+doff            == 5                                    == # Offset for date timestamp in radar filename
 etime           == datetime.datetime(2015,12,03,01,00)  == # End time of analysis of interest
 extra           == ''                                   == # This will be appended to all output files as an identifier.
 extrax          == ''                                   == # This will be appended to all output files as an identifier.
-radar_files     == '/Volumes/Scratch/radar_stuff/04_ipol_ready/'        == # Input directory of radar files to read in
+radar_files     == '/Volumes/Scratch/radar_stuff/04_ipol_ready/' == # Input directory of radar files to read in
+rdadd           == 20                                   == # Number of characters in timestamp on radar file.
 stime           == datetime.datetime(2015,12,03,00,00)  == # Start time of analysis of interest
-type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
+time_parse      == [5,20]                               == # More time formatting
+type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs+simulated)
 wdate_format    == %Y%m%d_%H%M%S                        == # Format of the date/time in the radar file name
 
 #--------------------
@@ -57,14 +60,11 @@ radarname   == SPOL         == #
 #------ Radar File ------
 #------------------------
 
-doff        == 5        == # Offset for date timestamp in radar filename
 dz_name     == REF      == # Name of the reflectivity field
 dr_name     == ZDR      == # Name of the differential reflectivity field
 kd_name     == KDP      == # Name of the Kdp field
-rdadd       == 20       == # Number of characters in timestamp on radar file.
 rh_name     == RHO      == # Name of the RhoHV field
 rr_name     == None     == # Name of the Rain rate / precipitation field
-time_parse  == [5,20]   == # More time formatting
 vr_name     == VEL      == # Name of radial velocity field
 
 #-----------------------------
@@ -74,27 +74,39 @@ vr_name     == VEL      == # Name of radial velocity field
 mphys   == obs  == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
 
 #--------------------------
-#------ Doppler File ------
+#------ Doppler Info ------
 #--------------------------
 
-dd_on           == False        == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on           == False             == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
-dd_files        == '/Users/bdolan/scratch/gitlab/iPOLARRIS/obs_TWP_dd_20060123.txt' == # Location of dual-Doppler files
-ddadd           == 4                == # Number of characters in the timestamp
-ddate_format    == %Y%m%d_%H%M      == # Format for the dual-Doppler file date
-ddoff           == 12               == # Offset for dual-Doppler timestamp in filename
+dd_files        == '/Volumes/Scratch/radar_stuff/05_dopvel_gridded/' == # Location of dual-Doppler files
+ddadd           == 25               == # Number of characters in the timestamp
+ddate_format    == %Y%m%d_%H%M%S    == # Format for the dual-Doppler file date
+ddoff           == 10               == # Offset for dual-Doppler timestamp in filename
 rdate_format    == %Y%m%d_%H%M%S    == # Format for the radar file date
+
+#---------------------------
+#------ Doppler File -------
+#---------------------------
+
+convname    == None                 == # Name of 
+uname       == eastward_wind        == # Name of the zonal wind field
+vname       == northward_wind       == # Name of the meridional wind field
+wname       == upward_air_velocity  == # Name of the vertical wind field
+xname       == x                    == # Name of the zonal directional variable
+yname       == y                    == # Name of the meridional directional variables
+zname       == z                    == # Name of the vertical level field
 
 #---------------------------
 #------ Sounding File ------
 #---------------------------
 
-snd_on          == False                == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 ad              == config['date']+'_'   == # Extra characters
 sdate_format    == %Y%m%d%H             == # Sounding file date format
-sfiles          == '/Volumes/rawah/data/jib/MC3E_darwin_analysis/' == # Sounding file directory
-sstat           == DWN                  == # Sounding station identification
+sfiles          == '/Volumes/Scratch/radar_stuff/06_soundings/' == # Sounding file directory
+sstat           == UIL                  == # Sounding station identification
 
 #------------------------------------
 #------ Flags if type == 'wrf' ------
@@ -104,13 +116,6 @@ convert_Tk_Tc   == False    == # Convert temperature in K to deg C
 #
 ###############Set up variable names and how to read the data###############
 t_name == T                        ==#Name of the temperature field
-uname == None                         ==#Name of the zonal wind field
-vname == None                         ==#Name of the meridional wind field
-wname == None                         ==#Name of the vertical wind field
-convname == None 		      ==#Name of 
-xname == x                            ==#Name of the zonal directional variable
-yname == y                            ==#Name of the meridional directional variables
-zname == z                            ==#Name of the vertical level field
 latname == lat			   ==
 lonname == lon 			   ==
 pol_on == True                        ==#Calculate the pol data such as HID and RR
