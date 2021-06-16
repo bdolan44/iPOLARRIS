@@ -83,15 +83,20 @@ def match_snd(rdate,sdates):
 
 def find_snd_match(config):
     rdum =[]
-    with open(config['radar_files']) as f: 
+    #with open(config['radar_files']) as f: 
     #    dum.append(foo(f.readline()))
     #    dum.append(foo(f.readline()))
 
-        for line in f:
-            dat = (line)
-            rdum.append(foo(dat))
+    #    for line in f:
+    #        dat = (line)
+    #        rdum.append(foo(dat))
     #print('sfiles:',config['sfiles'])
-    slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
+    rdum = glob.glob(config['radar_files']+'*')
+    #slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
+    slist = glob.glob(config['sfiles']+'*')
+    print(rdum)
+    print(slist)
+    input()
     sdates=[]
     for v,sname in enumerate(slist):
 
@@ -261,15 +266,15 @@ def polarris_driver(configfile):
     # =====
 
     if config['dd_on']==True:
-        with open(config['dd_files'], 'r') as f:
-            dfiles1 = f.read().splitlines()
+        #with open(config['dd_files'], 'r') as f:
+        #    dfiles1 = f.read().splitlines()
+        dfiles1 = glob.glob(config['dd_files']+"*")
         tmd = []
         for d in dfiles1:
             dformat = config['ddate_format']
             base = os.path.basename(d)
 #            print('dd base',base,config['ddoff'],config['ddadd'])
             radcdate = base[config['ddoff']:config['ddadd']]
-#            print (radcdate)
 #            print('dformat is',dformat,radcdate)
             if dformat == '%H%M':
             
@@ -285,7 +290,7 @@ def polarris_driver(configfile):
                 dat2=datetime.datetime.strptime(radcdate,dformat)
                 #dstart=datetime.datetime.strptime(config['date'],'%Y%m%d')
             tmd.append(dat2)
-        
+
         print('Matching Dual-Doppler')
         dmatch = find_dd_match(rfiles,dfiles1,tm,tmd)
         #print('dmatch is ',dmatch)
@@ -302,6 +307,10 @@ def polarris_driver(configfile):
 
         conv = np.zeros([rvar.dims['d'],rvar.dims['z'],rvar.dims['y'],rvar.dims['x']])
         conv.fill(np.nan)
+        
+        print(rvar.variables['x'])
+        print(dvar.variables['x'])
+        input()
         xsubmin = np.where(rvar.variables['x']==np.min(dvar.variables['x']))[0][0]
         xsubmax = np.where(rvar.variables['x']==np.max(dvar.variables['x']))[0][0]
 
@@ -330,8 +339,8 @@ def polarris_driver(configfile):
         rvar[config['vname']] = (['d','z','y','x'],vnew)
         rvar[config['convname']] = (['d','z','y','x'],conv)
 
-    print('sending data to RadarData!')
-    input()
+    print('Sending data to RadarData...')
+    #input()
 
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'])
 
