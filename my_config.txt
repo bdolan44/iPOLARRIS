@@ -8,7 +8,7 @@ date            == '20151203'                           == # Date of the case
 etime           == datetime.datetime(2015,12,03,01,00)  == # End time of analysis of interest
 extra           == ''                                   == # This will be appended to all output files as an identifier.
 extrax          == ''                                   == # This will be appended to all output files as an identifier.
-radar_files     == '/Users/adistefano/rad/test/'        == # Input directory of radar files to read in
+radar_files     == '/Volumes/Scratch/radar_stuff/04_ipol_ready/'        == # Input directory of radar files to read in
 stime           == datetime.datetime(2015,12,03,00,00)  == # Start time of analysis of interest
 type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 wdate_format    == %Y%m%d_%H%M%S                        == # Format of the date/time in the radar file name
@@ -57,14 +57,14 @@ radarname   == SPOL         == #
 #------ Radar File ------
 #------------------------
 
-doff        == 4        == # Offset for date timestamp in radar filename
+doff        == 5        == # Offset for date timestamp in radar filename
 dz_name     == REF      == # Name of the reflectivity field
 dr_name     == ZDR      == # Name of the differential reflectivity field
 kd_name     == KDP      == # Name of the Kdp field
-rdadd       == 19       == # Number of characters in timestamp on radar file.
+rdadd       == 20       == # Number of characters in timestamp on radar file.
 rh_name     == RHO      == # Name of the RhoHV field
 rr_name     == None     == # Name of the Rain rate / precipitation field
-time_parse  == [4,19]   == # More time formatting
+time_parse  == [5,20]   == # More time formatting
 vr_name     == VEL      == # Name of radial velocity field
 
 #-----------------------------
