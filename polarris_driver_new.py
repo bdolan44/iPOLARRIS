@@ -99,8 +99,9 @@ def find_snd_match(config):
 
         base = os.path.basename(sname)
 #            print base
-        radcdate=np.str(base[13:13+10])
-        #print('radcdate',radcdate)
+        radcdate=np.str(base[config['soff']:config['sadd']])
+        print('radcdate',radcdate)
+        input()
         dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['sdate_format'])
         sdates.append(dates)
 

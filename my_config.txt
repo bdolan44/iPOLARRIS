@@ -98,14 +98,16 @@ yname       == y                    == # Name of the meridional directional vari
 zname       == z                    == # Name of the vertical level field
 
 #---------------------------
-#------ Sounding File ------
+#------ Sounding Info ------
 #---------------------------
 
 snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 ad              == config['date']+'_'   == # Extra characters
-sdate_format    == %Y%m%d%H             == # Sounding file date format
+sdate_format    == %Y%m%d%H%M%S         == # Sounding file date format
 sfiles          == '/Volumes/Scratch/radar_stuff/06_soundings/' == # Sounding file directory
+soff            == 4                    == # Offset for date timestamp in radar filename 
+sadd            == 19                   == # Number of characters in timestamp on radar file
 sstat           == UIL                  == # Sounding station identification
 
 #------------------------------------
