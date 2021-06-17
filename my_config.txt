@@ -4,18 +4,18 @@
 #------ Input ------
 #-------------------
 
-date            == '20151203'                           == # Date of the case
-etime           == '20151203_0200'                      == # End time of analysis of interest
-etime_format    == %Y%m%d_%H%M                          == # End time format
-extra           == ''                                   == # This will be appended to all output files as an identifier.
-extrax          == ''                                   == # This will be appended to all output files as an identifier.
-radar_files     == '/Volumes/Scratch/radar_stuff/04_ipol_ready/' == # Input directory of radar files to read in
-rdate_format    == %Y%m%d_%H%M%S                        == # Format for the radar file date
-rdend           == 20                                   == # End of date timestamp in radar filename
-rdstart         == 5                                    == # Start of date timestamp in radar filename
-stime           == '20151203_0100'                      == # Start time of analysis of interest
-stime_format    == %Y%m%d_%H%M                          == # Start time format
-type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
+date                == '20151203'                           == # Date of the case
+edatetime           == '20151203_0200'                      == # End time of analysis of interest
+edatetime_format    == %Y%m%d_%H%M                          == # End time format
+extra               == ''                                   == # This will be appended to all output files as an identifier.
+extrax              == ''                                   == # This will be appended to all output files as an identifier.
+radar_files         == '/Volumes/Scratch/radar_stuff/04_ipol_ready/' == # Input directory of radar files to read in
+rdate_format        == %Y%m%d_%H%M%S                        == # Format for the radar file date
+rdend               == 20                                   == # End of date timestamp in radar filename
+rdstart             == 5                                    == # Start of date timestamp in radar filename
+sdatetime           == '20151203_0100'                      == # Start time of analysis of interest
+sdatetime_format    == %Y%m%d_%H%M                          == # Start time format
+type                == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 
 #--------------------
 #------ Output ------
