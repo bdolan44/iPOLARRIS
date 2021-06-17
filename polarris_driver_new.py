@@ -99,9 +99,8 @@ def find_snd_match(config):
 
         base = os.path.basename(sname)
 #            print base
-        radcdate=np.str(base[config['soff']:config['sadd']])
-        print('radcdate',radcdate)
-        input()
+        radcdate=np.str(base[config['sdstart']:config['sdend']])
+        #print('radcdate',radcdate)
         dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['sdate_format'])
         sdates.append(dates)
 
@@ -110,9 +109,13 @@ def find_snd_match(config):
     for v,cname in enumerate(rdum):
 #            print cname
         base = os.path.basename(cname)
-        radcdate=np.str(base[config['doff']:config['doff']+15])
-        dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
-        if (dates >= config['etime']) and (dates <= config['stime']):
+        radcdate=np.str(base[config['rdstart']:config['rdend']])
+        #dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
+        dates = datetime.datetime.strptime('{r}'.format(r=radcdate),config['rdate_format'])
+        sdt = datetime.datetime.strptime(config['sdatetime'],config['sdatetime_format'])
+        edt = datetime.datetime.strptime(config['edatetime'],config['edatetime_format'])
+        #if (dates >= config['etime']) and (dates <= config['stime']):
+        if (dates <= edt) and (dates >= sdt):
             #print cname
             #now find a sounding match
             mv = match_snd(dates,sdates)
@@ -253,9 +256,9 @@ def polarris_driver(configfile):
     tm = []
     for d in rfiles:
         #print(d)
-        dformat = config['wdate_format']
+        dformat = config['rdate_format']
         base = os.path.basename(d)
-        radcdate=np.str(base[config['time_parse'][0]:config['time_parse'][1]])
+        radcdate=np.str(base[config['rdstart']:config['rdend']])
         date=datetime.datetime.strptime(radcdate,dformat)
         tm.append(date)
 
@@ -272,12 +275,12 @@ def polarris_driver(configfile):
             dformat = config['ddate_format']
             base = os.path.basename(d)
 #            print('dd base',base,config['ddoff'],config['ddadd'])
-            radcdate = base[config['ddoff']:config['ddadd']]
+            radcdate = base[config['ddstart']:config['ddend']]
 #            print('dformat is',dformat,radcdate)
             if dformat == '%H%M':
             
-                hr=int(base[config['ddoff']:config['ddoff']+2])
-                mn=int(base[config['ddoff']+2:config['ddoff']+4])
+                hr=int(base[config['ddstart']:config['ddstart']+2])
+                mn=int(base[config['ddstart']+2:config['ddstart']+4])
                 #print('hr','mn',hr,mn)
             #    print radcdate
                 #date=datetime.datetime.strptime(radcdate,dformat)
