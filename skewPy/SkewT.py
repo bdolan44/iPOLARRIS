@@ -933,10 +933,15 @@ class Sounding(UserDict):
                 self['Latitude'] = float(header.split()[6])
                 self.sounding_date = header.split()[-1]
             else:
-                self.station = header[:5]
-                dstr = (' ').join(header.split()[-4:])
-                self.sounding_date = datetime.strptime(dstr, "%HZ %d %b %Y").strftime("%Y-%m-%d_%H:%M:%S") 
-
+                #self.station = header[:5]
+                findstat = np.where([x.isalpha() for x in str(header)])[0]
+                self.station = header[min(findstat):max(findstat)+1]
+                #self.station = header[header.find(header.isalpha())]
+                #dstr = (' ').join(header.split()[-4:])
+                dstr = (' ').join(header.split()[-6:-4])
+                #self.sounding_date = datetime.strptime(dstr, "%HZ %d %b %Y").strftime("%Y-%m-%d_%H:%M:%S") 
+                self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d_%H:%M:%S") 
+            
             if self.station_name is not None: self.station = self.station_name
 
             for ff in fields:
