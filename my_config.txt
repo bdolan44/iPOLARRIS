@@ -5,16 +5,17 @@
 #-------------------
 
 date            == '20151203'                           == # Date of the case
-doff            == 5                                    == # Offset for date timestamp in radar filename
-etime           == datetime.datetime(2015,12,03,01,00)  == # End time of analysis of interest
+etime           == '20151203_0200'                      == # End time of analysis of interest
+etime_format    == %Y%m%d_%H%M                          == # End time format
 extra           == ''                                   == # This will be appended to all output files as an identifier.
 extrax          == ''                                   == # This will be appended to all output files as an identifier.
 radar_files     == '/Volumes/Scratch/radar_stuff/04_ipol_ready/' == # Input directory of radar files to read in
-rdadd           == 20                                   == # Number of characters in timestamp on radar file.
-stime           == datetime.datetime(2015,12,03,00,00)  == # Start time of analysis of interest
-time_parse      == [5,20]                               == # More time formatting
-type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs+simulated)
-wdate_format    == %Y%m%d_%H%M%S                        == # Format of the date/time in the radar file name
+rdate_format    == %Y%m%d_%H%M%S                        == # Format for the radar file date
+rdend           == 20                                   == # End of date timestamp in radar filename
+rdstart         == 5                                    == # Start of date timestamp in radar filename
+stime           == '20151203_0100'                      == # Start time of analysis of interest
+stime_format    == %Y%m%d_%H%M                          == # Start time format
+type            == 'obs'                                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 
 #--------------------
 #------ Output ------
@@ -77,13 +78,12 @@ mphys   == obs  == # Type of microphysics used in model: 'obs' OR '<scheme>' if 
 #------ Doppler Info ------
 #--------------------------
 
-dd_on           == False             == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on           == False            == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
-dd_files        == '/Volumes/Scratch/radar_stuff/05_dopvel_gridded/' == # Location of dual-Doppler files
-ddadd           == 25               == # Number of characters in the timestamp
+dd_files        == '/Volumes/Scratch/radar_stuff/05dopvel_gridded/' == # Location of dual-Doppler files
 ddate_format    == %Y%m%d_%H%M%S    == # Format for the dual-Doppler file date
-ddoff           == 10               == # Offset for dual-Doppler timestamp in filename
-rdate_format    == %Y%m%d_%H%M%S    == # Format for the radar file date
+ddstart         == 4                == # Offset for dual-Doppler timestamp in filename
+ddend           == 10               == # Offset for dual-Doppler timestamp in filename
 
 #---------------------------
 #------ Doppler File -------
@@ -104,18 +104,18 @@ zname       == z                    == # Name of the vertical level field
 snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 ad              == config['date']+'_'   == # Extra characters
-sdate_format    == %Y%m%d%H%M%S         == # Sounding file date format
+sdate_format    == %Y%m%d_%H%M%S        == # Sounding file date format
 sfiles          == '/Volumes/Scratch/radar_stuff/06_soundings/' == # Sounding file directory
-soff            == 4                    == # Offset for date timestamp in radar filename 
-sadd            == 19                   == # Number of characters in timestamp on radar file
+sdstart         == 4                    == # Offset for date timestamp in radar filename 
+sdend           == 19                   == # Number of characters in timestamp on radar file
 sstat           == UIL                  == # Sounding station identification
 
 #------------------------------------
 #------ Flags if type == 'wrf' ------
 #------------------------------------
 convert_Tk_Tc   == False    == # Convert temperature in K to deg C
-#
-#
+
+
 ###############Set up variable names and how to read the data###############
 t_name == T                        ==#Name of the temperature field
 latname == lat			   ==
