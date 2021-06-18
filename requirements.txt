@@ -10,7 +10,6 @@ libgfortran
 cartopy
 pip
 toolz
-pip:
 dask
 click
 scipy
