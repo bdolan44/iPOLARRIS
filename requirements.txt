@@ -1,0 +1,16 @@
+pandas
+dill
+netcdf4
+xarray
+python
+matplotlib
+pyproj
+tqdm
+libgfortran
+cartopy
+pip
+toolz
+pip:
+dask
+click
+scipy
