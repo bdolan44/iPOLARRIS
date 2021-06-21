@@ -1,2 +1,2 @@
-../rad/20151203/KLGX20151203_000253.nc
-../rad/20151203/KLGX20151203_000646.nc
+/Volumes/Scratch/radar_stuff/04_ipol_ready/KLGX_20151203_010200_V06.nc
+/Volumes/Scratch/radar_stuff/04_ipol_ready/KLGX_20151203_010607_V06.nc

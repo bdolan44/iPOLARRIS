@@ -82,16 +82,16 @@ def match_snd(rdate,sdates):
 
 
 def find_snd_match(config):
-    #rdum =[]
-    #with open(config['radar_files']) as f: 
-    #    dum.append(foo(f.readline()))
-    #    dum.append(foo(f.readline()))
+    rdum =[]
+    with open(config['radar_files']) as f: 
+        dum.append(foo(f.readline()))
+        dum.append(foo(f.readline()))
 
-    #    for line in f:
-    #        dat = (line)
-    #        rdum.append(foo(dat))
-    #print('sfiles:',config['sfiles'])
-    rdum = glob.glob(config['radar_files']+'*')
+        for line in f:
+            dat = (line)
+            rdum.append(foo(dat))
+    print('sfiles:',config['sfiles'])
+    #rdum = glob.glob(config['radar_files']+'*')
     #slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
     slist = glob.glob(config['sfiles']+'*')
     sdates=[]
@@ -203,8 +203,8 @@ def polarris_driver(configfile):
 
     print('Finding and concatenating radar files in '+config['radar_files']+'...')
     drop_vars=config['drop_vars']
-    #with open(config['radar_files'], 'r') as f:
-    #    rfiles = f.read().splitlines()
+    with open(config['radar_files'], 'r') as f:
+        rfiles = f.read().splitlines()
     
     print((config['exper']),(config['mphys']))
     if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
@@ -230,7 +230,7 @@ def polarris_driver(configfile):
 #            print('trying to read normally')
 #            rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim,combine='by_coords')
 #        except ValueError as ve:
-        rfiles = glob.glob(config['radar_files']+"*")
+        #rfiles = glob.glob(config['radar_files']+"*")
         rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
         #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
 
