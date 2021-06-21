@@ -1,3 +1,0 @@
- Date   Unc_Conv_RR   Unc_Strat_RR   Unc_Tot_RR 
- 20151203-000253  nan nan nan
- 20151203-000646  nan nan nan

@@ -202,6 +202,7 @@ def polarris_driver(configfile):
     print('Finding and concatenating radar files in '+config['radar_files']+'...')
     drop_vars=config['drop_vars']
     with open(config['radar_files'], 'r') as f:
+        print(config['radar_files'])
         rfiles = f.read().splitlines()
     
     print((config['exper']),(config['mphys']))
@@ -265,9 +266,9 @@ def polarris_driver(configfile):
     # =====
 
     if config['dd_on']==True:
-        #with open(config['dd_files'], 'r') as f:
-        #    dfiles1 = f.read().splitlines()
-        dfiles1 = glob.glob(config['dd_files']+"*")
+        with open(config['dopp_files'], 'r') as g:
+            dfiles1 = g.read().splitlines()
+        #dfiles1 = glob.glob(config['dd_files']+"*")
         tmd = []
         for d in dfiles1:
             dformat = config['ddate_format']
