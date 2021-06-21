@@ -921,6 +921,8 @@ class Sounding(UserDict):
             output = {}
 
             fields = lines[0].split()
+            #print(fields[0].lower())
+            #fields = lines[3].split()
             #units = lines[4].split()
             #print(fields)
             #print(units)
@@ -949,18 +951,23 @@ class Sounding(UserDict):
                 output[ff.lower()]=zeros((nlines-skip)) - 999.
 
             #print 'output keys: {}'.format(output.keys())
-
+            
             lhi=[1, 9,16,23,30,37,46,53,58,65,72]
             rhi=[7,14,21,28,35,42,49,56,63,70,77]
 
-            lcounter = 5
-            for line,idx in zip(lines[6:],range(ndata)):
-                lcounter += 1
+            #lcounter = 1
+            #for line,idx in zip(lines[6:],range(ndata)):
+            print('Hello')
+            for line,idx in zip(lines[1:],range(ndata)):
+                #lcounter += 1
 
                 try: output[fields[0].lower()][idx] = float(line[lhi[0]:rhi[0]])
                 except ValueError: 
                     break
-
+                print(line)
+                print(idx)
+                print(output[fields[0].lower()][idx])
+                
                 for ii in range(1, len(rhi)):
                     try: 
             # Debug only:
@@ -968,6 +975,8 @@ class Sounding(UserDict):
                         output[fields[ii].lower()][idx]=float(line[lhi[ii]:rhi[ii]].strip())
                     except ValueError: 
                         pass
+
+            input()
 
             for field in fields:
                 #print field
@@ -1053,7 +1062,7 @@ class Sounding(UserDict):
         """
         from numpy import interp
 
-        #	print startp, startt, startdp
+        print(startp, startt, startdp)
         assert startt >startdp, "Not a valid parcel. Check Td<Tc"
         Pres=linspace(startp, 50, 100)
 
