@@ -106,7 +106,7 @@ snd_on          == True                 == # Set this to loop through separate d
 
 ad              == config['date']+'_'   == # Extra characters
 sdate_format    == %Y%m%d_%H%M%S        == # Sounding file date format
-sfiles          == ./soundfiles.txt'    == # Sounding file directory
+sfiles          == ./soundfiles.txt     == # Sounding file directory
 sdstart         == 4                    == # Offset for date timestamp in radar filename 
 sdend           == 19                   == # Number of characters in timestamp on radar file
 sstat           == UIL                  == # Sounding station identification
