@@ -307,9 +307,12 @@ def polarris_driver(configfile):
         conv = np.zeros([rvar.dims['d'],rvar.dims['z'],rvar.dims['y'],rvar.dims['x']])
         conv.fill(np.nan)
         
-        print(rvar.variables['x'])
-        print(dvar.variables['x'])
-        input()
+        # NEW! MultiDop only works if distance values are in metres, not km. Need a condition to convert back to km so that doppler and radar distances are comparable.
+        if np.array_equal(dvar.variables['x'].values, 1000.0*rvar.variables['x'].values):
+            dvar['x'] = rvar['x']
+            dvar['y'] = rvar['y']
+            dvar['z'] = rvar['z']
+
         xsubmin = np.where(rvar.variables['x']==np.min(dvar.variables['x']))[0][0]
         xsubmax = np.where(rvar.variables['x']==np.max(dvar.variables['x']))[0][0]
 
@@ -317,26 +320,27 @@ def polarris_driver(configfile):
         ysubmax = np.where(rvar.variables['y']==np.max(dvar.variables['y']))[0][0]
 
         zsubmin = np.where(rvar.variables['z']==np.min(dvar.variables['z']))[0][0]
-        zsubmax = np.where(rvar.variables['z']==np.max(dvar.variables['z']))[0][0]
-        
+        zsubmax = np.where(rvar.variables['z']==np.max(dvar.variables['z']))[0][0]        
+
         for q,d in enumerate(dmatch.keys()):
             #print(q,'i outer',dmatch[d])
             if dmatch[d] is not None:
                 #print('good, dmatch is not none')
                 dfile = dmatch[d]
                 if dfile in dfiles1:
+                    print(dfile)
                     i = dfiles1.index(dfile)
                     #print(i,'i inner')
-                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
-                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['uname']].sel(d=i)
-                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['vname']].sel(d=i)
-                    conv[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['convname']].sel(d=i)
-
+                    #wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
+                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']][i,:,:,:]
+                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['uname']][i,:,:,:]
+                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['vname']][i,:,:,:]
+                    #conv[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['convname']][i,:,:,:]
 
         rvar[config['wname']] = (['d','z','y','x'],wvar)
         rvar[config['uname']] = (['d','z','y','x'],unew)
         rvar[config['vname']] = (['d','z','y','x'],vnew)
-        rvar[config['convname']] = (['d','z','y','x'],conv)
+        #rvar[config['convname']] = (['d','z','y','x'],conv)
 
     print('Sending data to RadarData...')
     #input()
