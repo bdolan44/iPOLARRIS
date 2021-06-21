@@ -466,7 +466,6 @@ class Sounding(UserDict):
         if data is None:
             self.data={}
             self.readfile(filename)
-
         else:
             self.data=data
             self['SoundingDate']=""
@@ -921,11 +920,13 @@ class Sounding(UserDict):
             ndata = nlines-skip
             output = {}
 
-            fields = lines[3].split()
-            units = lines[4].split()
+            fields = lines[0].split()
+            #units = lines[4].split()
+            #print(fields)
+            #print(units)
 
             # First line for WRF profiles differs from the UWYO soundings
-            header = lines[0]
+            header = lines[1]
             if header[:5] == '00000':
             # WRF profile
                 self.station = '-99999'
@@ -938,9 +939,9 @@ class Sounding(UserDict):
                 self.station = header[min(findstat):max(findstat)+1]
                 #self.station = header[header.find(header.isalpha())]
                 #dstr = (' ').join(header.split()[-4:])
-                dstr = (' ').join(header.split()[-6:-4])
+                dstr = (' ').join(header.split()[-5:-4])
                 #self.sounding_date = datetime.strptime(dstr, "%HZ %d %b %Y").strftime("%Y-%m-%d_%H:%M:%S") 
-                self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d_%H:%M:%S") 
+                self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d").strftime("%Y-%m-%d_%H:%M:%S") 
             
             if self.station_name is not None: self.station = self.station_name
 
@@ -1116,9 +1117,13 @@ class Sounding(UserDict):
         """
 
         #	print 'mixdepth: ', mixdepth
-        pres=self.data["pres"]
-        temp=self.data["temp"]
-        dwpt=self.data["dwpt"]
+        #pres=self.data["pres"]
+        pres=self.data["pressure"]
+        #temp=self.data["temp"]
+        temp=self.data["temperature"]
+        #dwpt=self.data["dwpt"]
+        dwpt=self.data["dewpoint"]
+
 
 	# if a surface pressure is provided, use that, otherwise just grab the first pressure
         if pres_s is None:
