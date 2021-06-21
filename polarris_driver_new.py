@@ -194,8 +194,6 @@ def polarris_driver(configfile):
     
     time.sleep(3)
     print('Read-in complete.\n')
-    #print(config)
-    #input()
 
     # =====
     # (2) Find input radar files and concatenate the data. Rename x, y, z variables. 
