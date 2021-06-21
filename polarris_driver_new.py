@@ -84,8 +84,8 @@ def match_snd(rdate,sdates):
 def find_snd_match(config):
     rdum =[]
     with open(config['radar_files']) as f: 
-        dum.append(foo(f.readline()))
-        dum.append(foo(f.readline()))
+        #dum.append(foo(f.readline()))
+        #dum.append(foo(f.readline()))
 
         for line in f:
             dat = (line)
@@ -93,7 +93,9 @@ def find_snd_match(config):
     print('sfiles:',config['sfiles'])
     #rdum = glob.glob(config['radar_files']+'*')
     #slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
-    slist = glob.glob(config['sfiles']+'*')
+    with open(config['sfiles']) as f:
+        slist = f.read().splitlines()
+    #slist = glob.glob(config['sfiles']+'*')
     sdates=[]
     for v,sname in enumerate(slist):
 
