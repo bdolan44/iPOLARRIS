@@ -79,12 +79,12 @@ mphys   == obs  == # Type of microphysics used in model: 'obs' OR '<scheme>' if 
 #------ Doppler Info ------
 #--------------------------
 
-dd_on           == False            == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on           == True            == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
-dd_files        == '/Volumes/Scratch/radar_stuff/05dopvel_gridded/' == # Location of dual-Doppler files
+dd_files        == '/Volumes/Scratch/radar_stuff/05_dopvel_gridded/' == # Location of dual-Doppler files
 ddate_format    == %Y%m%d_%H%M%S    == # Format for the dual-Doppler file date
-ddstart         == 4                == # Offset for dual-Doppler timestamp in filename
-ddend           == 10               == # Offset for dual-Doppler timestamp in filename
+ddstart         == 10                == # Offset for dual-Doppler timestamp in filename
+ddend           == 25               == # Offset for dual-Doppler timestamp in filename
 
 #---------------------------
 #------ Doppler File -------
