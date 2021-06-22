@@ -1,5 +1,4 @@
 *.ipynb
-*.nc
 *.cdf
 *.png
 *.tar.gz
@@ -7,4 +6,3 @@
 *.pyc
 *.p
 *.npy
-obs.txt
