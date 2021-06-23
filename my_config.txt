@@ -155,11 +155,11 @@ hidsnow ==[3,4,5,6]                     ==#Group ice crystals, snow, wet snow an
 #
 #
 ####Set up some specifics for the cross-sections.####################
-xlim == [-100,100]                     ==#lat / lon zoom for CAPPIS
-ylim == [-100,100]                     ==# lat / lon zoom for CAPPIS
+#xlim == [-100,100]                     ==#lat / lon zoom for CAPPIS
+#ylim == [-100,100]                     ==# lat / lon zoom for CAPPIS
 y==10.                                 ==#Lat of the y cross-section for RHI
-#xlim == [-99,-95.5]                     ==#lat / lon zoom for CAPPIS
-#ylim == [35.0,37.5]                     ==# lat / lon zoom for CAPPIS
+xlim == [-126.0,-120.0]                     ==#lat / lon zoom for CAPPIS
+ylim == [45.0,49.0]                     ==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
 z == 2.5                                ==#Height of the CAPPIs
 cvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
