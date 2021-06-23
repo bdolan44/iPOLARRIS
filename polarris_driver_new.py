@@ -83,7 +83,7 @@ def match_snd(rdate,sdates):
 
 def find_snd_match(config):
     rdum =[]
-    with open(config['radar_files']) as f: 
+    with open(config['rfiles']) as f: 
         #dum.append(foo(f.readline()))
         #dum.append(foo(f.readline()))
 
@@ -91,7 +91,7 @@ def find_snd_match(config):
             dat = (line)
             rdum.append(foo(dat))
     print('sfiles:',config['sfiles'])
-    #rdum = glob.glob(config['radar_files']+'*')
+    #rdum = glob.glob(config['rfiles']+'*')
     #slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
     with open(config['sfiles']) as f:
         slist = f.read().splitlines()
@@ -182,7 +182,7 @@ def polarris_driver(configfile):
                 #print vval,key
                 if key.replace(" ", "") == 'image_dir':
                     numck = True
-                if key.replace(" ", "") == 'radar_files':
+                if key.replace(" ", "") == 'rfiles':
                     numck = True
 
                 if numck is True or vval == 'None' or vval == 'True' or vval == 'False':
@@ -201,17 +201,17 @@ def polarris_driver(configfile):
     # (2) Find input radar files and concatenate the data. Rename x, y, z variables. 
     # =====
 
-    print('Finding and concatenating radar files in '+config['radar_files']+'...')
+    print('Finding and concatenating radar files in '+config['rfiles']+'...')
     drop_vars=config['drop_vars']
-    with open(config['radar_files'], 'r') as f:
-        print(config['radar_files'])
+    with open(config['rfiles'], 'r') as f:
+        print(config['rfiles'])
         rfiles = f.read().splitlines()
     
     print((config['exper']),(config['mphys']))
     if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
 
-        file = open(config['radar_files'], "r")
+        file = open(config['rfiles'], "r")
         rf1=[]
         rf2=[]
         for line in file:
@@ -231,7 +231,7 @@ def polarris_driver(configfile):
 #            print('trying to read normally')
 #            rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim,combine='by_coords')
 #        except ValueError as ve:
-        #rfiles = glob.glob(config['radar_files']+"*")
+        #rfiles = glob.glob(config['rfiles']+"*")
         rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
         #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
 
@@ -350,6 +350,7 @@ def polarris_driver(configfile):
 
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'])
 
+    input()
     if config['snd_on'] == True:
         smatch = find_snd_match(config)
         #print("rfiles",rfiles[0])
