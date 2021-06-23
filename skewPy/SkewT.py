@@ -973,8 +973,11 @@ class Sounding(UserDict):
             # Debug only:
             # print fields[ii].lower(), float(line[lhi[ii]:rhi[ii]].strip())
                         output[fields[ii].lower()][idx]=float(line[lhi[ii]:rhi[ii]].strip())
+                        print(output[fields[ii].lower()][idx])
                     except ValueError: 
                         pass
+
+                input()
 
             input()
 
