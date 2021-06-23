@@ -268,7 +268,7 @@ def polarris_driver(configfile):
     # =====
 
     if config['dd_on']==True:
-        with open(config['dopp_files'], 'r') as g:
+        with open(config['dfiles'], 'r') as g:
             dfiles1 = g.read().splitlines()
         #dfiles1 = glob.glob(config['dd_files']+"*")
         tmd = []
