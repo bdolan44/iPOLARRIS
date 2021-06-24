@@ -6,3 +6,4 @@
 *.pyc
 *.p
 *.npy
+figures/*
