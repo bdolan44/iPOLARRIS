@@ -517,8 +517,9 @@ class Sounding(UserDict):
     
 
 #	let's try to interpolate the parcel stuff onto the environmental stuff
-        f_pt = si.interp1d(all_parcel_p, all_parcel_t, bounds_error=True)
-
+        #print('Hello')
+        #f_pt = si.interp1d(all_parcel_p, all_parcel_t, bounds_error=True)
+        f_pt = si.interp1d(all_parcel_p, all_parcel_t, fill_value="extrapolate")
         self.parcel_p = self.data['pres'].copy()
         ###BD added .compressed here because I was getting an error about being a masked array in si.interp1d   3/2017
         self.parcel_t = f_pt(self.parcel_p.compressed())
@@ -920,7 +921,18 @@ class Sounding(UserDict):
             ndata = nlines-skip
             output = {}
 
-            fields = lines[0].split()
+            txtfields = lines[0].split()
+            fields = deepcopy(txtfields)
+            for ii, var in enumerate(fields):
+                if var == 'pressure':
+                    fields[ii] = 'pres'
+                elif var == 'height':
+                    fields[ii] = 'hght'
+                elif var == 'temperature':
+                    fields[ii] = 'temp'
+                elif var == 'dewpoint':
+                    fields[ii] = 'dwpt'
+
             #print(fields[0].lower())
             #fields = lines[3].split()
             #units = lines[4].split()
@@ -947,46 +959,69 @@ class Sounding(UserDict):
             
             if self.station_name is not None: self.station = self.station_name
 
-            for ff in fields:
-                output[ff.lower()]=zeros((nlines-skip)) - 999.
-
+           
+            #print(output)
             #print 'output keys: {}'.format(output.keys())
             
             lhi=[1, 9,16,23,30,37,46,53,58,65,72]
             rhi=[7,14,21,28,35,42,49,56,63,70,77]
-
+            
+            ''' 
             #lcounter = 1
             #for line,idx in zip(lines[6:],range(ndata)):
-            print('Hello')
             for line,idx in zip(lines[1:],range(ndata)):
                 #lcounter += 1
 
+                #print(line)
+                #print(line[0],line[1],line[2])
+                #print(line[lhi[0]:rhi[0]])
+                #print('')
                 try: output[fields[0].lower()][idx] = float(line[lhi[0]:rhi[0]])
                 except ValueError: 
+                    print('BREAK')
                     break
-                print(line)
-                print(idx)
-                print(output[fields[0].lower()][idx])
+                #print(line)
+                #print(idx)
+                #print(output[fields[0].lower()][idx])
                 
+                #input()
+
                 for ii in range(1, len(rhi)):
                     try: 
             # Debug only:
             # print fields[ii].lower(), float(line[lhi[ii]:rhi[ii]].strip())
                         output[fields[ii].lower()][idx]=float(line[lhi[ii]:rhi[ii]].strip())
-                        print(output[fields[ii].lower()][idx])
+                        #print(output[fields[ii].lower()][idx])
                     except ValueError: 
                         pass
-
-                input()
-
-            input()
-
+            
+            #print(output)
+            #input()
+            '''
+            # NEW! For loop to read in output data from sounding file
+            # First, determine number of columns, and find lines in the text file where data is missing ==> omit. May not be necessary if masking handles missing values properly...
+            numcols = len(lines[0].split())+1
+            for line in lines[1:]:
+                if len(line.split()) != numcols:
+                    lines.remove(line)
+                    continue
+            
+            for ff in fields:
+                output[ff.lower()] = zeros((len(lines[1:])-1)) - 999.
+            
+            # Next, read each column into a dictionary.
+            for line, ii in zip(lines[1:],range(1,len(lines[1:]))):
+                for jj in range(0,numcols-1):
+                    try:
+                        output[fields[jj].lower()][ii-1] = float(line.split()[jj+1])
+                    except ValueError:
+                        continue
+            
             for field in fields:
                 #print field
                 ff=field.lower()
                 # here is where the copy is made from output to self.data
                 self.data[ff]=ma.masked_values(output[ff], -999.)
-
 
 
         elif self.fmt == 'EDT': # THIS IS FOR READING IN VAISALA EDITED DATA FILE FORMATS, FOR SPECIAL FIELD OPS SOUNDINGS
@@ -1065,7 +1100,7 @@ class Sounding(UserDict):
         """
         from numpy import interp
 
-        print(startp, startt, startdp)
+        #print(startp, startt, startdp)
         assert startt >startdp, "Not a valid parcel. Check Td<Tc"
         Pres=linspace(startp, 50, 100)
 
@@ -1129,12 +1164,9 @@ class Sounding(UserDict):
         """
 
         #	print 'mixdepth: ', mixdepth
-        #pres=self.data["pres"]
-        pres=self.data["pressure"]
-        #temp=self.data["temp"]
-        temp=self.data["temperature"]
-        #dwpt=self.data["dwpt"]
-        dwpt=self.data["dewpoint"]
+        pres=self.data["pres"]
+        temp=self.data["temp"]
+        dwpt=self.data["dwpt"]
 
 
 	# if a surface pressure is provided, use that, otherwise just grab the first pressure
