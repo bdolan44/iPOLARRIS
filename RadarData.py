@@ -621,8 +621,8 @@ class RadarData(RadarConfig.RadarConfig):
             #hiddum = np.argmax(scoresdum,axis=0)+1
 #            print(np.shape(tdum),'tdum')
             #whbad = np.where(np.logical_and(hiddum ==1,tdum <-5.0))
-            if tdum == None: whbad = np.where(np.logical_and(hiddum == 1,tdum == None))
-            else: np.where(np.logical_and(hiddum == 1,tdum < -5.0))
+            if tdum.any() == None: whbad = np.where(np.logical_and(hiddum == 1,tdum == None))
+            else: whbad = np.where(np.logical_and(hiddum == 1,tdum < -5.0))
             dzmask = np.where(np.isnan(dzhold))
             hiddum[whbad] = -1
             hiddum = np.array(hiddum,dtype='float64')
