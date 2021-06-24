@@ -102,7 +102,7 @@ zname       == z                    == # Name of the vertical level field
 #------ Sounding Info ------
 #---------------------------
 
-snd_on          == False                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 ad              == config['date']+'_'   == # Extra characters
 sdate_format    == %Y%m%d_%H%M%S        == # Sounding file date format
