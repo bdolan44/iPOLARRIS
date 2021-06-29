@@ -129,10 +129,14 @@ class RadarConfig(object):
     def set_dbz_colorbar(self, color_list=None):
         if color_list is None:
             # just use the default here
-            radarcbar = ['PeachPuff','Aqua','DodgerBlue','MediumBlue','Lime', \
-                'LimeGreen','Green','Yellow','Orange','OrangeRed', \
-                'Red', 'Crimson','Fuchsia','Indigo','DarkCyan','White']
-        else:
+            #radarcbar = ['PeachPuff','Aqua','DodgerBlue','Blue','Lime', \
+            #    'LimeGreen','Green','Yellow','Orange','DarkOrange','Red', \
+            #    'Crimson','Fuchsia','Purple','Indigo','MidnightBlue'] 
+            #radarcbar = ['PeachPuff','Aqua','DodgerBlue','MediumBlue','Lime', \
+            #    'LimeGreen','Green','Yellow','Orange','OrangeRed','Red', \
+            #    'Crimson','Fuchsia','Indigo','DarkCyan','White'] 
+            radarcbar = ['Lavender', 'Thistle', 'Plum', 'MediumPurple', 'CornFlowerBlue', 'SkyBlue', 'PaleTurquoise', 'LightCyan', 'Yellow', 'Gold', 'Orange', 'DarkOrange', 'Chocolate', 'IndianRed', 'FireBrick', 'Maroon']
+        else: 
             radarcbar = deepcopy(color_list)
 
         temp_cmap = colors.ListedColormap(radarcbar)
