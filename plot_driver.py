@@ -1409,7 +1409,7 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False,statpt=False):
     
     # (3) Extract the range of values in the variable of interest and derive a colourmap.
     if var in rdata.lims.keys(): # If the variable exists in the dataset:
-        print( 'var:',var)
+        #print( 'var:',var)
         range_lim = rdata.lims[var][1] - rdata.lims[var][0]
     #          print np.shape(data), np.shape(xdat),np.shape(ydat)
     #            print 'in var',var
