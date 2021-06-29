@@ -28,6 +28,10 @@ from skewPy import SkewT
 
 #--------------- Main Program ----------------
 
+print('\n#############################################')
+print('####### Starting run_ipolarris_new.py #######')
+print('#############################################')
+
 configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 

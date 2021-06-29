@@ -164,9 +164,9 @@ def polarris_driver(configfile):
 
     config = {} # Load variable for config file data
     #print('ready to roll')
-    print('\n#########################################')
-    print('#### Entering polarris_driver_new.py ####')
-    print('#########################################')
+    print('\n#################################################')
+    print('############ Entering polarris_driver_new.py ####')
+    print('#################################################')
     time.sleep(3)
 
     print('\nReading '+str(configfile[0])+'...')
@@ -412,8 +412,8 @@ def polarris_driver(configfile):
 #     rdata.data[rdata.rho_name].values[whbad2] = np.nan
 #     rdata.data[rdata.w_name].values[whbad2] = np.nan
 
-    print('\n###########################################')
-    print('#### Returning to run_ipolarris_new.py ####')
-    print('###########################################\n')
+    print('\n###################################################')
+    print('############ Returning to run_ipolarris_new.py ####')
+    print('###################################################\n')
 
     return rdata, config
