@@ -44,7 +44,7 @@ def find_dd_match(rdum,ddum,rdate,ddates):
         
         if mval != 'no':
             dfile = ddum[mval[0]]
-            print ('Found DD match!', dfile)
+            print('Found DD match!', dfile)
             mdfiles[cname] = dfile
         else:
             mdfiles[cname] = None
@@ -90,7 +90,7 @@ def find_snd_match(config):
         for line in f:
             dat = (line)
             rdum.append(foo(dat))
-    print('sfiles:',config['sfiles'])
+    #print('sfiles:',config['sfiles'])
     #rdum = glob.glob(config['rfiles']+'*')
     #slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
     with open(config['sfiles']) as f:
@@ -164,6 +164,11 @@ def polarris_driver(configfile):
 
     config = {} # Load variable for config file data
     #print('ready to roll')
+    print('\n#########################################')
+    print('#### Entering polarris_driver_new.py ####')
+    print('#########################################')
+    time.sleep(3)
+
     print('\nReading '+str(configfile[0])+'...')
     with open(configfile[0]) as f:
         lines = [l for l in (line.strip() for line in f) if l] # NEW! Allow new lines in config file - can be skipped over!
@@ -204,10 +209,13 @@ def polarris_driver(configfile):
     print('Finding and concatenating radar files in '+config['rfiles']+'...')
     drop_vars=config['drop_vars']
     with open(config['rfiles'], 'r') as f:
-        print(config['rfiles'])
+        #print(config['rfiles'])
         rfiles = f.read().splitlines()
     
-    print((config['exper']),(config['mphys']))
+    #print((config['exper']),(config['mphys']))
+    print('Station/experiment: '+config['exper'])
+    print('Input: '+config['mphys'])
+    time.sleep(3)
     if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
 
@@ -247,8 +255,8 @@ def polarris_driver(configfile):
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
  
-    time.sleep(3)
     print('Radar files ready.\n')
+    time.sleep(3)
 
     # =====
     # (3) Get datetime objects from radar file names.
@@ -268,6 +276,8 @@ def polarris_driver(configfile):
     # =====
 
     if config['dd_on']==True:
+        print('In your config file, dd_on is set to True.')
+        time.sleep(3)
         with open(config['dfiles'], 'r') as g:
             dfiles1 = g.read().splitlines()
         #dfiles1 = glob.glob(config['dd_files']+"*")
@@ -331,7 +341,7 @@ def polarris_driver(configfile):
                 #print('good, dmatch is not none')
                 dfile = dmatch[d]
                 if dfile in dfiles1:
-                    print(dfile)
+                    #print(dfile)
                     i = dfiles1.index(dfile)
                     #print(i,'i inner')
                     #wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
@@ -345,20 +355,22 @@ def polarris_driver(configfile):
         rvar[config['vname']] = (['d','z','y','x'],vnew)
         #rvar[config['convname']] = (['d','z','y','x'],conv)
 
-    print('Sending data to RadarData...')
+    print('\nSending data to RadarData...')
    
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'])
 
     if config['snd_on'] == True:
+        print('In your config file, snd_on is set to True.')
+        time.sleep(3)
         smatch = find_snd_match(config)
         #print("rfiles",rfiles[0])
         sfile = smatch[rfiles[0]]
-        print('matching sounding')
+        print('Matching Sounding')
     else:
         smatch = None
                                           
     if smatch is not None:
-        print ('Smatch',sfile)
+        print ('Found sounding match!',sfile,'\n')
         snd = SkewT.Sounding(sfile)
         rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
                     # and then will take the heights and temps
@@ -400,5 +412,8 @@ def polarris_driver(configfile):
 #     rdata.data[rdata.rho_name].values[whbad2] = np.nan
 #     rdata.data[rdata.w_name].values[whbad2] = np.nan
 
+    print('\n###########################################')
+    print('#### Returning to run_ipolarris_new.py ####')
+    print('###########################################\n')
 
     return rdata, config
