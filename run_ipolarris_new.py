@@ -1,40 +1,42 @@
-import numpy as np
-import os
+#===================================================
+#============== RUN_IPOLARRIS_NEW.PY ===============
+#===================================================
+
+# Import core Python packages
+from collections import OrderedDict
+import datetime
 import glob
-from netCDF4 import Dataset
 import matplotlib
 matplotlib.use('Agg')
+from netCDF4 import Dataset
+import numpy as np
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
-import xarray as xr
-
-import numpy as np
-
-import RadarData
-import datetime
-
-import RadarConfig
-import plot_driver
-#from polarris_config import run_exper
-#from polarris_config import get_data
+import sys
 import warnings
 warnings.filterwarnings('ignore')
+import xarray as xr
+
+# Import iPOLARRIS functions
 import GeneralFunctions as GF
-from skewPy import SkewT
-from collections import OrderedDict
 from polarris_driver_new import polarris_driver
-import os
-import sys
+import plot_driver
+import RadarData
+import RadarConfig
+from skewPy import SkewT
 
+#--------------- Main Program ----------------
 
-configfile = sys.argv[1:]
+configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
 #config['image_dir'] ='./'
-print(config['extrax'],'EXTRA 1 is')
-#########################################
+#print(config['extrax'],'EXTRA 1 is')
 
+# If a second argument is passed for WRF config file, produce a bunch of comparison plots!
+# More comments in this section TBD!
 if sys.argv[2:]:
     configfile1 = sys.argv[2:]
     rdata2, config2 = polarris_driver(configfile1)
@@ -86,26 +88,32 @@ else:
     ################################################################################
     ##Plot a composite reflectivity at a given time.
 
-
-    #tdate = datetime.datetime(2011,5,23,22,00)
+    # tdate = datetime.datetime(2011,5,23,22,00)
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
     print('In run_ipolarris...running the COMPOSITE figs.')
-    for i,d in enumerate(np.array(rdata.date)):
-        print('plotting composites by time....')
-        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
-        print('made composite')
-        rtimematch = d
-        ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name))
-        minlat = config['ylim'][0]
-        maxlat = config['ylim'][1]
-        minlon = config['xlim'][0]
-        maxlon = config['xlim'][1]
-        ax.set_extent([minlon, maxlon, minlat,maxlat])
+    for i,rtimematch in enumerate(np.array(rdata.date)):
+        
+        if config['compo_ref']:
 
-        plt.tight_layout()
-        plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-        plt.close()
+            print('plotting composites by time....')
+            fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False,statpt=True)
+            print('made composite')
+            #ax.set_title('{e} {r} Composite {d:%Y-%m-%d %H%M} UTC'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name), fontsize=18)
+            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            ax.text(1, 1, '{d:%Y-%m-%d %H%M} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            
+            #minlat = config['ylim'][0]
+            #maxlat = config['ylim'][1]
+            #minlon = config['xlim'][0]
+            #maxlon = config['xlim'][1]
+            #ax.set_extent([minlon, maxlon, minlat,maxlat])
+
+            #plt.tight_layout()
+            plt.savefig('{i}Composite_{v}_{d:%Y-%m-%d_%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400, bbox_inches='tight')
+            plt.close()
+
+        input()
 
         print('plotting cappis at 1 km by time...')
         fig, ax = plt.subplots(1,1,figsize=(8,8))

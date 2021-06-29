@@ -1,0 +1,2 @@
+samples/KLGX_KATX_20151203_010200_V06_dopvel_gridded.nc
+samples/KLGX_KATX_20151203_010607_V06_dopvel_gridded.nc

@@ -35,7 +35,8 @@ import xarray as xr
 
 #import analysis_tools as AT
 #import lightning_tools as LT
-from CSU_RadarTools.csu_radartools import csu_fhc
+#from CSU_RadarTools.csu_radartools import csu_fhc
+import csu_fhc
 import general_tools as gentools
 import RadarConfig
 from matplotlib.colors import from_levels_and_colors
