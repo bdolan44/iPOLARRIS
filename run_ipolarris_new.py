@@ -101,7 +101,7 @@ else:
             print('made composite')
             #ax.set_title('{e} {r} Composite {d:%Y-%m-%d %H%M} UTC'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name), fontsize=18)
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            ax.text(1, 1, '{d:%Y-%m-%d %H%M} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             
             #minlat = config['ylim'][0]
             #maxlat = config['ylim'][1]
@@ -111,7 +111,7 @@ else:
 
             #plt.tight_layout()
             os.makedirs(config['image_dir']+'composite_'+rdata.dz_name+'/',exist_ok=True)
-            plt.savefig('{i}Composite_{v}_{d:%Y-%m-%d_%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400, bbox_inches='tight')
+            plt.savefig('{i}Composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400, bbox_inches='tight')
             plt.close()
 
         input()
