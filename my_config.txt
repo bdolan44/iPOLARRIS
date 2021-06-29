@@ -24,11 +24,13 @@ type                == 'obs'                == # Type of input data: 'obs' OR 'w
 
 image_dir   == './figures/' == # Output figure directory
 ptype       == 'png'        == # Output figure file extenstion (i.e. .png, .jpg, ...)
+color_adj   == True         == # Use color-blindness palette for output (i.e. reflectivity)
 
 #--------------------------
 #------ Output Flags ------
 #--------------------------
 
+compo_ref           == True     == # FA) Turn on plotting for composite reflectivity
 plot_int            == False    == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs             == False    == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
@@ -56,7 +58,7 @@ band        == S            == # Radar band: X, C OR S. Note: needs to be capita
 exper       == 'KLGX'       == # Radar location
 lat         == 47.116806    == # Latitude of the radar station
 lon         == -124.10625   == # Longitude of the radar station
-radarname   == SPOL         == # 
+radarname   == S-band       == # 
 
 #------------------------
 #------ Radar File ------
