@@ -1465,3 +1465,78 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False,statpt=False):
     newax.set_ylabel('Latitude',fontsize=16)
 
     return fig,ax#,gl#,dzcomp
+
+
+######################################
+##### plot_driver.PLOT_CAPPI#### #####
+######################################
+
+# Description: plot_cappi overlays a Cartopy basemap with a CAPPI plot of a given variable at a given height.
+
+def plot_cappi(rdata,var,zvar,hght,time,time_match,resolution='10m',cs_over=False,statpt=False):
+    
+    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+    
+    # (1) Find the index in the height variable of the altitude where CAPPI will be drawn.
+    if 'd' in rdata.data[zvar].dims:
+        try:
+            whz = np.where(rdata.data[zvar].sel(d=time).values==hght)[0][0]
+        except IndexError as ie:
+            zdiffs = np.median(np.diff(rdata.data[zvar].values))
+            whz = np.where(np.isclose(rdata.data[zvar].sel(d=time).values,hght,rtol=zdiffs))
+    else:
+        whz = np.where(rdata.data[zvar].values==hght)[0][0]
+
+    # (2) Find lat/lon array for the basemap. If not found, calculate it using get_latlon_fromxy().
+    if not rdata.lat_name in rdata.data.keys():
+        print('No latitude. Calculating....')
+        rdata.get_latlon_fromxy()
+        lats = rdata.data['lat']
+        lons = rdata.data['lon']
+    else:
+        if 'd' in rdata.data[rdata.lat_name].dims:
+            lats = rdata.data[rdata.lat_name].sel(d=time).values
+            lons= rdata.data[rdata.lon_name].sel(d=time).values
+        else:
+            lats = rdata.data[rdata.lat_name].values
+            lons= rdata.data[rdata.lon_name].values
+        
+    # (3) Initiate a new figure with Mercator projection.
+    fig, ax = plt.subplots(1,1,figsize=(10,8))
+    #ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
+
+    # (4) Overlay variable data as a colormesh plot (with colorbar) using PlateCarree projection.
+    rdata.cappi(var,z=whz,ts=time_match,contour='CS',ax=ax)
+    #if statpt: ax.plot(rdata.lon_0,rdata.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
+    if statpt: ax.plot(0,0,markersize=12,marker='^',color='k')
+   
+    #lur,bur,wur,hur = ax.get_position().bounds
+    #cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
+    #cbar_ax = fig.add_axes(cbar_ax_dims)
+    #cbt = plt.colorbar(cb,cax=cbar_ax)
+    #cbt.ax.tick_params(labelsize=16)
+    #if var.startswith('REF'): labtxt = 'Composite Reflectivity (dBZ)'
+    #else: labtxt = var
+    #cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
+
+    # (5) Make the figure look pretty! 
+    #ax.coastlines(resolution=resolution)
+    #ax.set_extent([np.min(lons), np.max(lons), np.min(lats), np.max(lats)])
+    #lon_formatter = LongitudeFormatter(number_format='.1f')
+    #lat_formatter = LatitudeFormatter(number_format='.1f')
+    #ax.xaxis.set_major_formatter(lon_formatter)
+    #ax.yaxis.set_major_formatter(lat_formatter)
+
+    #gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
+    #gl.xlabels_top = False
+    #gl.ylabels_right = False
+    #gl.xlabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
+    #gl.ylabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
+
+    #newax = fig.add_axes(ax.get_position(), frameon=False)
+    #newax.tick_params(axis='x', labelsize=0, length=0, pad=20)
+    #newax.tick_params(axis='y', labelsize=0, length=0, pad=55)
+    #newax.set_xlabel('Longitude',fontsize=16)
+    #newax.set_ylabel('Latitude',fontsize=16)
+
+    return fig,ax#,gl#,dzcomp

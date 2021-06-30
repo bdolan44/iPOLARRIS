@@ -1448,7 +1448,7 @@ class RadarData(RadarConfig.RadarConfig):
 #                 try:
 #                     cs = np.squeeze(csdats.sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
 #                     print('cs shape',np.shape(cs))
-                ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8,zorder=10)
+                cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8,zorder=10)
 #                 except:
 #                     cs = np.squeeze(csdats.sel(x=slice(xmini, xmaxi), y=slice(ymini, ymaxi)).values)
 #                     ax.contour(xdat,ydat,csvals,levels = [0,2],colors=['blue','k'],linewidths = [2],alpha = 0.8)
@@ -1462,7 +1462,7 @@ class RadarData(RadarConfig.RadarConfig):
         if range_lim >= 10:
             cb_format = '%d'
 
-
+        '''
         if labels:
             cb = fig.colorbar(dummy, ax=ax, fraction=0.03, pad=0.03, format=cb_format)
             if var in self.lims.keys():
@@ -1481,26 +1481,33 @@ class RadarData(RadarConfig.RadarConfig):
         else: # if this variable is not included in the defaults, have a lot less customization
             # can get around this with the **kwargs
             dummy = ax.pcolormesh(self.data[self.x_name], self.data[self.y_name], self.data[var][z_ind,:,:], **kwargs)
-
             cb = fig.colorbar(dummy, ax=ax, fraction=0.03, pad=0.03)
             if cblabel is not None:
                 cb.set_label(cblabel)
-
-
+        '''
+        lur,bur,wur,hur = ax.get_position().bounds
+        cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
+        cbar_ax = fig.add_axes(cbar_ax_dims)
+        cbt = fig.colorbar(dummy,cax=cbar_ax)
+        cbt.ax.tick_params(labelsize=16)
+        if var.startswith('REF'): labtxt = 'Reflectivity (dBZ)'
+        elif var.startswith('RRP'): labtxt = 'Rain Rate (mm/hour)'
+        else: labtxt = var
+        cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
 
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
             #print('setting min and max',xmin,xmax,ymin,ymax)
             ax.axis([xmin, xmax, ymin, ymax])
-#            if labels:
-#                 ax.set_xlabel('Longitude')
-#                 ax.set_ylabel('Latitude')
+            if labels:
+                 ax.set_xlabel('Longitude')
+                 ax.set_ylabel('Latitude')
         else:
             ax.axis([xmini, xmaxi, ymini, ymaxi])
             if labels:
-                ax.set_xlabel('Distance E of radar (km)')
-                ax.set_ylabel('Distance N of radar (km)')
-
+                ax.set_xlabel('Distance E of radar (km)',fontsize=16)
+                ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+        ax.tick_params(axis='both', which='major', labelsize=16)
 
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
