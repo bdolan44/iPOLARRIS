@@ -139,7 +139,8 @@ else:
             
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            
+            ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+
             os.makedirs(config['image_dir']+'cappi_'+rdata.dz_name+'/',exist_ok=True)
             plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
             plt.close()
@@ -165,7 +166,8 @@ else:
             
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            
+            ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+
             os.makedirs(config['image_dir']+'cappi_'+rdata.rr_name+'/',exist_ok=True)
             plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
             plt.close()
@@ -174,8 +176,6 @@ else:
 
         print('\nDone! Saved to '+config['image_dir']+'cappi_'+rdata.rr_name+'/')
         print('Moving on.\n')
-
-        input()
 
     # tdate = datetime.datetime(2006,1,23,18,00)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
@@ -211,6 +211,8 @@ else:
             tim = v.strftime(tformat)
             dum =[tim,rrconv[i].values,rrstrat[i].values,rrall[i].values]
             v_writer.writerow(dum)
+
+    input()
 
     conv = np.where(rdata.data[rdata.cs_name].values == 2)
     strat = np.where(rdata.data[rdata.cs_name].values == 1)
