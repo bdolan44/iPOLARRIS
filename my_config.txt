@@ -22,7 +22,7 @@ type                == 'obs'                == # Type of input data: 'obs' OR 'w
 #------ Output ------
 #--------------------
 
-image_dir   == './figures/' == # Output figure directory
+image_dir   == './output/'  == # Output figure directory
 ptype       == 'png'        == # Output figure file extenstion (i.e. .png, .jpg, ...)
 color_adj   == True         == # Use color-blindness palette for output (i.e. reflectivity)
 
@@ -30,9 +30,20 @@ color_adj   == True         == # Use color-blindness palette for output (i.e. re
 #------ Output Flags ------
 #--------------------------
 
-compo_ref           == True     == # FA) Turn on plotting for spatial composite reflectivity plotting
-cappi_ref           == True     == # FB) Turn on plotting for reflectivity CAPPIs
-cappi_rr            == True     == # FC) Turn on plotting for rain rate CAPPIs 
+# Base Plots
+compo_ref           == False     == # FA) Turn on plotting for spatial composite reflectivity plotting
+cappi_ref           == False     == # FB) Turn on plotting for reflectivity CAPPIs
+cappi_rr            == False     == # FC) Turn on plotting for rain rate CAPPIs 
+rrstats_txt         == False     == # FD)
+rrhist_txt          == False     == # FE)
+rrstats_areas_txt   == False     == # FF)
+rr_timeseries       == False     == # FG)
+vv_profiles         == False     == # FH)
+percentiles_txt     == False     == # FI)
+vert_ref            == False     == # FJ)
+refcfad             == False     == # FK)
+
+# Advanced Plots
 plot_int            == False    == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs             == False    == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.

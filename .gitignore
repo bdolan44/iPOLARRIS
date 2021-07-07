@@ -6,4 +6,4 @@
 *.pyc
 *.p
 *.npy
-figures/*
+output/*

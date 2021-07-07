@@ -2784,7 +2784,7 @@ class RadarData(RadarConfig.RadarConfig):
     def calc_timeseries_stats(self,var,ht_lev = 3,thresh=-99.,cs_flag=False,make_zeros=False,areas=False):
         #First calculate the domain averaged rain rates at a given level.
         #if self.rr_name is not None:
-        #    rr_timeseries_uncond = rr.mean(dim=['x','y','z'],skipna=True)       
+        #    rr_timeseries_uncond = rr.mean(dim=['x','y','z'],skipna=True)
         data = deepcopy(self.data[var].sel(z=slice(ht_lev,ht_lev+1)))
         whbad= np.where(data.values<thresh)
 
@@ -2795,13 +2795,13 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             data.values[whbad] = np.nan
         
-#       print('dat min:',data.values.min())
-            
+        #print('dat max:',data.values.max())
+
         if cs_flag is not False:
             datstrat = data.where(self.data[self.cs_name].sel(z=slice(1,2))==1)
             datconv = data.where(self.data[self.cs_name].sel(z=slice(1,2))==2)
             datall = data.where(self.data[self.cs_name].sel(z=slice(1,2))>0)       
-            if areas==False:       
+            if areas==False:
                 datstrat_ts= datstrat.mean(dim=['z','y','x'],skipna=True)
                 datconv_ts= datconv.mean(dim=['z','y','x'],skipna=True)
                 datall_ts= datall.mean(dim=['z','y','x'],skipna=True)
@@ -2810,7 +2810,6 @@ class RadarData(RadarConfig.RadarConfig):
                 datstrat_ts = cssum.where(cssum==1).count(dim=['y','x'])
                 datconv_ts = cssum.where(cssum==2).count(dim=['y','x'])
                 datall_ts = cssum.where(cssum>0).count(dim=['y','x'])
-            
             return datstrat_ts,datconv_ts,datall_ts
         else:
 

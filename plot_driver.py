@@ -1040,15 +1040,16 @@ def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zl
             ax.plot(np.array(tm),cdat.mean(dim=['z','y','x'],skipna=True),color='r',label='Conv {e}'.format(e=typ),ls=ls)
             ax.plot(np.array(tm),sdat.mean(dim=['z','y','x'],skipna=True),color='b',label='strat {e}'.format(e=typ),ls=ls)
         
-        ax.legend(loc='best')
+        ax.legend(loc='best',fontsize=14)
 
     else:
         ax.plot(np.array(tm),data.where(data>thresh).mean(dim=['z','y','x'],skipna=True),color='k',label='Total')
 
-    ax.xaxis.set_major_formatter(hourFormatter)
-    ax.xaxis.set_major_locator(HourLocator(interval=1))
+    #ax.xaxis.set_major_formatter(hourFormatter)
+    #ax.xaxis.set_major_locator(HourLocator(interval=1))
     #d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
-    ax.set_xlabel('Time (UTC)')
+    ax.tick_params(axis='both',labelsize=14)
+    ax.set_xlabel('Time (UTC)',fontsize=16)
 
     return ax#,adat,cdat,sdat
 
@@ -1076,7 +1077,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
-        ax.legend(loc='best')
+        ax.legend(loc='best',fontsize=14)
         ax.plot(wdn50,zdat,color=c2)
         ax.plot(wdn90,zdat,color=c1)
         ax.plot(wdn99,zdat,color=c3)
@@ -1097,9 +1098,11 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
         ax.plot(wup50,zdat,color=c2,label='50th {e}'.format(e=typ),ls=ls)
         ax.plot(wup90,zdat,color=c1,label='90th {e}'.format(e=typ),ls=ls)
         ax.plot(wup99,zdat,color=c3,label='99th {e}'.format(e=typ),ls=ls)
-        ax.legend(loc='best')
+        ax.legend(loc='best',fontsize=14)
 
-    ax.set_ylabel('Height (km)')
+    ax.tick_params(axis='both',labelsize=14)
+    ax.set_ylabel('Height (km)',fontsize=16)
+
     return ax
     
     
@@ -1122,7 +1125,7 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
             zdat = z.values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
         ax.plot(wdn50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
-        ax.legend(loc='best')
+        ax.legend(loc='best',fontsize=14)
 
     else:
         pdat =data.load().copy()
@@ -1135,9 +1138,10 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
         else:
             zdat = z.values
         ax.plot(wup50,zdat,color=c,label='{l} {e}'.format(l=lab,e=typ),ls=ls)
-        ax.legend(loc='best')
+        ax.legend(loc='best',fontsize=14)
 
-    ax.set_ylabel('Height (km)')
+    ax.tick_params(axis='both',labelsize=14)
+    ax.set_ylabel('Height (km)',fontsize=16)
     return ax
     
 def hid_cdf(data,rdata,hts,species,z_resolution=1.0, ret_z=0,pick=None,z_ind =0, mask = None):
@@ -1298,7 +1302,7 @@ def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_
     else:
         return cfad_out,value_bins
 
-def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None, 
+def plot_cfad(fig,cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None, 
         log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
 
 
@@ -1339,9 +1343,17 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 #            pc = ax.pcolormesh(vbins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
             pc = ax.pcolormesh(vbins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
 
-    cb = plt.colorbar(pc, ax=ax)
-    cb.set_label('Frequency (%)')
-    ax.set_ylabel('Height (km MSL)')
+    #cb = plt.colorbar(pc, ax=ax)
+    #cb.set_label('Frequency (%)',fontsize=16)
+    lur,bur,wur,hur = ax.get_position().bounds
+    cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
+    cbar_ax = fig.add_axes(cbar_ax_dims)
+    cbt = plt.colorbar(pc,cax=cbar_ax)
+    cbt.ax.tick_params(labelsize=16)
+    cbt.set_label('Frequency (%)', fontsize=16, rotation=270, labelpad=20)
+
+    ax.tick_params(axis='both',labelsize=14)
+    ax.set_ylabel('Height (km MSL)',fontsize=16)
 #        try:
     if rconf is not None:
         if var == 'DRC' or var == 'DRS':
