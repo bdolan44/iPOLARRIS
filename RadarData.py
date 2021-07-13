@@ -2108,14 +2108,13 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
     def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, 
-            log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False,cscfad = False, **kwargs):
+            log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False,cscfad = False, cbar=None, ylab=None, **kwargs):
 
         from matplotlib.colors import from_levels_and_colors
         if bins is None:
             bins = np.linspace(self.lims[var][0], self.lims[var][1], nbins)
         else:
             pass
-
 
         multiple = np.int(z_resolution/self.dz)
 #         print self.dz
@@ -2137,7 +2136,6 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             norm = None
 
-
         # plot the CFAD
         cfad_ma = np.ma.masked_where(cfad==0, cfad)
 #        print np.max(cfad_ma),var
@@ -2150,7 +2148,6 @@ class RadarData(RadarConfig.RadarConfig):
             #pc = ax.contourf(bins[0:-1],self.data[self.z_name].data[::multiple],(cfad_ma/np.sum(cfad_ma))*100.,levs,color=cols)
             pc = ax.contourf(bins[0:-1],hts,(cfad_ma),levs,color=cols,cmap=cmap,norm=norm,extend='both')
         else:
-
             if levels is not None:
                 cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
                 #print cmap
@@ -2161,17 +2158,24 @@ class RadarData(RadarConfig.RadarConfig):
 
 #        print np.shape(cfad_ma)
 
-        cb = fig.colorbar(pc, ax=ax)
-        cb.set_label('Frequency (%)')
-        ax.set_ylabel('Height (km MSL)')
+        if cbar is not None:
+            cb = fig.colorbar(pc, ax=ax)
+            cb.set_label('Frequency (%)',fontsize=18)
+            cb.ax.tick_params(labelsize=16)
+
+        if ylab is not None: 
+            ax.set_ylabel('Height (km MSL)',fontsize=22)
+            ax.tick_params(axis='y',labelsize=20)
+        else: ax.tick_params(axis='y',labelsize=0)
 # #        try:
-        ax.set_xlabel('%s %s' %(var, self.units[var]))
+        ax.set_xlabel('%s %s' %(var, self.units[var]),fontsize=22)
+        ax.tick_params(axis='x',labelsize=20)
 #        ax.set_title("{d} {r} {v}".format(d=self.date,r=self.radar_name,v=self.longnames[var]))
 #        ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
 #       except:
 #            pass
 
-        return fig, ax
+        return fig, ax, pc
 
 
 #############################################################################################################

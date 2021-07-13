@@ -785,21 +785,30 @@ def make_single_pplots(rdat,flags,config,y=None):
 
     if flags['cfad_mpanel_flag'] == True:
         print ('Working on Cfad mpanel')
-        fig, ax = plt.subplots(2,2,figsize=(18,12))
+        fig, ax = plt.subplots(2,2,figsize=(16,12),gridspec_kw={'wspace': 0.05, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
 
         if config['wname'] in rdat.data.variables.keys():
-            dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
+            dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,ylab=True)
         dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan, ylab=True)
         dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
-        #plt.clf()
+        
+        lur1,bur1,wur1,hur1 = axf[1].get_position().bounds
+        lur2,bur2,wur2,hur2 = axf[-1].get_position().bounds
+        cbar_ax_dims = [lur2+wur2+0.02,bur2-0.001,0.03,bur1+hur1]
+        cbar_ax = fig.add_axes(cbar_ax_dims)
+        cbt = plt.colorbar(dum[-1],cax=cbar_ax)
+        cbt.ax.tick_params(labelsize=20)
+        cbt.set_label('Frequency (%)', fontsize=22, rotation=270, labelpad=20)
 
+        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y-%m-%d_%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.clf()
+        
         if config['plot_cs'] == True:
-            fig, ax = plt.subplots(2,2,figsize=(18,12))
+            fig, ax = plt.subplots(2,2,figsize=(18,12),constrained_layout=True)
             axf = ax.flatten()
 
             if config['wname'] in rdat.data.variables.keys():
@@ -867,7 +876,7 @@ def make_single_pplots(rdat,flags,config,y=None):
     
     if flags['hid_cfad_flag'] == True:
         fig, ax = rdat.plot_hid_cdf()
-        plt.savefig('{d}{p}_CFAD_HID_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_CFAD_HID_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
 
         plt.clf()
 

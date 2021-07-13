@@ -312,12 +312,13 @@ else:
         ################################################################################
         ##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
         ## The conditional rain rate is achieved by sending threshold = 0.
-        fig,ax = plt.subplots(1,1,figsize=(10,10))
+        fig,ax = plt.subplots(1,1,figsize=(12,8))
         ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=1,make_zeros=False)
         ax = plot_driver.plot_timeseries(rdata.data[rdata.rr_name],rdata.date,ax,cs=True,rdata=rdata,thresh=0,zlev=1,ls='--',typ='uncond',make_zeros=True)#,zlev=0)
 
         ax.set_ylabel('Rain Rate (mm/hr)',fontsize=16)
         #ax.set_title('Precipitation Timeseries ')
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         plt.savefig('{i}precip_timeseries_convstrat_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
         plt.close()
@@ -337,12 +338,13 @@ else:
             print('\nIN RUN_IPOLARRIS_NEW... creating vertical profile figure.')
             print('Plotting vertical profile for variable '+rdata.w_name+'...')
  
-            fig,ax = plt.subplots(1,1,figsize=(10,10))
+            fig,ax = plt.subplots(1,1,figsize=(12,8))
             ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
             ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
-            ax.set_xlabel('Vertical velocity m/s',fontsize=16)
+            ax.set_xlabel('Vertical Velocity (m/s)',fontsize=16)
             #ax.set_title('Vertical velocity profiles')
-            #plt.tight_layout()
+            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+ #plt.tight_layout()
             plt.savefig('{i}quantile_vvel_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
             plt.close()
 
@@ -395,10 +397,11 @@ else:
         print('Plotting vertical profile for variable '+rdata.dz_name+'...')
         
         ##Next let's make mean vertical profile of reflectivity
-        fig,ax = plt.subplots(1,1,figsize=(10,10))
+        fig,ax = plt.subplots(1,1,figsize=(12,8))
         ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name],ax,split_updn=False,lab='dz',thresh=-50)
         #ax.set_title('Vertical profile of reflectivity')
-        ax.set_xlabel('Reflectivity',fontsize=16)
+        ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         plt.savefig('{i}meanprofile_refl_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
 
@@ -418,11 +421,12 @@ else:
 #    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
         cfaddat,vbins,r1ht = rdata.cfad(rdata.dz_name,ret_z=1,z_resolution=1.0,value_bins=np.arange(0,82,2),cscfad=False)
 
-        fig,ax = plt.subplots(1,1,figsize=(10,10))
+        fig,ax = plt.subplots(1,1,figsize=(12,8))
         ax = plot_driver.plot_cfad(fig,cfaddat, hts = r1ht,  vbins = vbins,ax=ax,cfad_on = 0,tspan = config['date'],maxval=20,cont=True,levels = True)
 
-        ax.set_xlabel('Reflectivity',fontsize=16)
+        ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
         #ax.set_title('{c} CFAD'.format(c=rdata.exper))
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
         plt.close()
