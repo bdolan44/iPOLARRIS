@@ -761,7 +761,13 @@ def plot_upstat(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
 
         
 def make_single_pplots(rdat,flags,config,y=None):
-    print ('in make_singl_pplots')
+    
+    print('\n#######################################')
+    print('####### Starting plot_driver.py #######')
+    print('#######################################\n')
+
+    print('ADVANCED PLOTTING: plot_driver.make_single_pplots')
+    print('Initiating...')
     tspan= [rdat.date[0],rdat.date[-1]]
     tms = np.array(rdat.date)
     #print('DATES',np.array(rdat.date))
@@ -787,10 +793,10 @@ def make_single_pplots(rdat,flags,config,y=None):
         dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
         dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
         dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-        plt.tight_layout()
+        #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
-        plt.clf()
+        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
+        #plt.clf()
 
         if config['plot_cs'] == True:
             fig, ax = plt.subplots(2,2,figsize=(18,12))
