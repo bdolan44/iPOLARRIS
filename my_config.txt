@@ -31,17 +31,17 @@ color_adj   == True         == # Use color-blindness palette for output (i.e. re
 #--------------------------
 
 # Base Plots
-compo_ref           == False     == # FA) Turn on plotting for spatial composite reflectivity plotting
-cappi_ref           == False     == # FB) Turn on plotting for reflectivity CAPPIs
-cappi_rr            == False     == # FC) Turn on plotting for rain rate CAPPIs 
-rrstats_txt         == False     == # FD)
-rrhist_txt          == False     == # FE)
-rrstats_areas_txt   == False     == # FF)
-rr_timeseries       == False     == # FG)
-vv_profiles         == False     == # FH)
-percentiles_txt     == False     == # FI)
-vert_ref            == False     == # FJ)
-refcfad             == False     == # FK)
+compo_ref           == True     == # FA) Turn on plotting for spatial composite reflectivity plotting
+cappi_ref           == True     == # FB) Turn on plotting for reflectivity CAPPIs
+cappi_rr            == True     == # FC) Turn on plotting for rain rate CAPPIs 
+rrstats_txt         == True     == # FD)
+rrhist_txt          == True     == # FE)
+rrstats_areas_txt   == True     == # FF)
+rr_timeseries       == True     == # FG)
+vv_profiles         == True     == # FH)
+percentiles_txt     == True     == # FI)
+vert_ref            == True     == # FJ)
+refcfad             == True     == # FK)
 
 # Advanced Plots
 plot_int            == False    == # FA) Turn on plotting of integrated parameters over the whole time frame
