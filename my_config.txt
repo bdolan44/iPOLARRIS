@@ -31,23 +31,23 @@ color_adj   == True         == # Use color-blindness palette for output (i.e. re
 #--------------------------
 
 # Base Plots
-compo_ref           == True     == # FA) Turn on plotting for spatial composite reflectivity plotting
-cappi_ref           == True     == # FB) Turn on plotting for reflectivity CAPPIs
-cappi_rr            == True     == # FC) Turn on plotting for rain rate CAPPIs 
-rrstats_txt         == True     == # FD)
-rrhist_txt          == True     == # FE)
-rrstats_areas_txt   == True     == # FF)
-rr_timeseries       == True     == # FG)
-vv_profiles         == True     == # FH)
-percentiles_txt     == True     == # FI)
-vert_ref            == True     == # FJ)
-refcfad             == True     == # FK)
+compo_ref           == False     == # FA) Turn on plotting for spatial composite reflectivity plotting
+cappi_ref           == False     == # FB) Turn on plotting for reflectivity CAPPIs
+cappi_rr            == False     == # FC) Turn on plotting for rain rate CAPPIs 
+rrstats_txt         == False     == # FD)
+rrhist_txt          == False     == # FE)
+rrstats_areas_txt   == False     == # FF)
+rr_timeseries       == False     == # FG)
+vv_profiles         == False     == # FH)
+percentiles_txt     == False     == # FI)
+vert_ref            == False     == # FJ)
+refcfad             == False     == # FK)
 
 # Advanced Plots
 plot_int            == False    == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs             == False    == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
-cfad_mpanel_flag    == False    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
+cfad_mpanel_flag    == True    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
 hid_cfad_flag       == False    == # FD) HID CFAD
 joint_flag          == False    == # FE) Z vs. Zdr
 cfad_individ_flag   == False    == # FF) Make separate images for dbz, Zdr, Kdp, W and Rho
@@ -112,8 +112,8 @@ wname       == upward_air_velocity  == # Name of the vertical wind field
 xname       == x                    == # Name of the zonal directional variable
 yname       == y                    == # Name of the meridional directional variables
 zname       == z                    == # Name of the vertical level field
-#xlim == [-100,100]                     ==#lat / lon zoom for CAPPIS
-#ylim == [-100,100]                     ==# lat / lon zoom for CAPPIS
+xlim == [-100,100]                     ==#lat / lon zoom for CAPPIS
+ylim == [-100,100]                     ==# lat / lon zoom for CAPPIS
 y==10.                                 ==#Lat of the y cross-section for RHI
 #xlim == [-127.0,-121.0]                     ==#lat / lon zoom for CAPPIS
 #ylim == [45.0,49.0]                     ==# lat / lon zoom for CAPPIS
