@@ -437,4 +437,8 @@ else:
         flags[k]=config[k]
 
     if any(flags.values()) == True:
-        plot_driver.make_single_pplots(rdata,flags,config) 
+        print('\n############################################')
+        print('####### Exiting run_ipolarris_new.py #######')
+        print('############################################\n')
+
+        plot_driver.make_single_pplots(rdata,flags,config)
