@@ -2521,11 +2521,13 @@ class RadarData(RadarConfig.RadarConfig):
 
         scalarMap = plt.cm.ScalarMappable(norm=self.normhid,cmap=self.hid_cmap)
         axcb = figure.add_axes(location) # x pos, y pos, x width, y width
-        cb = mpl.colorbar.ColorbarBase(axcb, cmap=self.hid_cmap, norm=self.normhid, boundaries=self.boundshid,\
-                orientation = 'vertical')
-        cb.set_ticks(np.arange(0,11))
+        cb = mpl.colorbar.ColorbarBase(axcb, cmap=self.hid_cmap, norm=self.normhid, boundaries=self.boundshid, orientation = 'vertical')
+        #cb.set_ticks(np.arange(0,10))
+        cb.set_ticks(np.arange(len(self.species))+0.5)
             # need to add a blank at the beginning of species to align labels correctly
-        labs = np.concatenate((np.array(['']), np.array(self.species)))
+        #labs = np.concatenate((np.array(['']), np.array(self.species)))
+        labs = np.array(self.species)
+        print(labs)
         cb.set_ticklabels(labs)
         return cb
 
@@ -2541,9 +2543,9 @@ class RadarData(RadarConfig.RadarConfig):
         if ax is None:
             fig, ax = plt.subplots(1,1)
         else:
-            fig = ax.get_figure()   
+            fig = ax.get_figure()
 
-        fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
+        #fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
         multiple = np.int(z_resolution/self.dz)
 #         if 'd' in self.data[self.z_name].dims:
 #             hgt = self.data[self.z_name].sel(d=0).values
@@ -2551,26 +2553,34 @@ class RadarData(RadarConfig.RadarConfig):
 #             hgt = self.data[self.z_name].valeus
         print(len(hgt),'heights!')
         for i, vl in enumerate(np.arange(0, len(hgt), multiple)):
-            #print vl,i
+            #print(vl,i)
 #            print self.data[self.z_name].data[vl]
             #print data[0,:]
 #            print('in plotting cfad',i, vl,np.shape(data),hgt[i])#,np.shape(data[0,:]))
-            ax.barh(hgt[i], data[0, i], left = 0., edgecolor = 'none', color = self.hid_colors[1]) 
+            ax.barh(hgt[i], data[0, i], left = 0., align = 'center', color = self.hid_colors[0]) 
             for spec in range(1, len(self.species)): # now looping thru the species to make bar plot
-                #print spec, np.max(data[spec,i])
-                
-                ax.barh(vl, data[spec, i], left = data[spec-1, i], \
-                color = self.hid_colors[spec+1], edgecolor = 'none')
+                #print spec, np.max(data[spec,i]) 
+                ax.barh(hgt[i], data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec], edgecolor = 'none')
+                #ax.barh(vl, data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec+1], edgecolor = 'none')
+
         ax.set_xlim(0,100)
         ax.set_xlabel('Cumulative frequency (%)')
         ax.set_ylabel('Height (km MSL)')
         # now have to do a custom colorbar?
-        self.HID_barplot_colorbar(fig)  # call separate HID colorbar function for bar plots
+
+        lur,bur,wur,hur = ax.get_position().bounds
+        cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
+        #cbar_ax = fig.add_axes(cbar_ax_dims)
+        #cbt = plt.colorbar(pc,cax=cbar_ax)
+        #cbt.ax.tick_params(labelsize=16)
+        #cbt.set_label('Frequency (%)', fontsize=16, rotation=270, labelpad=20)
+
+        self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
 
             #fig.suptitle('%04d/%02d/%02d - %02d:%02d:%02d %s, cell %d, HID CDF' \
             #                %(self.year,self.month,self.date,self.hour,self.minute,self.second, \
             #                self.radar, self.cell_num), fontsize = 14)
-        ax.set_title('%s %s HID CDF' % (self.print_date(), self.radar_name))
+        #ax.set_title('%s %s HID CDF' % (self.print_date(), self.radar_name))
 
         return fig, ax 
 

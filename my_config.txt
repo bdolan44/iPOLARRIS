@@ -47,8 +47,8 @@ refcfad             == False     == # FK)
 plot_int            == False    == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs             == False    == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
-cfad_mpanel_flag    == True    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
-hid_cfad_flag       == False    == # FD) HID CFAD
+cfad_mpanel_flag    == False    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
+hid_cfad_flag       == True    == # FD) HID CFAD
 joint_flag          == False    == # FE) Z vs. Zdr
 cfad_individ_flag   == False    == # FF) Make separate images for dbz, Zdr, Kdp, W and Rho
 hid_prof            == False    == # FG) Profile of HID species with height

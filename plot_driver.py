@@ -804,6 +804,8 @@ def make_single_pplots(rdat,flags,config,y=None):
         cbt.ax.tick_params(labelsize=20)
         cbt.set_label('Frequency (%)', fontsize=22, rotation=270, labelpad=20)
 
+        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        
         plt.savefig('{d}{p}_CFAD_4panel_{s:%Y-%m-%d_%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
         
@@ -876,6 +878,8 @@ def make_single_pplots(rdat,flags,config,y=None):
     
     if flags['hid_cfad_flag'] == True:
         fig, ax = rdat.plot_hid_cdf()
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        
         plt.savefig('{d}{p}_CFAD_HID_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
 
         plt.clf()
