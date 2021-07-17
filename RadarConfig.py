@@ -56,8 +56,10 @@ class RadarConfig(object):
 
 
         self.species = np.array(['DZ','RN','CR','AG','WS','VI','LDG','HDG','HA','BD'])
-        self.hid_colors = ['White','LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
-            'Lime','Yellow','Red','Fuchsia']
+        #self.hid_colors = ['White','LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
+        #    'Lime','Yellow','Red','Fuchsia']
+        self.hid_colors = ['LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
+            'Lime','Yellow','Red','Fuchsia']       
         self.pol_vars = np.array([self.dz_name, self.zdr_name, self.kdp_name, self.ldr_name, self.rho_name, self.hid_name])
 
         self.cs_colors = ['#FFFFFF', 'DodgerBlue', 'Red', 'Khaki']
@@ -155,7 +157,8 @@ class RadarConfig(object):
             hidcbar = deepcopy(color_list)
         self.hid_cmap = colors.ListedColormap(hidcbar)
 
-        self.boundshid = np.arange(0,12)
+        #self.boundshid = np.arange(0,12)
+        self.boundshid = np.arange(0,11)
         self.normhid = colors.BoundaryNorm(self.boundshid, self.hid_cmap.N)
 #############################################################################################################
     def set_cs_colorbar(self, color_list=None):
