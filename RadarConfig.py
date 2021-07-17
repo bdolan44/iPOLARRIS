@@ -158,7 +158,7 @@ class RadarConfig(object):
         self.hid_cmap = colors.ListedColormap(hidcbar)
 
         #self.boundshid = np.arange(0,12)
-        self.boundshid = np.arange(0,11)
+        self.boundshid = np.arange(self.hid_cmap.N+1)
         self.normhid = colors.BoundaryNorm(self.boundshid, self.hid_cmap.N)
 #############################################################################################################
     def set_cs_colorbar(self, color_list=None):
