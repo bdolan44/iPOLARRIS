@@ -17,8 +17,8 @@ from copy import deepcopy
 import RadarData
 import GeneralFunctions as GF
 from matplotlib import colors
-#plt.style.use('presentation')
-plt.style.use('default')
+plt.style.use('presentation.mplstyle')
+#plt.style.use('default')
 
 from matplotlib.dates import DateFormatter,HourLocator
 dayFormatter = DateFormatter('%H%M')      # e.g., 12
