@@ -2222,9 +2222,11 @@ class RadarData(RadarConfig.RadarConfig):
         cb = ax.contourf(edge[0][:-1],edge[1][:-1],hist.T,norm=colors.Normalize(vmin=0, vmax=np.max(hist)),levels=np.arange(0.01,np.max(hist),0.01))
         if cbon == True:
             #print ' making colorbar'
-            plt.colorbar(cb,ax=ax)
+            col = plt.colorbar(cb,ax=ax)
+            col.ax.tick_params(labelsize=24)
 
-
+        ax.tick_params(axis='both',labelsize=24)
+        
         # This will just look at the whole volume
 #        if above is None:
         return fig, ax

@@ -847,8 +847,8 @@ def make_single_pplots(rdat,flags,config,y=None):
         if config['wname'] in rdat.data.variables.keys():
 
             rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-            plt.tight_layout()
-            plt.savefig('{d}{p}_CFAD_W_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+            #plt.tight_layout()
+            plt.savefig('{d}{p}_CFAD_W_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400)
             plt.clf()
 
 
@@ -886,35 +886,35 @@ def make_single_pplots(rdat,flags,config,y=None):
 
     if flags['joint_flag'] == True:
 
-        fig, ax = plt.subplots(2,2,figsize=(12,12))
+        fig, ax = plt.subplots(2,2,figsize=(16,14),gridspec_kw={'wspace': 0.25, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
 
         zzdr_wrf,ed = rdat.hist2d(varx=rdat.dz_name,vary=rdat.zdr_name,binsx=config['dzbins'],binsy=config['drbins'])
         rdat.plot_2dhist(zzdr_wrf,ed,ax=axf[0])
-        axf[0].set_xlabel('Zdr')
-        axf[0].set_ylabel('dBZ')
-        axf[0].set_title(title_string)
+        axf[0].set_xlabel(rdat.zdr_name+' '+rdat.units[rdat.zdr_name],fontsize=26)
+        axf[0].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
+        #axf[0].set_title(title_string)
+
         zkdp_wrf,edk = rdat.hist2d(varx=rdat.dz_name,vary=rdat.kdp_name,binsx=config['dzbins'],binsy=config['kdbins'])
         rdat.plot_2dhist(zkdp_wrf,edk,ax=axf[1])
-        axf[1].set_title(title_string)
-        axf[1].set_xlabel('Kdp')
-        axf[1].set_ylabel('dBZ')
-
+        #axf[1].set_title(title_string)
+        axf[1].set_xlabel(rdat.kdp_name+' '+rdat.units[rdat.kdp_name],fontsize=26)
+        axf[1].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
 
         zw_wrf,edw = rdat.hist2d(varx=rdat.dz_name,vary=rdat.w_name,binsx=config['dzbins'],binsy=config['wbins'])
         rdat.plot_2dhist(zw_wrf,edw,ax=axf[2])
-        axf[2].set_title(title_string)
-        axf[2].set_xlabel('W')
-        axf[2].set_ylabel('dBZ')
+        #axf[2].set_title(title_string)
+        axf[2].set_xlabel(rdat.w_name+' '+rdat.units[rdat.w_name],fontsize=26)
+        axf[2].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
 
         zr_wrf,edr = rdat.hist2d(varx=rdat.rr_name,vary=rdat.w_name,binsx=config['rrbins'],binsy=config['wbins'],xthr=0.00000)
-        cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3],cbon=True)
-        axf[3].set_title(title_string)
-        axf[3].set_xlabel('W')
-        axf[3].set_ylabel(rdat.rr_name)
+        cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3])
+        #axf[3].set_title(title_string)
+        axf[3].set_xlabel(rdat.w_name+' '+rdat.units[rdat.w_name],fontsize=26)
+        axf[3].set_ylabel(rdat.rr_name+' '+rdat.units[rdat.rr_name],fontsize=26,labelpad=10)
         axf[3].set_ylim(0,50)
 
-        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
 
