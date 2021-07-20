@@ -842,38 +842,42 @@ def make_single_pplots(rdat,flags,config,y=None):
             plt.clf()
 
     if flags['cfad_individ_flag'] == True:
-        fig, ax = plt.subplots(1,1,figsize=(18,12))
     #        axf = ax.flatten()
         if config['wname'] in rdat.data.variables.keys():
 
-            rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
+            fig, ax = plt.subplots(1,1,figsize=(14,12))
+            rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
             #plt.tight_layout()
-            plt.savefig('{d}{p}_CFAD_W_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400)
+            ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+            plt.savefig('{d}{p}_CFAD_W_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
             plt.clf()
 
-
-        fig, ax = plt.subplots(1,1,figsize=(18,12))
-        rdat.cfad_plot(rdat.dz_name,ax = ax,bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        plt.tight_layout()
-        plt.savefig('{d}{p}_CFAD_dBZ_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+        fig, ax = plt.subplots(1,1,figsize=(14,12))
+        rdat.cfad_plot(rdat.dz_name,ax = ax,bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
+        #plt.tight_layout()
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+        plt.savefig('{d}{p}_CFAD_dBZ_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
-        fig, ax = plt.subplots(1,1,figsize=(18,12))
-        rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        plt.tight_layout()
-        plt.savefig('{d}{p}_CFAD_Zdr_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+        fig, ax = plt.subplots(1,1,figsize=(14,12))
+        rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
+        #plt.tight_layout()
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)       
+        plt.savefig('{d}{p}_CFAD_Zdr_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
-        fig, ax = plt.subplots(1,1,figsize=(18,12))
-        rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-        plt.savefig('{d}{p}_CFAD_Kdp_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
-        plt.tight_layout()
+        fig, ax = plt.subplots(1,1,figsize=(14,12))
+        rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+        plt.savefig('{d}{p}_CFAD_Kdp_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
+        #plt.tight_layout()
         plt.clf()
 
-        fig, ax = plt.subplots(1,1,figsize=(18,12))
-        rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-        plt.tight_layout()
-        plt.savefig('{d}{p}_CFAD_RHO_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+        fig, ax = plt.subplots(1,1,figsize=(14,12))
+        rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
+        #plt.tight_layout()
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+        plt.savefig('{d}{p}_CFAD_RHO_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
     
     if flags['hid_cfad_flag'] == True:
@@ -895,6 +899,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         axf[0].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
         #axf[0].set_title(title_string)
 
+        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         zkdp_wrf,edk = rdat.hist2d(varx=rdat.dz_name,vary=rdat.kdp_name,binsx=config['dzbins'],binsy=config['kdbins'])
         rdat.plot_2dhist(zkdp_wrf,edk,ax=axf[1])
         #axf[1].set_title(title_string)
@@ -920,6 +925,8 @@ def make_single_pplots(rdat,flags,config,y=None):
 
     if flags['hid_prof'] == True:
 
+        fig, ax = plt.subplots(1,1,figsize=(18,12))
+        
         hts, mwrf_water_vert = rdat.hid_vertical_fraction(config['hidwater'],z_resolution =config['z_resolution'])
         hts, mwrf_graup_vert = rdat.hid_vertical_fraction(config['hidgraup'],z_resolution =config['z_resolution'])
         hts, mwrf_hail_vert = rdat.hid_vertical_fraction(config['hidhail'],z_resolution =config['z_resolution'])
@@ -929,12 +936,16 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.plot(mwrf_graup_vert,hts,color='g',label='graupel',lw=lw)
         plt.plot(mwrf_hail_vert,hts,color='r',label='hail',lw=lw)
         plt.plot(mwrf_snow_vert,hts,color = 'yellow',label='snow',lw=lw)
-        plt.xlabel('Frequency (%)')
-        plt.ylabel('Height (km)')
-        plt.title(title_string)
-        plt.legend(loc = 'best')
-        plt.savefig('{d}{p}_HID_prof_{s:%Y%m%d%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=300)
+        ax.tick_params(axis='both',labelsize=22)
+        plt.xlabel('Frequency (%)',fontsize=24)
+        plt.ylabel('Height (km)',fontsize=24)
+        #plt.title(title_string)
+        plt.legend(loc='best',fontsize=22)
+
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        plt.savefig('{d}{p}_HID_prof_{s:%Y-%m-%d_%H%M%S}_{r}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
+
     if config['wname'] in rdat.data.variables.keys():
         if flags['up_width'] == True:
             tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
