@@ -904,13 +904,13 @@ def make_single_pplots(rdat,flags,config,y=None):
         zw_wrf,edw = rdat.hist2d(varx=rdat.dz_name,vary=rdat.w_name,binsx=config['dzbins'],binsy=config['wbins'])
         rdat.plot_2dhist(zw_wrf,edw,ax=axf[2])
         #axf[2].set_title(title_string)
-        axf[2].set_xlabel(rdat.w_name+' '+rdat.units[rdat.w_name],fontsize=26)
+        axf[2].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
         axf[2].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
 
         zr_wrf,edr = rdat.hist2d(varx=rdat.rr_name,vary=rdat.w_name,binsx=config['rrbins'],binsy=config['wbins'],xthr=0.00000)
         cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3])
         #axf[3].set_title(title_string)
-        axf[3].set_xlabel(rdat.w_name+' '+rdat.units[rdat.w_name],fontsize=26)
+        axf[3].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
         axf[3].set_ylabel(rdat.rr_name+' '+rdat.units[rdat.rr_name],fontsize=26,labelpad=10)
         axf[3].set_ylim(0,50)
 
