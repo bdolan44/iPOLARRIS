@@ -2159,9 +2159,9 @@ class RadarData(RadarConfig.RadarConfig):
 #        print np.shape(cfad_ma)
 
         if cbar is not None:
-            cb = fig.colorbar(pc, ax=ax)
-            cb.set_label('Frequency (%)',fontsize=18)
-            cb.ax.tick_params(labelsize=16)
+            cb = fig.colorbar(pc,ax=ax,pad=0.03)
+            cb.set_label('Frequency (%)',fontsize=22,rotation=270,labelpad=20)
+            cb.ax.tick_params(labelsize=20)
 
         if ylab is not None: 
             ax.set_ylabel('Height (km MSL)',fontsize=22)
