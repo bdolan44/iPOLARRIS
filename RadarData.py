@@ -557,7 +557,8 @@ class RadarData(RadarConfig.RadarConfig):
         self.gridded_height = np.zeros(self.data[self.dz_name].shape)
         #print(self.x)
         for i in range(self.data[self.z_name].shape[0]):
-                 self.gridded_height[:,:,i,...] = self.data[self.z_name][i]
+            #self.gridded_height[:,:,i,...] = self.data[self.z_name][i]
+            self.gridded_height[:,i,:,:] = self.data[self.z_name][i]
 
         self.T = np.interp(self.gridded_height, self.snd_height, self.snd_temp)
 
@@ -608,7 +609,8 @@ class RadarData(RadarConfig.RadarConfig):
 #            print('shape holds',np.shape(dzhold))
             if use_temp and hasattr(self, 'T'):
                #print ('Using T!')
-               tdum = self.T[v,...]
+               #tdum = self.T[v,...]
+               tdum = self.T[v,:,:,:]
                
                #print(type(tdum),'tdum is')
                #print('T:',np.shape(tdum))
@@ -2777,6 +2779,9 @@ class RadarData(RadarConfig.RadarConfig):
         #print np.shape(uw)
         #print np.shape(self.T[0,:,0,0])
         # now inerpolate this to the temps listed
+        print(self.T[0,:,0,0])
+        print(temps)
+        print(uw)
         self.T = xr.DataArray(data=self.T,dims=['d','z','y','x'])
         if 'd' in self.T.dims:
             print('shapes in updraft width',np.shape(uw),np.shape(self.T.sel(x=0,y=0)))
@@ -2784,6 +2789,8 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             f_temp_u = sint.interp1d(self.T[:,0,0], uw, bounds_error=False)
         uwp_interp = f_temp_u(temps)
+        print(uwp_interp)
+        input()
         #return temps, uw
         return temps,uwp_interp
 
