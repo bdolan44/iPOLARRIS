@@ -17,7 +17,8 @@ from copy import deepcopy
 import RadarData
 import GeneralFunctions as GF
 from matplotlib import colors
-plt.style.use('presentation')
+#plt.style.use('presentation')
+plt.style.use('default')
 
 from matplotlib.dates import DateFormatter,HourLocator
 dayFormatter = DateFormatter('%H%M')      # e.g., 12
@@ -1046,7 +1047,7 @@ def plot_timeseries(data,tm,ax,ls = '-',cs=False,rdata=None,thresh=-50,typ='',zl
 
     ax.xaxis.set_major_formatter(hourFormatter)
     ax.xaxis.set_major_locator(HourLocator(interval=1))
-    d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+    #d=plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
     ax.set_xlabel('Time (UTC)')
 
     return ax#,adat,cdat,sdat
@@ -1105,7 +1106,7 @@ def plot_quartiles(data,q1,q2,q3,z,ax,c1='goldenrod',c2='r',c3='k',split_updn=Fa
 def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=-50):
     if split_updn == True:
         
-        pdat=data.load()
+        pdat=data.load().copy()
         pdat.values[pdat.values<-100] = np.nan
         
         wup = pdat.where(data>0)
@@ -1124,7 +1125,7 @@ def plot_verprof(data,z,ax,c='r',lab='',split_updn=False,ls = '-',typ='',thresh=
         ax.legend(loc='best')
 
     else:
-        pdat =data.load()
+        pdat =data.load().copy()
         pdat.values[pdat.values<thresh] = np.nan
         
     
@@ -1369,23 +1370,28 @@ def plot_cfad(cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=None,
 
     return ax
 
-def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
+######################################
+##### plot_driver.PLOT_COMPOSITE #####
+######################################
+
+# Description: plot_composite overlays a Cartopy basemap with a colormesh plot of a given variable.
+
+def plot_composite(rdata,var,time,resolution='10m',cs_over=False,statpt=False):
+    
+    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+    
+    # (1) Create an array that is a copy of the variable of interest. Remove bad data.
     dat = deepcopy(rdata.data[var].sel(d=time))
+    # dat = np.ma.masked_below(rdata.data[rdata.zdr_name].sel(d=time).values,-2)
     whbad = np.where(rdata.data['CSS'].sel(d=time).values<0)
     dat.values[whbad] = np.nan
-    cs_arr = np.nanmax(np.squeeze(rdata.data['CSS'].sel(d=time).values),axis=0)
-    cs_arr = np.squeeze(cs_arr)
     dat = np.squeeze(dat.values)
-#    dat = np.ma.masked_below(rdata.data[rdata.zdr_name].sel(d=time).values,-2)
     dzcomp = np.nanmax(dat,axis=0)
+    cs_arr = np.squeeze(np.nanmax(np.squeeze(rdata.data['CSS'].sel(d=time).values),axis=0))
 
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
-    from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-
-    #ax.stock_img()
+    # (2) Find lat/lon array for the basemap. If not found, calculate it using get_latlon_fromxy().
     if not rdata.lat_name in rdata.data.keys():
-        print('no Latitude. cAlculating....')
+        print('No latitude. Calculating....')
         rdata.get_latlon_fromxy()
         lats = rdata.data['lat']
         lons = rdata.data['lon']
@@ -1399,16 +1405,11 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
         
     # Specifies the detail level of the map.
     # Options are '110m' (default), '50m', and '10m'
-    ax.coastlines(resolution=resolution)
-#    print(np.min(lons),np.max(lons))
-    ax.set_extent([np.min(lons), np.max(lons), np.min(lats), np.max(lats)])
-    lon_formatter = LongitudeFormatter(number_format='.1f')
-    lat_formatter = LatitudeFormatter(number_format='.1f')
-    ax.xaxis.set_major_formatter(lon_formatter)
-    ax.yaxis.set_major_formatter(lat_formatter)
+    # print(np.min(lons),np.max(lons))
     
-    if var in rdata.lims.keys():
-        print( 'var:',var)
+    # (3) Extract the range of values in the variable of interest and derive a colourmap.
+    if var in rdata.lims.keys(): # If the variable exists in the dataset:
+        #print( 'var:',var)
         range_lim = rdata.lims[var][1] - rdata.lims[var][0]
     #          print np.shape(data), np.shape(xdat),np.shape(ydat)
     #            print 'in var',var
@@ -1416,36 +1417,51 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False):
         vmin=rdata.lims[var][0]
         vmax=rdata.lims[var][1]
         cmap=rdata.cmaps[var]
-    else:
+    else: # If not
         print ('unrecognized var',var)
         dat = rdata.data[var].data
         dat[dat<-900.0]=np.nan
-        range_lim  = np.nanmax(dat) - np.nanmin(dat)
+        range_lim = np.nanmax(dat) - np.nanmin(dat)
         vmin=np.nanmin(dat)
         vmax=np.nanmax(dat)
         cmap = plt.cm.gist_ncar
 
+    # (4) Initiate a new figure with Mercator projection.
+    fig = plt.figure(figsize=(10,8))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
 
+    # (5) Overlay variable data as a colormesh plot (with colorbar) using PlateCarree projection.
     cb = ax.pcolormesh(lons,lats,dzcomp, vmin =vmin,vmax=vmax,cmap=cmap,transform=ccrs.PlateCarree())
-    cbt = plt.colorbar(cb)
-    cbt.set_label(var)
-    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
-    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
-    if cs_over == True:
-        ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
+    if cs_over == True: ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
+    if statpt: ax.plot(rdata.lon_0,rdata.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
+   
+    lur,bur,wur,hur = ax.get_position().bounds
+    cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
+    cbar_ax = fig.add_axes(cbar_ax_dims)
+    cbt = plt.colorbar(cb,cax=cbar_ax)
+    cbt.ax.tick_params(labelsize=16)
+    if var.startswith('REF'): labtxt = 'Composite Reflectivity (dBZ)'
+    else: labtxt = var
+    cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
 
-    for tick in ax.xaxis.get_major_ticks():
-                    tick.label.set_fontsize(22) 
-    for tick in ax.yaxis.get_major_ticks():
-                    tick.label.set_fontsize(22) 
+    # (6) Make the figure look pretty! 
+    ax.coastlines(resolution=resolution)
+    ax.set_extent([np.min(lons), np.max(lons), np.min(lats), np.max(lats)])
+    lon_formatter = LongitudeFormatter(number_format='.1f')
+    lat_formatter = LatitudeFormatter(number_format='.1f')
+    ax.xaxis.set_major_formatter(lon_formatter)
+    ax.yaxis.set_major_formatter(lat_formatter)
 
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                      linewidth=2, color='gray', alpha=0.5, linestyle='--')
-
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
     gl.xlabels_top = False
     gl.ylabels_right = False
-    gl.xlabel_style = {'size': 16, 'color': 'gray','rotation':-15}
-    gl.ylabel_style = {'size': 16, 'color': 'gray'}#,'rotation':-15}
+    gl.xlabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
+    gl.ylabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
 
-    
+    newax = fig.add_axes(ax.get_position(), frameon=False)
+    newax.tick_params(axis='x', labelsize=0, length=0, pad=20)
+    newax.tick_params(axis='y', labelsize=0, length=0, pad=55)
+    newax.set_xlabel('Longitude',fontsize=16)
+    newax.set_ylabel('Latitude',fontsize=16)
+
     return fig,ax#,gl#,dzcomp

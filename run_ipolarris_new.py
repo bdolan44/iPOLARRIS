@@ -1,40 +1,46 @@
-import numpy as np
-import os
+#===================================================
+#============== RUN_IPOLARRIS_NEW.PY ===============
+#===================================================
+
+# Import core Python packages
+from collections import OrderedDict
+import datetime
 import glob
-from netCDF4 import Dataset
 import matplotlib
 matplotlib.use('Agg')
+from netCDF4 import Dataset
+import numpy as np
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
-import xarray as xr
-
-import numpy as np
-
-import RadarData
-import datetime
-
-import RadarConfig
-import plot_driver
-#from polarris_config import run_exper
-#from polarris_config import get_data
+import sys
 import warnings
 warnings.filterwarnings('ignore')
+import xarray as xr
+
+# Import iPOLARRIS functions
 import GeneralFunctions as GF
-from skewPy import SkewT
-from collections import OrderedDict
 from polarris_driver_new import polarris_driver
-import os
-import sys
+import plot_driver
+import RadarData
+import RadarConfig
+from skewPy import SkewT
 
+#--------------- Main Program ----------------
 
-configfile = sys.argv[1:]
+print('\n#############################################')
+print('####### Starting run_ipolarris_new.py #######')
+print('#############################################')
+
+configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
 #config['image_dir'] ='./'
-print(config['extrax'],'EXTRA 1 is')
-#########################################
+#print(config['extrax'],'EXTRA 1 is')
 
+# If a second argument is passed for WRF config file, produce a bunch of comparison plots!
+# More comments in this section TBD!
 if sys.argv[2:]:
     configfile1 = sys.argv[2:]
     rdata2, config2 = polarris_driver(configfile1)
@@ -75,7 +81,7 @@ if sys.argv[2:]:
     fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad='convective',savefig=True)
 
 ################################################################################
-##################Now you can just start plotting!##############################
+################## Now you can just start plotting! ############################
 ################################################################################
 
 ### To see the variables that are available to plot, type:
@@ -86,57 +92,69 @@ else:
     ################################################################################
     ##Plot a composite reflectivity at a given time.
 
-
-    #tdate = datetime.datetime(2011,5,23,22,00)
+    # tdate = datetime.datetime(2011,5,23,22,00)
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-    print('In run_ipolarris...running the COMPOSITE figs.')
-    for i,d in enumerate(np.array(rdata.date)):
-        print('plotting composites by time....')
-        fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=True)
-        print('made composite')
-        rtimematch = d
-        ax.set_title('{e} {r} composite {d:%Y%m%d %H%M}'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name))
-        minlat = config['ylim'][0]
-        maxlat = config['ylim'][1]
-        minlon = config['xlim'][0]
-        maxlon = config['xlim'][1]
-        ax.set_extent([minlon, maxlon, minlat,maxlat])
+    if config['compo_ref']:
+    
+        print('IN RUN_IPOLARRIS_NEW... creating the COMPOSITE figs.')
+        print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
+        for i,rtimematch in enumerate(np.array(rdata.date)):
 
-        plt.tight_layout()
-        plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-        plt.close()
+            fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False,statpt=True)
+            #ax.set_title('{e} {r} Composite {d:%Y-%m-%d %H%M} UTC'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name), fontsize=18)
+            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            
+            #minlat = config['ylim'][0]
+            #maxlat = config['ylim'][1]
+            #minlon = config['xlim'][0]
+            #maxlon = config['xlim'][1]
+            #ax.set_extent([minlon, maxlon, minlat,maxlat])
 
-        print('plotting cappis at 1 km by time...')
-        fig, ax = plt.subplots(1,1,figsize=(8,8))
-        if 'd' in rdata.data[rdata.z_name].dims:
-            try:
-                whz = np.where(rdata.data[rdata.z_name].sel(d=i).values==config['z'])[0][0]
-            except IndexError as ie:
-                #print('checking z...',rdata.data[rdata.z_name].sel(d=i).values)
-                zdiffs = np.median(np.diff(rdata.data[rdata.z_name].values))
-                whz = np.where(np.isclose(rdata.data[rdata.z_name].sel(d=i).values,config['z'],rtol=zdiffs))[0][0]
-                
-        else:
-            whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-        print('whz in run 122',whz)
-        rdata.cappi(rdata.dz_name,z=whz,ts=d,contour='CS',ax=ax)
-        ax.set_title('CAPPI DZ {t:%Y%m%d_%M%H%S} {h} km'.format(t=d,h=rdata.data['z'].values[whz]))
-        ax.set_xlim(config['xlim'][0],config['xlim'][1])
-        ax.set_ylim(config['ylim'][0],config['ylim'][1])
-#        ax.set_extent([minlon, maxlon, minlat,maxlat])
-        plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-        plt.close()
+            #plt.tight_layout()
+            os.makedirs(config['image_dir']+'composite_'+rdata.dz_name+'/',exist_ok=True)
+            plt.savefig('{i}Composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400, bbox_inches='tight')
+            plt.close()
+            print(rtimematch)
+        
+        print('\nDone! Saved to '+config['image_dir']+'composite_'+rdata.dz_name+'/')
+        input()
 
-        fig, ax = plt.subplots(1,1,figsize=(8,8))
-    #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-        rdata.cappi(rdata.rr_name,z=whz,ts=d,contour='CS',ax=ax)
-        ax.set_xlim(config['xlim'][0],config['xlim'][1])
-        ax.set_ylim(config['ylim'][0],config['ylim'][1])
-        ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'].values[2]))
-        plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
-        plt.close()
-  
+    if config['compo_ref']:
+ 
+        for i,rtimematch in enumerate(np.array(rdata.date)):
+
+            print('plotting cappis at 1 km by time...')
+            fig, ax = plt.subplots(1,1,figsize=(8,8))
+            if 'd' in rdata.data[rdata.z_name].dims:
+                try:
+                    whz = np.where(rdata.data[rdata.z_name].sel(d=i).values==config['z'])[0][0]
+                except IndexError as ie:
+                    #print('checking z...',rdata.data[rdata.z_name].sel(d=i).values)
+                    zdiffs = np.median(np.diff(rdata.data[rdata.z_name].values))
+                    whz = np.where(np.isclose(rdata.data[rdata.z_name].sel(d=i).values,config['z'],rtol=zdiffs))[0][0]
+                    
+            else:
+                whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
+            print('whz in run 122',whz)
+            rdata.cappi(rdata.dz_name,z=whz,ts=d,contour='CS',ax=ax)
+            ax.set_title('CAPPI DZ {t:%Y%m%d_%M%H%S} {h} km'.format(t=d,h=rdata.data['z'].values[whz]))
+            ax.set_xlim(config['xlim'][0],config['xlim'][1])
+            ax.set_ylim(config['ylim'][0],config['ylim'][1])
+    #        ax.set_extent([minlon, maxlon, minlat,maxlat])
+            plt.savefig('{i}DZ_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+            plt.close()
+
+            fig, ax = plt.subplots(1,1,figsize=(8,8))
+        #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
+            rdata.cappi(rdata.rr_name,z=whz,ts=d,contour='CS',ax=ax)
+            ax.set_xlim(config['xlim'][0],config['xlim'][1])
+            ax.set_ylim(config['ylim'][0],config['ylim'][1])
+            ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=d,h=rdata.data['z'].values[2]))
+            plt.savefig('{i}RR_CAPPI_{h}_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+            plt.close()
+      
 
     # tdate = datetime.datetime(2006,1,23,18,00)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
