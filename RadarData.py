@@ -2758,12 +2758,16 @@ class RadarData(RadarConfig.RadarConfig):
         #temps = self.data[self.z_name].data[0,:]
         # basically just loop thru the Z and get the associated temperature and area
 
-        data = self.data[self.w_name].data
+        #data = self.data[self.w_name].data
+        #data_dz = self.data[self.dz_name].data
+        data = self.data[self.w_name].values
+        data_dz = self.data[self.dz_name].values
         if thresh_dz == True:
-            data[self.data[self.dz_name].data < self.z_thresh]=np.nan
+            data[data_dz < self.z_thresh] = np.nan
 #        print np.shape(data),'ln2075'
         for iz, z in enumerate(self.data[self.z_name].data):
-            values_above = np.where(data[iz,...] >= thresh)[0]
+            #values_above = np.where(data[iz,...] >= thresh)[0]
+            values_above = np.where(data[:,iz,:,:] >= thresh)[0]
             num_above = len(values_above)
             uw[iz] = num_above*self.dx*self.dy/self.ntimes
             if self.data[self.x_name].units == "[deg]":
@@ -2773,6 +2777,7 @@ class RadarData(RadarConfig.RadarConfig):
         #print np.shape(uw)
         #print np.shape(self.T[0,:,0,0])
         # now inerpolate this to the temps listed
+        self.T = xr.DataArray(data=self.T,dims=['d','z','y','x'])
         if 'd' in self.T.dims:
             print('shapes in updraft width',np.shape(uw),np.shape(self.T.sel(x=0,y=0)))
             f_temp_u = sint.interp1d(self.T.sel(d=0,x=0,y=0), uw, bounds_error=False)
