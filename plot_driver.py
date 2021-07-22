@@ -947,26 +947,35 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.clf()
 
     if config['wname'] in rdat.data.variables.keys():
+
         if flags['up_width'] == True:
             tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
             #print np.max(m_warea_wrf)
+
+            fig, ax = plt.subplots(1,1,figsize=(18,12))
+
             plt.plot(m_warea_wrf,tmp,color='k',label='Obs',lw=5)
             plt.ylim(20,-60)
-            plt.xlabel('Updraft Width (km$^2$)')
-            plt.ylabel('Temperature (deg C)')
-            plt.title(title_string)
-            plt.savefig('{d}{p}_upwidth_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],y=config['y']),dpi=300)
+            plt.xlabel('Updraft Width (km$^2$)',fontsize=24)
+            plt.ylabel('Temperature (deg C)',fontsize=24)
+            ax.tick_params(axis='both',labelsize=22)
+            #plt.title(title_string)
+
+            ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=26, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+
+            plt.savefig('{d}{p}_upwidth_{s:%Y-%m-%d_%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],y=config['y']),dpi=400,bbox_inches='tight')
             plt.clf()
 
 #     for k in flags.keys():
 #         print('flag keys:',k,flags[k])
-    for ts in tms:
 
-        if flags['all_cappi']== True:
-            #z=2.0
-            #print xlim
-#             print (config['cappi_vars'])
-#             print (config['cappi_multi'])
+    if config['tms_on'] is True:
+
+        for ts in tms:
+                #z=2.0
+                #print xlim
+    #             print (config['cappi_vars'])
+    #             print (config['cappi_multi'])
             if config['cappi_multi'] is True:
                 #print('cappi mulit, vars',config['cappi_vars'])
                 #print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
@@ -994,10 +1003,8 @@ def make_single_pplots(rdat,flags,config,y=None):
                     #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
                     plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=ts,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],z=config['z']),dpi=300)
                     plt.clf()
-    
-        if flags['all_xsec']== True:
-            #y=-12.5
-            print ("xsec_multi")
+
+                #y=-12.5
             if config['xsec_multi'] == True:
                 if rdat.w_name is not None:
                     fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
@@ -1009,7 +1016,7 @@ def make_single_pplots(rdat,flags,config,y=None):
                     yof = 0.01
                 else:
                     yof=-0.02
-    
+
                 #plt.tight_layout()
                 
                 label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
@@ -1024,19 +1031,18 @@ def make_single_pplots(rdat,flags,config,y=None):
                     plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=ts,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],y=config['y']),dpi=300)
                     plt.clf()
 
-
-        if flags['qr_cappi'] == True:
-            print ("qr_cappi")
-            fig = rdat.cappi_multiplot(z=config['z'],ts=ts,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
-            plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],z=config['z']),dpi=300)
-            plt.clf()
-    
-        if flags['qr_rhi'] == True:
-            print ("qr_rhi")
-            fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
-            plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],y=config['y']),dpi=300)
-            plt.clf()
-        
+            if flags['qr_cappi'] == True:
+                    print ("qr_cappi")
+                    fig = rdat.cappi_multiplot(z=config['z'],ts=ts,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
+                    plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],z=config['z']),dpi=300)
+                    plt.clf()
+            
+            if flags['qr_rhi'] == True:
+                print ("qr_rhi")
+                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
+                plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{x}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,x=config['extrax'],t=config['ptype'],y=config['y']),dpi=300)
+                plt.clf()
+            
 def subset_convstrat(data,rdata,zlev=1):
     cssum =(rdata.data[rdata.cs_name].max(dim='z'))
     stratsub=data.sel(z=slice(zlev,zlev+1)).where(cssum==1)
