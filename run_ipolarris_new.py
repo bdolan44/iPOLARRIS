@@ -124,7 +124,6 @@ else:
         print('\nDone! Saved to '+config['image_dir']+'composite_'+rdata.dz_name+'/')
         print('Moving on.\n')
         
-
     if config['cappi_ref']:
         
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')

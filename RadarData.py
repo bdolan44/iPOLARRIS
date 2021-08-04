@@ -55,10 +55,10 @@ class RadarData(RadarConfig.RadarConfig):
     def __init__(self, data,times, ddata = None,dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid='HID',conv='Con',
             temp='T', x='x', y='y', z='z', u='U', v='V', w='Wvar', rr='RR',vr='VR',lat=None, lon=None, band='C',exper='CASE',lat_r=None,lon_r=None,
             radar_name= None,mphys=None,dd_data = None,z_thresh=-10.0,cs_z = 2.0,zconv = 41.,zdr_offset=0, remove_diffatt = False,lat_0 = 0.0,lon_0=90.0,
-            conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg'],return_scores=False): 
+            conv_types = ['CONVECTIVE'],strat_types = ['STRATIFORM'],mixed_types = ['UNCERTAIN'],mixr=['qr','qs','qc','qi','qh','qg'],return_scores=False,color_blind=False): 
 
         super(RadarData, self).__init__(dz=dz, zdr=zdr, kdp=kdp, ldr=ldr, rho=rho, hid=hid, conv=conv,temp=temp, x=x, y=y,lat_0=lat_0,lon_0=lon_0,lat_r=lat_r,lon_r=lon_r,
-                      z=z, u=u, v=v, w=w,rr=rr,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name)
+                      z=z, u=u, v=v, w=w,rr=rr,vr=vr,mphys=mphys,exper=exper,lat=lat,lon=lon,tm = times,radar_name = radar_name,color_blind=color_blind)
 
         # ********** initialize the data *********************
 #        self.data = {} 

@@ -12,7 +12,8 @@ class RadarConfig(object):
     
     def __init__(self, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid = 'HID',conv='Con',
             temp='T', x='x', y='y', z='z', u='U', v='V',rr='RR', w='Wvar',vr='VR',mphys='None',exper = 'Case',
-            band = 'C',lat_0 = 0,lon_0=90.0,lat_r=None,lon_r=None,lat=None,lon=None,tm = None,radar_name = None):
+            band = 'C',lat_0 = 0,lon_0=90.0,lat_r=None,lon_r=None,lat=None,lon=None,tm = None,radar_name = None,
+            color_blind = False):
         # ******** first the polarimetric stuff *************
         self.dz_name = dz
         self.zdr_name = zdr
@@ -65,7 +66,7 @@ class RadarConfig(object):
         self.cs_colors = ['#FFFFFF', 'DodgerBlue', 'Red', 'Khaki']
         self.cs_labels = ['', 'Strat', 'Conv', 'Mixed']
 
-        self.set_dbz_colorbar()
+        self.set_dbz_colorbar(color_blind=color_blind)
         self.set_hid_colorbar()
         self.set_cs_colorbar()
 
@@ -128,16 +129,18 @@ class RadarConfig(object):
         return extra
 #############################################################################################################
 
-    def set_dbz_colorbar(self, color_list=None):
+    def set_dbz_colorbar(self, color_list=None, color_blind=False):
         if color_list is None:
             # just use the default here
-            #radarcbar = ['PeachPuff','Aqua','DodgerBlue','Blue','Lime', \
-            #    'LimeGreen','Green','Yellow','Orange','DarkOrange','Red', \
-            #    'Crimson','Fuchsia','Purple','Indigo','MidnightBlue'] 
+            if color_blind is not True:
+                radarcbar = ['PeachPuff','Aqua','DodgerBlue','Blue','Lime', \
+                    'LimeGreen','Green','Yellow','Orange','DarkOrange','Red', \
+                    'Crimson','Fuchsia','Purple','Indigo','MidnightBlue'] 
             #radarcbar = ['PeachPuff','Aqua','DodgerBlue','MediumBlue','Lime', \
             #    'LimeGreen','Green','Yellow','Orange','OrangeRed','Red', \
             #    'Crimson','Fuchsia','Indigo','DarkCyan','White'] 
-            radarcbar = ['Lavender', 'Thistle', 'Plum', 'MediumPurple', 'CornFlowerBlue', 'SkyBlue', 'PaleTurquoise', 'LightCyan', 'Yellow', 'Gold', 'Orange', 'DarkOrange', 'Chocolate', 'IndianRed', 'FireBrick', 'Maroon']
+            else:
+                radarcbar = ['Lavender', 'Thistle', 'Plum', 'MediumPurple', 'CornFlowerBlue', 'SkyBlue', 'PaleTurquoise', 'LightCyan', 'Yellow', 'Gold', 'Orange', 'DarkOrange', 'Chocolate', 'IndianRed', 'FireBrick', 'Maroon']
         else: 
             radarcbar = deepcopy(color_list)
 
