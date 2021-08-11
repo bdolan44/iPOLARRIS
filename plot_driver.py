@@ -898,8 +898,8 @@ def make_single_pplots(rdat,flags,config,y=None):
         axf[0].set_xlabel(rdat.zdr_name+' '+rdat.units[rdat.zdr_name],fontsize=26)
         axf[0].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
         #axf[0].set_title(title_string)
-
-        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        
         zkdp_wrf,edk = rdat.hist2d(varx=rdat.dz_name,vary=rdat.kdp_name,binsx=config['dzbins'],binsy=config['kdbins'])
         rdat.plot_2dhist(zkdp_wrf,edk,ax=axf[1])
         #axf[1].set_title(title_string)
