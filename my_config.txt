@@ -32,27 +32,27 @@ cb_friendly == True         == # Use color-blindness palette for output (i.e. re
 
 # Base Plots
 compo_ref           == True     == # FA) Turn on plotting for spatial composite reflectivity plotting
-cappi_ref           == False     == # FB) Turn on plotting for reflectivity CAPPIs
-cappi_rr            == False     == # FC) Turn on plotting for rain rate CAPPIs 
-rrstats_txt         == False     == # FD)
-rrhist_txt          == False     == # FE)
-rrstats_areas_txt   == False     == # FF)
-rr_timeseries       == False     == # FG)
-vv_profiles         == False     == # FH)
-percentiles_txt     == False     == # FI)
-vert_ref            == False     == # FJ)
-refcfad             == False     == # FK)
+cappi_ref           == True     == # FB) Turn on plotting for reflectivity CAPPIs
+cappi_rr            == True     == # FC) Turn on plotting for rain rate CAPPIs 
+rrstats_txt         == True     == # FD)
+rrhist_txt          == True     == # FE)
+rrstats_areas_txt   == True     == # FF)
+rr_timeseries       == True     == # FG)
+vv_profiles         == True     == # FH)
+percentiles_txt     == True     == # FI)
+vert_ref            == True     == # FJ)
+refcfad             == True     == # FK)
 
 # Advanced Plots
-plot_int            == False    == # FA) Turn on plotting of integrated parameters over the whole time frame
-plot_cs             == False    == # FB) Plot seperate Convective and stratiform CFADs
+plot_int            == True    == # FA) Turn on plotting of integrated parameters over the whole time frame
+plot_cs             == True    == # FB) Plot seperate Convective and stratiform CFADs
 ####The following are for EACH radar / model time specified in the radar_files list.
-cfad_mpanel_flag    == False    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
-hid_cfad_flag       == False    == # FD) HID CFAD
-joint_flag          == False    == # FE) Z vs. Zdr
-cfad_individ_flag   == False    == # FF) Make separate images for dbz, Zdr, Kdp, W and Rho
-hid_prof            == False    == # FG) Profile of HID species with height
-up_width            == False    == # FJ) Make a plot of the vertical velocity profile with temperature.
+cfad_mpanel_flag    == True    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
+hid_cfad_flag       == True    == # FD) HID CFAD
+joint_flag          == True    == # FE) Z vs. Zdr
+cfad_individ_flag   == True    == # FF) Make separate images for dbz, Zdr, Kdp, W and Rho
+hid_prof            == True    == # FG) Profile of HID species with height
+up_width            == True    == # FJ) Make a plot of the vertical velocity profile with temperature.
 tms_on              == False    == #
 cappi_multi         == False    == # FM) Make cappi cross section for all times. change parameters in plot_driver.py
 xsec_multi          == False    == # FN) make RHI cross sections for all times. change parmaters in plot_driver.py
