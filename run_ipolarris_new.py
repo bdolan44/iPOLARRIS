@@ -37,7 +37,7 @@ configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
-config['image_dir'] = config['image_dir']+'/'+\
+config['image_dir'] = config['image_dir']+\
         config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
         config['type']+'/'
 #print(,'EXTRA 1 is')
@@ -103,7 +103,10 @@ else:
     
         print('IN RUN_IPOLARRIS_NEW... creating COMPOSITE figures.')
         print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
-        
+            
+        outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
+        os.makedirs(outdir,exist_ok=True)
+       
         for i,rtimematch in enumerate(np.array(rdata.date)):
 
             fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False,statpt=True)
@@ -118,20 +121,22 @@ else:
             #ax.set_extent([minlon, maxlon, minlat,maxlat])
 
             #plt.tight_layout()
-            os.makedirs(config['image_dir']+'composite_'+rdata.dz_name+'/',exist_ok=True)
             #plt.savefig('{i}composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400, bbox_inches='tight') 
-            plt.savefig('{i}{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
             plt.close()
             print(rtimematch)
         
-        print('\nDone! Saved to '+config['image_dir']+'composite_'+rdata.dz_name+'/')
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
         
     if config['cappi_ref']:
         
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
         print('\nPlotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.dz_name+'...')
-        
+ 
+        outdir = config['image_dir']+'cappi_'+rdata.dz_name+'/'
+        os.makedirs(outdir,exist_ok=True)
+       
         for i,rtimematch in enumerate(np.array(rdata.date)):
 
             fig, ax = plot_driver.plot_cappi(rdata,rdata.dz_name,rdata.z_name,config['z'],i,rtimematch,cs_over=False,statpt=True)
@@ -144,14 +149,13 @@ else:
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-            os.makedirs(config['image_dir']+'cappi_'+rdata.dz_name+'/',exist_ok=True)
             #plt.savefig('{i}dz_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
-            plt.savefig('{i}{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}{e}_{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,h=config['z'],v=rdata.dz_name,t=rtimematch),dpi=400,bbox_inches='tight')
             plt.close()
 
             print(rtimematch)
 
-        print('\nDone! Saved to '+config['image_dir']+'cappi_'+rdata.dz_name+'/')
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
     
     if config['cappi_rr']:
@@ -161,6 +165,9 @@ else:
  
         print('Plotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.rr_name+'...')
  
+        outdir = config['image_dir']+'cappi_'+rdata.rr_name+'/'
+        os.makedirs(outdir,exist_ok=True)
+
         for i,rtimematch in enumerate(np.array(rdata.date)):
 
             fig, ax = plot_driver.plot_cappi(rdata,rdata.rr_name,rdata.z_name,config['z'],i,rtimematch,cs_over=False,statpt=True)
@@ -175,14 +182,13 @@ else:
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-            os.makedirs(config['image_dir']+'cappi_'+rdata.rr_name+'/',exist_ok=True)
             #plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
-            plt.savefig('{i}{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}{e}_{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,h=config['z'],v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
             plt.close()
 
             print(rtimematch)
 
-        print('\nDone! Saved to '+config['image_dir']+'cappi_'+rdata.rr_name+'/')
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
     # tdate = datetime.datetime(2006,1,23,18,00)
@@ -206,8 +212,9 @@ else:
         rrstrat,rrconv,rrall = rdata.calc_timeseries_stats(rdata.rr_name,ht_lev=2.5,cs_flag=True,thresh=0.0)
 
         tformat = '%Y%m%d-%H%M%S'
-        os.makedirs(config['image_dir']+'txtfiles/',exist_ok=True)
-        with open('{i}{e}_rr_uncondmean_stats.txt'.format(i=config['image_dir']+'txtfiles/',e=config['exper']), mode='w') as csv_file:
+        outdir = config['image_dir']+'txtfiles/'
+        os.makedirs(outdir,exist_ok=True)
+        with open('{i}{e}_{v}_uncondmean_stats.txt'.format(i=outdir,v=rdata.rr_name,e=rdata.exper),mode='w') as csv_file:
             v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
             v_writer.writerow(['Date', 'Unc_Conv_RR', 'Unc_Strat_RR', 'Unc_Tot_RR'])
             for i,v in enumerate(rdata.date):
@@ -216,10 +223,10 @@ else:
                 dum =[tim,rrconvu[i].values,rrstratu[i].values,rrallu[i].values]
                 v_writer.writerow(dum)
 
-        print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
+        print('\nDone! Saved to '+outdir)
         print('Printing conditional-mean statistics for variable '+rdata.rr_name+'...')
 
-        with open('{i}{e}_rr_condmean_stats.txt'.format(i=config['image_dir']+'txtfiles/',e=config['exper']), mode='w') as csv_file:
+        with open('{i}{e}_{v}_condmean_stats.txt'.format(i=outdir,v=rdata.rr_name,e=rdata.exper),mode='w') as csv_file:
             v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
             v_writer.writerow(['Date', 'Conv_RR', 'Strat_RR', 'Tot_RR'])
             for i,v in enumerate(rdata.date):
@@ -228,11 +235,11 @@ else:
                 dum =[tim,rrconv[i].values,rrstrat[i].values,rrall[i].values]
                 v_writer.writerow(dum)
 
-        print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
+        print('\nDone! Saved to '+outdir)
         print('Printing relative frequency statistics for variable '+rdata.rr_name+'...')
 
         rain_area = rdata.radar_area
-        with open('{i}{e}_rel_frequency_stats.txt'.format(i=config['image_dir']+'txtfiles/',e=config['exper']), mode='w') as csv_file:
+        with open('{i}{e}_{v}_rel_frequency_stats.txt'.format(i=outdir,v=rdata.rr_name,e=rdata.exper), mode='w') as csv_file:
             v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
             v_writer.writerow(['Date', 'Conv', 'Strat', 'Tot'])
             for i,v in enumerate(rdata.date):
@@ -241,7 +248,7 @@ else:
                 dum =[tim,rrconv[i].values*rdata.dx*rdata.dy/rain_area*100.,rrstrat[i].values*rdata.dx*rdata.dy/rain_area*100.,rrall[i].values*rdata.dx*rdata.dy/rain_area*100.]
                 v_writer.writerow(dum)
 
-        print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
     if config['rrhist_txt']:
@@ -256,15 +263,16 @@ else:
         hists, eg = np.histogram(np.ravel((rdata.data[rdata.rr_name].values[strat])),bins=np.logspace(-1,2.4,40))
 
         #tformat = '%Y%m%d-%H%M%S'
-        os.makedirs(config['image_dir']+'txtfiles/',exist_ok=True)
-        with open('{i}{e}_rr_histgram_{m}.txt'.format(i=config['image_dir']+'txtfiles/',e=config['exper'],m=config['mphys']), mode='w') as csv_file:
+        outdir = config['image_dir']+'txtfiles/'
+        os.makedirs(outdir,exist_ok=True)
+        with open('{i}{e}_{v}_rr_histgram_{m}.txt'.format(i=outdir,v=rdata.rr_name,e=rdata.exper,m=rdata.mphys), mode='w') as csv_file:
             v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
             v_writer.writerow(['Date', 'Con', 'Strat', 'Tot'])
             for i,v in enumerate(eg[:-1]):
                 dum =[v,histc[i],hists[i],hist[i]]
                 v_writer.writerow(dum)
  
-        print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
    
     if config['rrstats_areas_txt']:
@@ -278,8 +286,9 @@ else:
         #grid_area=rdata.radar_area()
         rain_area = rdata.radar_area
         tformat = '%Y%m%d-%H%M%S'
-        os.makedirs(config['image_dir']+'txtfiles/',exist_ok=True)
-        with open('{i}{e}_domain_area_stats.txt'.format(i=config['image_dir']+'txtfiles/',e=config['exper']), mode='w') as csv_file:
+        outdir = config['image_dir']+'txtfiles/' 
+        os.makedirs(outdir,exist_ok=True)
+        with open('{i}{e}_domain_area_stats.txt'.format(i=outdir,e=rdata.exper), mode='w') as csv_file:
             v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
             v_writer.writerow(['Date', 'Unc_Con', 'Unc_Strat', 'Unc_Tot'])
             for i,v in enumerate(rdata.date):
@@ -288,26 +297,9 @@ else:
                 dum =[tim,rrconvu_area[i].values.astype(float)*rdata.dx*rdata.dy,rrstratu_area[i].values.astype(float)*rdata.dx*rdata.dy,rrallu_area[i].values.astype(float)*rdata.dx*rdata.dy]
                 v_writer.writerow(dum)
 
-        print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
-    '''
-    if config['rrstats_txt']:
-     
-        tformat = '%Y%m%d-%H%M%S'
-        os.makedirs(config['image_dir']+'txtfiles/',exist_ok=True)
-        with open('{i}{e}_rel_frequency_stats.txt'.format(i=config['image_dir']+'txtfiles/',e=config['exper']), mode='w') as csv_file:
-            v_writer = csv.writer(csv_file, delimiter=' ', quotechar=' ', quoting=csv.QUOTE_NONNUMERIC)
-            v_writer.writerow(['Date', 'Conv', 'Strat', 'Tot'])
-            for i,v in enumerate(rdata.date):
-                print( v)
-                tim = v.strftime(tformat)
-                dum =[tim,rrconv[i].values*rdata.dx*rdata.dy/rain_area*100.,rrstrat[i].values*rdata.dx*rdata.dy/rain_area*100.,rrall[i].values*rdata.dx*rdata.dy/rain_area*100.]
-                v_writer.writerow(dum)
-
-        print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
-        print('Moving on.\n')
-    '''
     if config['rr_timeseries']:
 
         print('\nIN RUN_IPOLARRIS_NEW... creating timeseries.')
@@ -324,7 +316,8 @@ else:
         #ax.set_title('Precipitation Timeseries ')
         ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
-        plt.savefig('{i}precip_timeseries_convstrat_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+        #plt.savefig('{i}precip_timeseries_convstrat_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+        plt.savefig('{i}{e}_{v}_timeseries_convstrat.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,v=rdata.rr_name),dpi=400,bbox_inches='tight')
         plt.close()
  
         print('\nDone! Saved to '+config['image_dir'])
@@ -342,6 +335,9 @@ else:
             print('\nIN RUN_IPOLARRIS_NEW... creating vertical profile figure.')
             print('Plotting vertical profile for variable '+rdata.w_name+'...')
  
+            outdir = config['image_dir']+'vertical_profile/'
+            os.makedirs(outdir,exist_ok=True)
+ 
             fig,ax = plt.subplots(1,1,figsize=(12,8))
             ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=True)
             ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
@@ -349,7 +345,8 @@ else:
             #ax.set_title('Vertical velocity profiles')
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
  #plt.tight_layout()
-            plt.savefig('{i}quantile_vvel_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+            #plt.savefig('{i}quantile_vvel_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}{e}_{v}_vertprof.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,v=rdata.w_name),dpi=400,bbox_inches='tight')
             plt.close()
 
             print('\nDone! Saved to '+config['image_dir'])
@@ -364,8 +361,9 @@ else:
             p99d,p90d,p50d,ht = rdata.percentile(wdown=True)
             p99a,p90a,p50a,ht = rdata.percentile(wdown=False)
 
-            os.makedirs(config['image_dir']+'txtfiles/',exist_ok=True)
-            file = open('{i}{e}_{m}_updown_percentiles.txt'.format(i=config['image_dir']+'txtfiles/',e=rdata.exper,m=rdata.mphys),'w') 
+            outdir = config['image_dir']+'txtfiles/'
+            os.makedirs(outdir,exist_ok=True)
+            file = open('{i}{e}_{v}_updown_percentiles.txt'.format(i=outdir,v=rdata.w_name,e=rdata.exper),'w') 
      
             file.write("Updraft\n") 
             file.write("Height (km).    P99.    P90.     P50\n") 
@@ -384,7 +382,7 @@ else:
 
             file.close()
 
-            print('\nDone! Saved to '+config['image_dir']+'txtfiles/')
+            print('\nDone! Saved to '+outdir)
             print('Moving on.\n')
  
     else:
@@ -399,6 +397,9 @@ else:
  
         print('\nIN RUN_IPOLARRIS_NEW... creating vertical profile figure.')
         print('Plotting vertical profile for variable '+rdata.dz_name+'...')
+       
+        outdir = config['image_dir']+'vertical_profile/'
+        os.makedirs(outdir,exist_ok=True)
         
         ##Next let's make mean vertical profile of reflectivity
         fig,ax = plt.subplots(1,1,figsize=(12,8))
@@ -407,13 +408,14 @@ else:
         ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
         ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
-        plt.savefig('{i}meanprofile_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
-
+        #plt.savefig('{i}meanprofile_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+        plt.savefig('{i}{e}_{v}_vertprof.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,v=rdata.dz_name),dpi=400,bbox_inches='tight')
         plt.close()
  
-        print('\nDone! Saved to '+config['image_dir'])
+        print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
-   
+  
+    '''
     if config['refcfad']:
 
         print('\nIN RUN_IPOLARRIS_NEW... creating CFAD figure.')
@@ -432,12 +434,14 @@ else:
         #ax.set_title('{c} CFAD'.format(c=rdata.exper))
         ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
-        plt.savefig('{i}CFAD_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+        #plt.savefig('{i}CFAD_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+        plt.savefig('{i}{e}_{v}_CFAD.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,v=rdata.dz_name),dpi=400,bbox_inches='tight')
         plt.close()
 
         print('\nDone! Saved to '+config['image_dir'])
         print('Moving on.\n')
- 
+    '''
+
     #################################################################################
 
     flags = {}
@@ -449,4 +453,4 @@ else:
         print('####### Exiting run_ipolarris_new.py #######')
         print('############################################\n')
 
-        plot_driver.make_single_pplots(rdata,flags,config)
+        plot_driver.make_single_pplots(rdata,flags,config,config['image_dir'])

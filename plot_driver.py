@@ -66,7 +66,7 @@ def plot_cfad_int(dat1,config,typ='dz',n1=None):
 
     plt.tight_layout()
 
-    plt.savefig('{id}CFAD_{tp}_{s}_int.{t}'.format(id=config['image_dir'],s=n1,t=config['ptype'],tp=typ.upper()),dpi=200)
+    plt.savefig('{id}CFAD_{tp}_{s}_int.{t}'.format(id=outdir,s=n1,t=config['ptype'],tp=typ.upper()),dpi=200)
     plt.clf()
 
 def plot_hid_int(dat1,config,typ='hid',n1 = None):
@@ -88,7 +88,7 @@ def plot_hid_int(dat1,config,typ='hid',n1 = None):
 
     plt.tight_layout()
     
-    plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=config['image_dir'],h=typ.upper(),s=n1,t=config['ptype']),bbox_inches='tight', pad_inches=0.01,dpi=200)
+    plt.savefig('{id}CFAD_{h}_{s}_int.{t}'.format(id=outdir,h=typ.upper(),s=n1,t=config['ptype']),bbox_inches='tight', pad_inches=0.01,dpi=200)
     plt.clf()
     
 def plot_hid_prof_int(dat1,config,typ='hid',n1 = None,n2 = None):
@@ -114,7 +114,7 @@ def plot_hid_prof_int(dat1,config,typ='hid',n1 = None,n2 = None):
     ax.set_ylabel('Height (km)',fontsize=18)
     ax.set_ylim(0,20)
     plt.tight_layout()
-    plt.savefig('{d}{e1}_hid_vert_int.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
+    plt.savefig('{d}{e1}_hid_vert_int.{t}'.format(d=outdir,e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
     plt.clf()
 
 def plot_joint_int(dat1,config,typ='zzdr',n1= None,n2=None):
@@ -128,7 +128,7 @@ def plot_joint_int(dat1,config,typ='zzdr',n1= None,n2=None):
         ax.set_ylabel('dBZ')
         ax.set_title('{e} {m}'.format(e=dat1['rconf'].exper,m=dat1['rconf'].mphys))
         plt.colorbar(cb6,ax=ax)
-        plt.savefig('{d}{e1}_zzdr_int.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_zzdr_int.{t}'.format(d=outdir,e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
     if typ == 'zkdp':              
@@ -137,7 +137,7 @@ def plot_joint_int(dat1,config,typ='zzdr',n1= None,n2=None):
         ax.set_ylabel('dBZ')
         ax.set_title('{e} {m}'.format(e=dat1['rconf'].exper,m=dat1['rconf'].mphys))
         plt.colorbar(cb6,ax=ax)
-        plt.savefig('{d}{e1}_zkdp_int.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_zkdp_int.{t}'.format(d=outdir,e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
     if typ == 'zw':
@@ -146,7 +146,7 @@ def plot_joint_int(dat1,config,typ='zzdr',n1= None,n2=None):
         ax.set_ylabel('dBZ')
         ax.set_title('{e} {m}'.format(e=dat1['rconf'].exper,m=dat1['rconf'].mphys))
         plt.colorbar(cb6,ax=ax)
-        plt.savefig('{d}{e1}_zw_int.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_zw_int.{t}'.format(d=outdir,e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
     if typ == 'wr':
@@ -156,7 +156,7 @@ def plot_joint_int(dat1,config,typ='zzdr',n1= None,n2=None):
         ax.set_xlabel('W (M/s)')
         ax.set_title('{e} {m}'.format(e=dat1['rconf'].exper,m=dat1['rconf'].mphys))
         plt.colorbar(cb6,ax=ax)
-        plt.savefig('{d}{e1}_wr_int.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_wr_int.{t}'.format(d=outdir,e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
 def plot_upwidth_int(dat1,config,n1= None):
@@ -165,7 +165,7 @@ def plot_upwidth_int(dat1,config,n1= None):
         plt.ylim(20,-60)
         plt.xlabel('Updraft Width (km$^2$)')
         plt.ylabel('Temperature (deg C)')
-        plt.savefig('{d}{e1}_upwidth_int.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_upwidth_int.{t}'.format(d=outdir,e1=dat1['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
 def plot_uppercent_compare(dat1,dat2,config,n1= None,n2=None):
@@ -195,7 +195,7 @@ def plot_uppercent_compare(dat1,dat2,config,n1= None,n2=None):
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
-    plt.savefig('{id}{e1}_{e2}_wpercent_compare_{s}.{t}'.format(id=config['image_dir'],e2=dat1['rconf'].exper,e1=dat2['rconf'].exper,s=st_diff,t=config['ptype']),dpi=200)
+    plt.savefig('{id}{e1}_{e2}_wpercent_compare_{s}.{t}'.format(id=outdir,e2=dat1['rconf'].exper,e1=dat2['rconf'].exper,s=st_diff,t=config['ptype']),dpi=200)
     plt.clf()
 
 def plot_uppercent_compare_updn(dat1, dat2, config, n1=None, n2=None):
@@ -261,7 +261,7 @@ def plot_uppercent_compare_updn(dat1, dat2, config, n1=None, n2=None):
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
     print (st_diff)
 #    plt.savefig('test.png')
-    plt.savefig('{id}{s}_updownstats.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype']),dpi=200)
+    plt.savefig('{id}{s}_updownstats.{t}'.format(id=outdir,s=st_diff,t=config['ptype']),dpi=200)
 #
 def plot_uppercent(dat1,config,n1= None):
     fig, ax = plt.subplots(1,2,figsize=(18,8))
@@ -294,7 +294,7 @@ def plot_uppercent(dat1,config,n1= None):
 
 
     plt.tight_layout()
-    plt.savefig('{id}{e}_vvelstats.{t}'.format(id=config['image_dir'],e=dat1['rconf'].exper,t=config['ptype']),dpi=200)
+    plt.savefig('{id}{e}_vvelstats.{t}'.format(id=outdir,e=dat1['rconf'].exper,t=config['ptype']),dpi=200)
 #    plt.clf()
 
 
@@ -320,7 +320,7 @@ def plot_upwidth(dat1,dat2,config,n1= None,n2=None):
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
-    plt.savefig('{id}{e1}_{e2}_wpwidth_compare_{s}.{t}'.format(id=config['image_dir'],e2=dat1['rconf'].exper,e1=dat2['rconf'].exper,s=st_diff,t=config['ptype']),dpi=200)
+    plt.savefig('{id}{e1}_{e2}_wpwidth_compare_{s}.{t}'.format(id=outdir,e2=dat1['rconf'].exper,e1=dat2['rconf'].exper,s=st_diff,t=config['ptype']),dpi=200)
     plt.clf()
 
 def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
@@ -354,7 +354,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         axf[2].set_ylabel('dBZ',fontsize=18)
         axf[2].set_xlabel('Zdr',fontsize = 18)
         axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
-        plt.savefig('{d}{e1}_{e2}_zzdr_comp.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_{e2}_zzdr_comp.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
     if typ == 'zkdp':              
@@ -378,7 +378,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
         plt.colorbar(cb,ax=axf[2])
 
-        plt.savefig('{d}{e1}_{e2}_zkdp_comp.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_{e2}_zkdp_comp.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
     if typ == 'zw':
@@ -402,7 +402,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
         plt.colorbar(cb,ax=axf[2])
 
-        plt.savefig('{d}{e1}_{e2}_zw_comp.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_{e2}_zw_comp.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
     if typ == 'wr':
@@ -426,7 +426,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         axf[2].set_title('{d}-{v}'.format(d=n1,v=n2))
         plt.colorbar(cb,ax=axf[2])
         
-        plt.savefig('{d}{e1}_{e2}_wr_comp.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
+        plt.savefig('{d}{e1}_{e2}_wr_comp.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
 def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False):
@@ -574,7 +574,7 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
     
         st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
 
-        plt.savefig('{id}CFAD_{tp}_{s}.{t}'.format(id=config['image_dir'],s=st_diff,t=config['ptype'],tp=typ.upper()),dpi=200)
+        plt.savefig('{id}CFAD_{tp}_{s}.{t}'.format(id=outdir,s=st_diff,t=config['ptype'],tp=typ.upper()),dpi=200)
     else:
         return fig, axf
 #    plt.clf()
@@ -610,7 +610,7 @@ def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
 
     plt.tight_layout()
     st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
-    plt.savefig('{id}CFAD_{h}_{s}.{t}'.format(id=config['image_dir'],h=typ.upper(),s=st_diff,t=config['ptype']),bbox_inches='tight',dpi=200)
+    plt.savefig('{id}CFAD_{h}_{s}.{t}'.format(id=outdir,h=typ.upper(),s=st_diff,t=config['ptype']),bbox_inches='tight',dpi=200)
     plt.clf()
 
 
@@ -730,7 +730,7 @@ def plot_hid_profile(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
     axf[2].set_ylabel('Height (km)',fontsize=18)
     axf[2].set_ylim(0,20)
 
-    plt.savefig('{d}{e1}_{e2}_hid_vert_compare.{t}'.format(d=config['image_dir'],e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
+    plt.savefig('{d}{e1}_{e2}_hid_vert_compare.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
     plt.clf() 
 
 
@@ -760,7 +760,7 @@ def plot_upstat(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
         
-def make_single_pplots(rdat,flags,config,y=None):
+def make_single_pplots(rdat,flags,config,outpath,y=None):
     
     print('\n#######################################')
     print('####### Starting plot_driver.py #######')
@@ -784,6 +784,10 @@ def make_single_pplots(rdat,flags,config,y=None):
     title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
 
     if flags['cfad_mpanel_flag'] == True:
+        
+        outdir = outpath+'multi_panel/'
+        os.makedirs(outdir,exist_ok=True)
+
         print ('Working on Cfad mpanel')
         fig, ax = plt.subplots(2,2,figsize=(16,12),gridspec_kw={'wspace': 0.05, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
@@ -806,10 +810,14 @@ def make_single_pplots(rdat,flags,config,y=None):
 
         axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         
-        plt.savefig('{d}{p}_CFAD_4panel_{s:%Y-%m-%d_%H%M%S}_{r}_{m}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_CFAD_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
         
         if config['plot_cs'] == True:
+            
+            outdir = outpath+'multi_panel/'
+            os.makedirs(outdir,exist_ok=True)
+            
             fig, ax = plt.subplots(2,2,figsize=(18,12),constrained_layout=True)
             axf = ax.flatten()
 
@@ -819,9 +827,9 @@ def make_single_pplots(rdat,flags,config,y=None):
             dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
             dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
             extrax ='convective'
-            plt.tight_layout()
+            #plt.tight_layout()
     #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-            plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,x=extrax,t=config['ptype']),dpi=300)
+            plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
             plt.clf()
 
             fig, ax = plt.subplots(2,2,figsize=(18,12))
@@ -834,38 +842,43 @@ def make_single_pplots(rdat,flags,config,y=None):
             extrax ='stratiform'
             plt.tight_layout()
     #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-            plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype'],x=extrax),dpi=300)
+            #plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=outdir,p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype'],x=extrax),dpi=300) 
+            plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
             plt.clf()
 
     if flags['cfad_individ_flag'] == True:
     #        axf = ax.flatten()
+
+        outdir = outpath+'cfad/'
+        os.makedirs(outdir,exist_ok=True)
+ 
         if config['wname'] in rdat.data.variables.keys():
 
             fig, ax = plt.subplots(1,1,figsize=(14,12))
             rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
             #plt.tight_layout()
             ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-            plt.savefig('{d}{p}_CFAD_W_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.w_name,t=config['ptype']),dpi=400,bbox_inches='tight')
             plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.dz_name,ax = ax,bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
         #plt.tight_layout()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-        plt.savefig('{d}{p}_CFAD_dBZ_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.dz_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
         #plt.tight_layout()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)       
-        plt.savefig('{d}{p}_CFAD_Zdr_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.zdr_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-        plt.savefig('{d}{p}_CFAD_Kdp_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.kdp_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         #plt.tight_layout()
         plt.clf()
 
@@ -873,19 +886,21 @@ def make_single_pplots(rdat,flags,config,y=None):
         rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
         #plt.tight_layout()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-        plt.savefig('{d}{p}_CFAD_RHO_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.rho_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
     
     if flags['hid_cfad_flag'] == True:
         fig, ax = rdat.plot_hid_cdf()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         
-        plt.savefig('{d}{p}_CFAD_HID_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
-
+        plt.savefig('{d}{p}_HID_CFAD.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
     if flags['joint_flag'] == True:
 
+        outdir = outpath+'multi_panel/'
+        os.makedirs(outdir,exist_ok=True)
+ 
         fig, ax = plt.subplots(2,2,figsize=(16,14),gridspec_kw={'wspace': 0.25, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
 
@@ -915,12 +930,15 @@ def make_single_pplots(rdat,flags,config,y=None):
         axf[3].set_ylabel(rdat.rr_name+' '+rdat.units[rdat.rr_name],fontsize=26,labelpad=10)
         axf[3].set_ylim(0,50)
 
-        plt.savefig('{d}{p}_2dPDF_4panel_{s:%Y%m%d%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_2dPDF_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
 
     if flags['hid_prof'] == True:
 
+        outdir = outpath+'vertical_profile/'
+        os.makedirs(outdir,exist_ok=True)
+ 
         fig, ax = plt.subplots(1,1,figsize=(18,12))
         
         hts, mwrf_water_vert = rdat.hid_vertical_fraction(config['hidwater'],z_resolution =config['z_resolution'])
@@ -939,7 +957,7 @@ def make_single_pplots(rdat,flags,config,y=None):
         plt.legend(loc='best',fontsize=22)
 
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-        plt.savefig('{d}{p}_HID_prof_{s:%Y-%m-%d_%H%M%S}_{r}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.savefig('{d}{p}_HID_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
     if config['wname'] in rdat.data.variables.keys():
@@ -959,7 +977,7 @@ def make_single_pplots(rdat,flags,config,y=None):
 
             ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=26, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
 
-            plt.savefig('{d}{p}_upwidth_{s:%Y-%m-%d_%H%M%S}_{r}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=tstart,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}{p}_updraft_width_{y}_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],y=config['y']),dpi=400,bbox_inches='tight')
             plt.clf()
 
 #     for k in flags.keys():
@@ -986,7 +1004,7 @@ def make_single_pplots(rdat,flags,config,y=None):
                     yof=-0.02
                 label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
                 #plt.tight_layout()
-                plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+                plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
                 plt.clf()
 
             else:
@@ -997,7 +1015,7 @@ def make_single_pplots(rdat,flags,config,y=None):
                     fig= rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
                     plt.tight_layout()
                     #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
-                    plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+                    plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
                     plt.clf()
 
                 #y=-12.5
@@ -1016,7 +1034,7 @@ def make_single_pplots(rdat,flags,config,y=None):
                 #plt.tight_layout()
                 
                 label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
-                plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
+                plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
                 plt.clf()
             else:
                 for i,v in enumerate(eval(config['rhi_vars'])):
@@ -1024,19 +1042,19 @@ def make_single_pplots(rdat,flags,config,y=None):
                     #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
                     fig = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'])
                     plt.tight_layout()
-                    plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=config['image_dir'],v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+                    plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
                     plt.clf()
 
             if flags['qr_cappi'] == True:
                     print ("qr_cappi")
                     fig = rdat.cappi_multiplot(z=config['z'],ts=ts,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
-                    plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+                    plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
                     plt.clf()
             
             if flags['qr_rhi'] == True:
                 print ("qr_rhi")
                 fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
-                plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=config['image_dir'],p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+                plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
                 plt.clf()
             
 def subset_convstrat(data,rdata,zlev=1):
@@ -1287,9 +1305,9 @@ def plot_hid_comparison_cfad(rdata1,rdata2,z_res=1.0,config=None,n1=None,n2=None
     plt.tight_layout()
     if savefig == True:
         if cscfad is not None:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}_HID.{p}'.format(p=config['ptype'],d=config['image_dir'],c=cscfad,e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}_HID.{p}'.format(p=config['ptype'],d=outdir,c=cscfad,e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
         else:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_HID.{p}'.format(p=config['ptype'],d=config['image_dir'],e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
+            plt.savefig('{d}CFAD_diff_{e1}_{e2}_HID.{p}'.format(p=config['ptype'],d=outdir,e1=rdata1.exper,e2=rdata2.exper),dpi=400,bbox_inches='tight')
         return fig, axf
     else:
         return fig,axf
