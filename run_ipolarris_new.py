@@ -37,7 +37,9 @@ configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
 rdata, config = polarris_driver(configfile)
-#config['image_dir'] ='./'
+config['image_dir'] = config['image_dir']+'/'+\
+        config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
+        config['type']+'/'
 #print(,'EXTRA 1 is')
 
 # If a second argument is passed for WRF config file, produce a bunch of comparison plots!
