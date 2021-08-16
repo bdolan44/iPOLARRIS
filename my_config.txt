@@ -1,9 +1,20 @@
+####################################################
 #################### MY_CONFIG.TXT #################
+####################################################
 
-#-------------------
-#------ Input ------
-#-------------------
+type    == 'obs'  == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
+mphys   == obs    == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
 
+
+#==============
+#### INPUT ####
+#==============
+
+#-----------------------------------------------
+#------ Radar File Reading (NOT OPTIONAL) ------
+#-----------------------------------------------
+
+# Args
 sdatetime           == '20151203_0100'      == # Start time of analysis of interest
 sdatetime_format    == %Y%m%d_%H%M          == # Start time format
 edatetime           == '20151203_0200'      == # End time of analysis of interest
@@ -16,37 +27,88 @@ rfiles              == './inputtxt/radfiles.txt'   == # Input directory of radar
 rdate_format        == %Y%m%d_%H%M%S               == # Format for the radar file date
 rdend               == 20                          == # End of date timestamp in radar filename
 rdstart             == 5                           == # Start of date timestamp in radar filename
-type                == 'obs'                       == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 
-#--------------------
-#------ Output ------
-#--------------------
+# Variables (NOTE: use NCDUMP to locate variable names of radar observables and info)
+dz_name     == REF      == # Name of the reflectivity field
+dr_name     == ZDR      == # Name of the differential reflectivity field
+kd_name     == KDP      == # Name of the Kdp field
+rh_name     == RHO      == # Name of the RhoHV field
+rr_name     == RRP      == # Name of the Rain rate / precipitation field
+vr_name     == VEL      == # Name of radial velocity field
+band        == S            == # Radar band: X, C OR S. Note: needs to be capital letter.
+exper       == 'KLGX'       == # Radar location
+lat         == 47.116806    == # Latitude of the radar station
+lon         == -124.10625   == # Longitude of the radar station
+radarname   == S-band       == # 
 
-image_dir   == './output/'  == # Output figure directory
-ptype       == 'png'        == # Output figure file extenstion (i.e. .png, .jpg, ...)
-cb_friendly == True         == # Use color-blindness palette for output (i.e. reflectivity)
+# Other (NOTE: use the internet to find these - not ideal)
+alt         == 354          == # Altitude of the radar
 
-#--------------------------
-#------ Output Flags ------
-#--------------------------
+#---------------------------------------------------
+#------ Doppler Radar File Reading (Optional) ------
+#---------------------------------------------------
 
-# Base Plots
+dd_on           == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+# Args
+dfiles          == ./inputtxt/doppfiles.txt      == # Location of dual-Doppler files
+ddate_format    == %Y%m%d_%H%M%S                 == # Format for the dual-Doppler file date
+ddstart         == 10                            == # Offset for dual-Doppler timestamp in filename
+ddend           == 25                            == # Offset for dual-Doppler timestamp in filename
+
+# Variables (NOTE: use NCDUMP to locate variable names of Doppler radar fields and info)
+convname    == None                 == # Name of 
+uname       == eastward_wind        == # Name of the zonal wind field
+vname       == northward_wind       == # Name of the meridional wind field
+wname       == upward_air_velocity  == # Name of the vertical wind field
+xname       == x                    == # Name of the zonal directional variable
+yname       == y                    == # Name of the meridional directional variables
+zname       == z                    == # Name of the vertical level field
+
+#----------------------------------------------
+#------ Sounding File Reading (Optional) ------
+#----------------------------------------------
+
+snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+# Args
+ad              == config['date']+'_'            == # Extra characters
+sdate_format    == %Y%m%d_%H%M%S                 == # Sounding file date format
+sfiles          == ./inputtxt/soundfiles.txt     == # Sounding file directory
+sdstart         == 4                             == # Offset for date timestamp in radar filename 
+sdend           == 19                            == # Number of characters in timestamp on radar file
+sstat           == UIL                           == # Sounding station identification
+
+# Variables
+t_name == T                        ==#Name of the temperature field
+
+
+#===============
+#### OUTPUT ####
+#===============
+
+#----------------------------------------------------------
+#------ Output Flags (what to print) if type = 'obs' ------
+#----------------------------------------------------------
+
+# Plots created in run_ipolarris_new.py
 compo_ref           == True     == # FA) Turn on plotting for spatial composite reflectivity plotting
 cappi_ref           == True     == # FB) Turn on plotting for reflectivity CAPPIs
 cappi_rr            == True     == # FC) Turn on plotting for rain rate CAPPIs 
-rrstats_txt         == True     == # FD)
-rrhist_txt          == True     == # FE)
-rrstats_areas_txt   == True     == # FF)
 rr_timeseries       == True     == # FG)
 vv_profiles         == True     == # FH)
-percentiles_txt     == True     == # FI)
 vert_ref            == True     == # FJ)
 refcfad             == True     == # FK)
 
-# Advanced Plots
+# Text files created in run_ipolarris_new.py
+rrstats_txt         == True     == # FD)
+rrhist_txt          == True     == # FE)
+rrstats_areas_txt   == True     == # FF)
+percentiles_txt     == True     == # FI)
+
+# Plots created in plot_driver.py
 plot_int            == True    == # FA) Turn on plotting of integrated parameters over the whole time frame
 plot_cs             == True    == # FB) Plot seperate Convective and stratiform CFADs
-####The following are for EACH radar / model time specified in the radar_files list.
 cfad_mpanel_flag    == True    == # FC) 4 panel CFADs of Dbz, Zdr, Kdp and W
 hid_cfad_flag       == True    == # FD) HID CFAD
 joint_flag          == True    == # FE) Z vs. Zdr
@@ -61,56 +123,22 @@ qr_rhi              == False    == # FL) Make rhis of the mixing ratios (only va
 
 ks                  == ['cfad_mpanel_flag','hid_cfad_flag','joint_flag','cfad_individ_flag','hid_prof','cappi_multi','xsec_multi','up_width','qr_cappi','qr_rhi']   == # FP) list of flags
 
-#------------------------
-#------ Radar Info ------
-#------------------------
+#----------------------------------------------------------
+#------ Output Flags (what to print) if type = 'wrf' ------
+#----------------------------------------------------------
 
-alt         == 354          == # Altitude of the radar
-band        == S            == # Radar band: X, C OR S. Note: needs to be capital letter.
-exper       == 'KLGX'       == # Radar location
-lat         == 47.116806    == # Latitude of the radar station
-lon         == -124.10625   == # Longitude of the radar station
-radarname   == S-band       == # 
-
-#------------------------
-#------ Radar File ------
-#------------------------
-
-dz_name     == REF      == # Name of the reflectivity field
-dr_name     == ZDR      == # Name of the differential reflectivity field
-kd_name     == KDP      == # Name of the Kdp field
-rh_name     == RHO      == # Name of the RhoHV field
-rr_name     == RRP      == # Name of the Rain rate / precipitation field
-vr_name     == VEL      == # Name of radial velocity field
+convert_Tk_Tc   == False    == # Convert temperature in K to deg C
 
 #-----------------------------
-#------ WRF Output File ------
+#------ Output Settings ------
 #-----------------------------
 
-mphys   == obs  == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
+# Args
+image_dir   == './outputfig/'  == # Output figure directory
+ptype       == 'png'           == # Output figure file extenstion (i.e. .png, .jpg, ...)
+cb_friendly == True            == # Use color-blindness palette for output (i.e. reflectivity)
 
-#--------------------------
-#------ Doppler Info ------
-#--------------------------
-
-dd_on           == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
-
-dfiles          == ./inputtxt/doppfiles.txt      == # Location of dual-Doppler files
-ddate_format    == %Y%m%d_%H%M%S        == # Format for the dual-Doppler file date
-ddstart         == 10                   == # Offset for dual-Doppler timestamp in filename
-ddend           == 25                   == # Offset for dual-Doppler timestamp in filename
-
-#---------------------------
-#------ Doppler File -------
-#---------------------------
-
-convname    == None                 == # Name of 
-uname       == eastward_wind        == # Name of the zonal wind field
-vname       == northward_wind       == # Name of the meridional wind field
-wname       == upward_air_velocity  == # Name of the vertical wind field
-xname       == x                    == # Name of the zonal directional variable
-yname       == y                    == # Name of the meridional directional variables
-zname       == z                    == # Name of the vertical level field
+# Constant-Altitude Plan-Position Indicator (CAPPI) 
 xlim == [-100,100]                     ==#lat / lon zoom for CAPPIS
 ylim == [-100,100]                     ==# lat / lon zoom for CAPPIS
 y==10.                                 ==#Lat of the y cross-section for RHI
@@ -119,27 +147,25 @@ y==10.                                 ==#Lat of the y cross-section for RHI
 #y==35.7                                 ==#Lat of the y cross-section for RHI
 z == 2.5                                ==#Height of the CAPPIs
 
-#---------------------------
-#------ Sounding Info ------
-#---------------------------
+# Histogram Bins for Radar Observables
+wbins == np.arange(-25,26,0.5)          == # Histogram bins for vertical velocity
+dzbins == np.arange(-10,60,1)           == # Histogram bins for reflectivity
+drbins == np.arange(-2,6,0.05)          == # Histogram bins for differential reflectivity
+kdbins == np.arange(-2,6,0.05)          == # Histogram bins for specific differential phase
+rrbins == np.logspace(0.01,100.01,30)   == # Histogram bins for rain rates
 
-snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+# Grouping of HID Variables for Vertical Profiling
+hidwater == [1,2,10]                    ==#Group drizzle, rain and big drops
+hidgraup == [7,8]                       ==#Group low and high density graupel
+hidhail == [9]                          ==#Hail
+hidsnow ==[3,4,5,6]                     ==#Group ice crystals, snow, wet snow and VI
 
-ad              == config['date']+'_'            == # Extra characters
-sdate_format    == %Y%m%d_%H%M%S                 == # Sounding file date format
-sfiles          == ./inputtxt/soundfiles.txt     == # Sounding file directory
-sdstart         == 4                             == # Offset for date timestamp in radar filename 
-sdend           == 19                            == # Number of characters in timestamp on radar file
-sstat           == UIL                           == # Sounding station identification
 
-#------------------------------------
-#------ Flags if type == 'wrf' ------
-#------------------------------------
-convert_Tk_Tc   == False    == # Convert temperature in K to deg C
-
+#=========================================================
+#### UNCLASSIFIED (from old version of my_config.txt) ####
+#=========================================================
 
 ###############Set up variable names and how to read the data###############
-t_name == T                        ==#Name of the temperature field
 latname == lat			   ==
 lonname == lon 			   ==
 pol_on == True                        ==#Calculate the pol data such as HID and RR
@@ -157,22 +183,10 @@ mask_model == False ==
 drop_vars == False ==
 #
 #######Set up some variables related to the observations ###################
-## lat/lon of the radar
 removediffatt == True                 ==#Remove differential attenuation by Zdr < -1 and dBZ < 35.
 #
 ############Select the types of plots to see on the output##########################
 #############Set up some plotting configurations #########################
-wbins == np.arange(-25,26,0.5)          ==#Histogram bins for vertical velocity
-dzbins == np.arange(-10,60,1)           ==#Histogram bins for reflectivity
-drbins == np.arange(-2,6,0.05)          ==#Histogram bins for differential reflectivity
-kdbins == np.arange(-2,6,0.05)          ==#Histogram bins for specific differential phase
-rrbins == np.logspace(0.01,100.01,30)   ==#Histogram bins for rain rates
-#
-###Set up the types of hid to group together for water, graupel, hail and snow.
-hidwater == [1,2,10]                    ==#Group drizzle, rain and big drops
-hidgraup == [7,8]                       ==#Group low and high density graupel
-hidhail == [9]                          ==#Hail
-hidsnow ==[3,4,5,6]                     ==#Group ice crystals, snow, wet snow and VI
 #
 #
 ####Set up some specifics for the cross-sections.####################
