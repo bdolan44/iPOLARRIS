@@ -9,14 +9,14 @@ sdatetime_format    == %Y%m%d_%H%M          == # Start time format
 edatetime           == '20151203_0200'      == # End time of analysis of interest
 edatetime_format    == %Y%m%d_%H%M          == # End time format
 
-date                == '20151203'           == # Date of the case
-extra               == ''                   == # This will be appended to all output files as an identifier.
-extrax              == ''                   == # This will be appended to all output files as an identifier.
-rfiles              == './dpolfiles.txt'    == # Input directory of radar files to read in
-rdate_format        == %Y%m%d_%H%M%S        == # Format for the radar file date
-rdend               == 20                   == # End of date timestamp in radar filename
-rdstart             == 5                    == # Start of date timestamp in radar filename
-type                == 'obs'                == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
+date                == '20151203'	           == # Date of the case
+extra               == ''                          == # This will be appended to all output files as an identifier.
+extrax              == ''                          == # This will be appended to all output files as an identifier.
+rfiles              == './inputtxt/radfiles.txt'   == # Input directory of radar files to read in
+rdate_format        == %Y%m%d_%H%M%S               == # Format for the radar file date
+rdend               == 20                          == # End of date timestamp in radar filename
+rdstart             == 5                           == # Start of date timestamp in radar filename
+type                == 'obs'                       == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 
 #--------------------
 #------ Output ------
@@ -95,7 +95,7 @@ mphys   == obs  == # Type of microphysics used in model: 'obs' OR '<scheme>' if 
 
 dd_on           == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
-dfiles          == ./doppfiles.txt      == # Location of dual-Doppler files
+dfiles          == ./inputtxt/doppfiles.txt      == # Location of dual-Doppler files
 ddate_format    == %Y%m%d_%H%M%S        == # Format for the dual-Doppler file date
 ddstart         == 10                   == # Offset for dual-Doppler timestamp in filename
 ddend           == 25                   == # Offset for dual-Doppler timestamp in filename
@@ -125,12 +125,12 @@ z == 2.5                                ==#Height of the CAPPIs
 
 snd_on          == True                 == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
-ad              == config['date']+'_'   == # Extra characters
-sdate_format    == %Y%m%d_%H%M%S        == # Sounding file date format
-sfiles          == ./soundfiles.txt     == # Sounding file directory
-sdstart         == 4                    == # Offset for date timestamp in radar filename 
-sdend           == 19                   == # Number of characters in timestamp on radar file
-sstat           == UIL                  == # Sounding station identification
+ad              == config['date']+'_'            == # Extra characters
+sdate_format    == %Y%m%d_%H%M%S                 == # Sounding file date format
+sfiles          == ./inputtxt/soundfiles.txt     == # Sounding file directory
+sdstart         == 4                             == # Offset for date timestamp in radar filename 
+sdend           == 19                            == # Number of characters in timestamp on radar file
+sstat           == UIL                           == # Sounding station identification
 
 #------------------------------------
 #------ Flags if type == 'wrf' ------
