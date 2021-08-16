@@ -848,18 +848,18 @@ class RadarData(RadarConfig.RadarConfig):
             print ('Sorry, your wavelength has not been run yet! Return to first principles!')
             return
 
-        rr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
+        rr_arr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
                                                       czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band=band,fhc=self.hid)
 #         mask=np.where(np.isnan(self.data[self.dz_name].values))
 #         rr[mask]=np.nan
 #         rm[mask]=-1
 
-        self.add_field((self.data[self.dz_name].dims,rr,), 'RRP')
-        self.add_field((self.data[self.dz_name].dims,rm,), 'RRM')
-        if self.rr_name ==None:
-            self.rr_name ='RRP'
+        if self.rr_name == None:
+            self.rr_name = 'RR'
+        self.add_field((self.data[self.dz_name].dims,rr_arr,),self.rr_name)
+        self.add_field((self.data[self.dz_name].dims,rm,),'RRM')
         whbad = np.where(np.isnan(self.data[self.dz_name]))
-        self.data['RRP'].values[whbad]=np.nan
+        self.data[self.rr_name].values[whbad]=np.nan
         self.data['RRM'].values[whbad]=-1
         return
 #############################################################################################################
@@ -1493,7 +1493,7 @@ class RadarData(RadarConfig.RadarConfig):
         cbt = fig.colorbar(dummy,cax=cbar_ax)
         cbt.ax.tick_params(labelsize=16)
         if var.startswith('REF'): labtxt = 'Reflectivity (dBZ)'
-        elif var.startswith('RRP'): labtxt = 'Rain Rate (mm/hour)'
+        elif var.startswith('RR'): labtxt = 'Rain Rate (mm/hour)'
         else: labtxt = var
         cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
 

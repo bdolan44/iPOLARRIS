@@ -31,7 +31,7 @@ dz_name     == REF      == # Name of the reflectivity field
 dr_name     == ZDR      == # Name of the differential reflectivity field
 kd_name     == KDP      == # Name of the Kdp field
 rh_name     == RHO      == # Name of the RhoHV field
-rr_name     == RRP      == # Name of the Rain rate / precipitation field
+rr_name     == None      == # Name of the Rain rate / precipitation field
 vr_name     == VEL      == # Name of radial velocity field
 band        == S            == # Radar band: X, C OR S. Note: needs to be capital letter.
 exper       == KLGX       == # Radar location
