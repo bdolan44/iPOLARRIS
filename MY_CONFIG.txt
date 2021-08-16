@@ -2,7 +2,7 @@
 #################### MY_CONFIG.TXT #################
 ####################################################
 
-type    == 'obs'  == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
+type    == obs    == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 mphys   == obs    == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
 
 
@@ -36,7 +36,7 @@ rh_name     == RHO      == # Name of the RhoHV field
 rr_name     == RRP      == # Name of the Rain rate / precipitation field
 vr_name     == VEL      == # Name of radial velocity field
 band        == S            == # Radar band: X, C OR S. Note: needs to be capital letter.
-exper       == 'KLGX'       == # Radar location
+exper       == KLGX       == # Radar location
 lat         == 47.116806    == # Latitude of the radar station
 lon         == -124.10625   == # Longitude of the radar station
 radarname   == S-band       == # 
