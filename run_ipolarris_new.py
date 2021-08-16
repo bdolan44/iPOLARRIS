@@ -38,7 +38,7 @@ configfile = sys.argv[1:] # Feed config file name as arg
 
 rdata, config = polarris_driver(configfile)
 #config['image_dir'] ='./'
-#print(config['extrax'],'EXTRA 1 is')
+#print(,'EXTRA 1 is')
 
 # If a second argument is passed for WRF config file, produce a bunch of comparison plots!
 # More comments in this section TBD!
@@ -53,7 +53,7 @@ if sys.argv[2:]:
     ax[1].set_title(rdata2.exper)
     ax[2].set_title("{e} - {v}".format(e=rdata.exper,v=rdata2.exper))    
     plt.suptitle("Reflectivity")
-    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}_{x}.{p}'.format(p=config['ptype'],d=config['image_dir'],c='ALL',x=config['extrax'],e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
+    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}.{p}'.format(p=config['ptype'],d=config['image_dir'],c='ALL',e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
     plt.close()
 
 
@@ -117,7 +117,7 @@ else:
 
             #plt.tight_layout()
             os.makedirs(config['image_dir']+'composite_'+rdata.dz_name+'/',exist_ok=True)
-            plt.savefig('{i}composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400, bbox_inches='tight')
+            plt.savefig('{i}composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400, bbox_inches='tight')
             plt.close()
             print(rtimematch)
         
@@ -142,7 +142,7 @@ else:
             ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
             os.makedirs(config['image_dir']+'cappi_'+rdata.dz_name+'/',exist_ok=True)
-            plt.savefig('{i}dz_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}dz_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
             plt.close()
 
             print(rtimematch)
@@ -172,7 +172,7 @@ else:
             ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
             os.makedirs(config['image_dir']+'cappi_'+rdata.rr_name+'/',exist_ok=True)
-            plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
             plt.close()
 
             print(rtimematch)
@@ -186,7 +186,7 @@ else:
     # rtimematch = rdata.date[whdate[0][0]]
     # ax.set_title('C/S composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
     # plt.tight_layout()
-    # plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400)
+    # plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=),dpi=400)
     # plt.clf()
 
     ################################################################################
@@ -319,7 +319,7 @@ else:
         #ax.set_title('Precipitation Timeseries ')
         ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
-        plt.savefig('{i}precip_timeseries_convstrat_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
+        plt.savefig('{i}precip_timeseries_convstrat_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
         plt.close()
  
         print('\nDone! Saved to '+config['image_dir'])
@@ -344,7 +344,7 @@ else:
             #ax.set_title('Vertical velocity profiles')
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
  #plt.tight_layout()
-            plt.savefig('{i}quantile_vvel_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}quantile_vvel_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
             plt.close()
 
             print('\nDone! Saved to '+config['image_dir'])
@@ -402,7 +402,7 @@ else:
         ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
         ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
-        plt.savefig('{i}meanprofile_refl_{e}_{m}_{x}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
+        plt.savefig('{i}meanprofile_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
 
         plt.close()
  
@@ -427,7 +427,7 @@ else:
         #ax.set_title('{c} CFAD'.format(c=rdata.exper))
         ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
-        plt.savefig('{i}CFAD_refl_{e}_{m}_{x}_new.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys,x=config['extrax']),dpi=400,bbox_inches='tight')
+        plt.savefig('{i}CFAD_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
         plt.close()
 
         print('\nDone! Saved to '+config['image_dir'])
