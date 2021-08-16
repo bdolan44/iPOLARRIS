@@ -2779,9 +2779,6 @@ class RadarData(RadarConfig.RadarConfig):
         #print np.shape(uw)
         #print np.shape(self.T[0,:,0,0])
         # now inerpolate this to the temps listed
-        print(self.T[0,:,0,0])
-        print(temps)
-        print(uw)
         self.T = xr.DataArray(data=self.T,dims=['d','z','y','x'])
         if 'd' in self.T.dims:
             print('shapes in updraft width',np.shape(uw),np.shape(self.T.sel(x=0,y=0)))
@@ -2789,8 +2786,6 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             f_temp_u = sint.interp1d(self.T[:,0,0], uw, bounds_error=False)
         uwp_interp = f_temp_u(temps)
-        print(uwp_interp)
-        input()
         #return temps, uw
         return temps,uwp_interp
 
