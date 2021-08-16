@@ -206,7 +206,7 @@ def polarris_driver(configfile):
     # (2) Find input radar files and concatenate the data. Rename x, y, z variables. 
     # =====
 
-    print('Finding and concatenating radar files in '+config['rfiles']+'...')
+    #print('Finding and concatenating radar files in '+config['rfiles']+'...')
     drop_vars=config['drop_vars']
     with open(config['rfiles'], 'r') as f:
         #print(config['rfiles'])
@@ -216,7 +216,7 @@ def polarris_driver(configfile):
     print('Station/experiment: '+config['exper'])
     print('Input: '+config['mphys'])
     time.sleep(3)
-    if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
+    if config['exper'] == 'MC3E' and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
 
         file = open(config['rfiles'], "r")

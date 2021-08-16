@@ -23,7 +23,7 @@ edatetime_format    == %Y%m%d_%H%M          == # End time format
 date                == '20151203'	           == # Date of the case
 extra               == ''                          == # This will be appended to all output files as an identifier.
 extrax              == ''                          == # This will be appended to all output files as an identifier.
-rfiles              == './inputtxt/radfiles.txt'   == # Input directory of radar files to read in
+rfiles              == './inputtxt/radfiles.txt'     == # Input directory of radar files to read in
 rdate_format        == %Y%m%d_%H%M%S               == # Format for the radar file date
 rdend               == 20                          == # End of date timestamp in radar filename
 rdstart             == 5                           == # Start of date timestamp in radar filename
