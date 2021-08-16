@@ -119,7 +119,8 @@ else:
 
             #plt.tight_layout()
             os.makedirs(config['image_dir']+'composite_'+rdata.dz_name+'/',exist_ok=True)
-            plt.savefig('{i}composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400, bbox_inches='tight')
+            #plt.savefig('{i}composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400, bbox_inches='tight') 
+            plt.savefig('{i}{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
             plt.close()
             print(rtimematch)
         
@@ -144,7 +145,8 @@ else:
             ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
             os.makedirs(config['image_dir']+'cappi_'+rdata.dz_name+'/',exist_ok=True)
-            plt.savefig('{i}dz_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+            #plt.savefig('{i}dz_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
+            plt.savefig('{i}{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch),dpi=400,bbox_inches='tight')
             plt.close()
 
             print(rtimematch)
@@ -174,7 +176,8 @@ else:
             ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
             os.makedirs(config['image_dir']+'cappi_'+rdata.rr_name+'/',exist_ok=True)
-            plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
+            #plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
+            plt.savefig('{i}{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch),dpi=400,bbox_inches='tight')
             plt.close()
 
             print(rtimematch)
