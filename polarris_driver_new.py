@@ -171,8 +171,9 @@ def polarris_driver(configfile):
 
     print('\nReading '+str(configfile[0])+'...')
     with open(configfile[0]) as f:
-        lines = [l for l in (line.strip() for line in f) if l] # NEW! Allow new lines in config file - can be skipped over!
-        for line in lines: #f:
+        lines1 = [mm for mm in (line.replace('\t',' ') for line in f) if mm]
+        lines2 = [nn for nn in (line.strip() for line in lines1) if nn] # NEW! Allow new lines in config file - can be skipped over!
+        for line in lines2: #f:
             #print line
             if not line.startswith("#"):
                 #print('line',line)
