@@ -106,7 +106,10 @@ class RadarData(RadarConfig.RadarConfig):
         print ('calculating rain area')
         self.radar_area()
         self.rr_name = rr
-        #print 'masking data'
+        if self.rr_name == None:
+            self.rr_name = 'RR'
+
+       #print 'masking data'
         #print('masking data')
         #self.mask_dat()
         if remove_diffatt == True:
@@ -854,8 +857,6 @@ class RadarData(RadarConfig.RadarConfig):
 #         rr[mask]=np.nan
 #         rm[mask]=-1
 
-        if self.rr_name == None:
-            self.rr_name = 'RR'
         self.add_field((self.data[self.dz_name].dims,rr_arr,),self.rr_name)
         self.add_field((self.data[self.dz_name].dims,rm,),'RRM')
         whbad = np.where(np.isnan(self.data[self.dz_name]))

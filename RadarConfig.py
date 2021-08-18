@@ -21,6 +21,8 @@ class RadarConfig(object):
         self.ldr_name = ldr
         self.rho_name = rho
         self.rr_name = rr
+        if self.rr_name == None:
+            self.rr_name = 'RR'
         self.temp_name = temp
         self.hid_name = hid
         self.vr_name = vr
