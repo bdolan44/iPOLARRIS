@@ -15,6 +15,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
+import time
 import warnings
 warnings.filterwarnings('ignore')
 import xarray as xr
@@ -29,6 +30,9 @@ from skewPy import SkewT
 
 #--------------- Main Program ----------------
 
+print('\niPOLARRIS INITIATING...')
+time.sleep(3)
+
 print('\n#############################################')
 print('####### Starting run_ipolarris_new.py #######')
 print('#############################################')
@@ -36,7 +40,17 @@ print('#############################################')
 configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
-rdata, config = polarris_driver(configfile)
+print('\n#################################################')
+print('############ Calling polarris_driver_new.py ####')
+print('#################################################')
+time.sleep(3)
+
+rdata, config, config['uname'], config['vname'], config['wname'] = polarris_driver(configfile)
+
+print('\n#################################################')
+print('####### Returning to run_ipolarris_new.py #######')
+print('#################################################')
+
 config['image_dir'] = config['image_dir']+\
         config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
         config['type']+'/'
@@ -99,7 +113,7 @@ else:
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
 
-    if config['compo_ref']:
+    if (config['compo_ref'] | config['all1']):
     
         print('IN RUN_IPOLARRIS_NEW... creating COMPOSITE figures.')
         print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
@@ -129,7 +143,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
         
-    if config['cappi_ref']:
+    if (config['cappi_ref'] | config['all1']):
         
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
         print('\nPlotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.dz_name+'...')
@@ -158,7 +172,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
     
-    if config['cappi_rr']:
+    if (config['cappi_rr'] | config['all1']):
 
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
         print('\nPlotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.dz_name+'...')
@@ -202,7 +216,7 @@ else:
 
     ################################################################################
     
-    if config['rrstats_txt']:
+    if (config['rrstats_txt'] | config['all2']):
         
         print('\nIN RUN_IPOLARRIS_NEW... creating text files.')
         print('Printing unconditional-mean statistics for variable '+rdata.rr_name+'...')
@@ -251,7 +265,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
-    if config['rrhist_txt']:
+    if (config['rrhist_txt'] | config['all2']):
 
         print('\nIN RUN_IPOLARRIS_NEW... creating text files.')
         print('Printing histogram data for variable '+rdata.rr_name+'...')
@@ -275,7 +289,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
    
-    if config['rrstats_areas_txt']:
+    if (config['rrstats_areas_txt'] | config['all2']):
         ###Areas
         print('\nIN RUN_IPOLARRIS_NEW... creating text files.')
         print('Printing domain area statistics for '+rdata.rr_name+'...')
@@ -300,7 +314,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
-    if config['rr_timeseries']:
+    if (config['rr_timeseries'] | config['all1']):
 
         print('\nIN RUN_IPOLARRIS_NEW... creating timeseries.')
         print('Plotting timeseries for variable '+rdata.rr_name+'...')
@@ -330,7 +344,7 @@ else:
     ##Next let's make quantile (50,90,99) plots of the vertical velocity. This splits it by up and down, but you can turn split_updn == False
     if rdata.w_name is not None:
 
-        if config['vv_profiles']:
+        if (config['vv_profiles'] | config['all1']):
  
             print('\nIN RUN_IPOLARRIS_NEW... creating vertical profile figure.')
             print('Plotting vertical profile for variable '+rdata.w_name+'...')
@@ -352,7 +366,7 @@ else:
             print('\nDone! Saved to '+config['image_dir'])
             print('Moving on.\n')
  
-        if config['percentiles_txt']:
+        if (config['percentiles_txt'] | config['all2']):
 
             print('\nIN RUN_IPOLARRIS_NEW... creating percentile text file.')
             print('Printing percentile data for variable '+rdata.w_name+'...')
@@ -393,7 +407,7 @@ else:
 
     ################################################################################
     
-    if config['vert_ref']:
+    if (config['vert_ref'] | config['all1']):
  
         print('\nIN RUN_IPOLARRIS_NEW... creating vertical profile figure.')
         print('Plotting vertical profile for variable '+rdata.dz_name+'...')
@@ -444,13 +458,15 @@ else:
 
     #################################################################################
 
-    flags = {}
-    for k in eval(config['ks']):
-        flags[k]=config[k]
+    print('\n########################################')
+    print('############ Calling plot_driver.py ####')
+    print('#########################################\n')
+    time.sleep(3)
 
-    if any(flags.values()) == True:
-        print('\n############################################')
-        print('####### Exiting run_ipolarris_new.py #######')
-        print('############################################\n')
+    plot_driver.make_single_pplots(rdata,config)
 
-        plot_driver.make_single_pplots(rdata,flags,config,config['image_dir'])
+    print('\n#################################################')
+    print('####### Returning to run_ipolarris_new.py #######')
+    print('#################################################')
+
+    print('\niPOLARRIS RUN COMPLETE FOR '+config['exper']+' '+config['sdatetime']+' - '+config['edatetime']+'\n')

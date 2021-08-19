@@ -164,10 +164,6 @@ def polarris_driver(configfile):
 
     config = {} # Load variable for config file data
     #print('ready to roll')
-    print('\n#################################################')
-    print('############ Entering polarris_driver_new.py ####')
-    print('#################################################')
-    time.sleep(3)
 
     print('\nReading '+str(configfile[0])+'...')
     with open(configfile[0]) as f:
@@ -216,7 +212,10 @@ def polarris_driver(configfile):
     #print((config['exper']),(config['mphys']))
     print('Station/experiment: '+config['exper'])
     print('Input: '+config['mphys'])
+    print('Start: '+config['sdatetime'])
+    print('End: '+config['edatetime'])
     time.sleep(3)
+
     if config['exper'] == 'MC3E' and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
 
@@ -309,6 +308,14 @@ def polarris_driver(configfile):
         #print('dmatch is ',dmatch)
         dvar = xr.open_mfdataset(dfiles1,concat_dim='d')
 
+        # NEW! MultiDop names velocity fields in long-form. Shorten fieldnames in dopp files here for plotting labels.
+        Uname = 'U'
+        Vname = 'V'
+        Wname = 'W'
+        dvar = dvar.rename({config['uname']:Uname})
+        dvar = dvar.rename({config['vname']:Vname})
+        dvar = dvar.rename({config['wname']:Wname})
+
         wvar = np.zeros([rvar.dims['d'],rvar.dims['z'],rvar.dims['y'],rvar.dims['x']])
         wvar.fill(np.nan)
 
@@ -346,19 +353,19 @@ def polarris_driver(configfile):
                     i = dfiles1.index(dfile)
                     #print(i,'i inner')
                     #wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
-                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']][i,:,:,:]
-                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['uname']][i,:,:,:]
-                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['vname']][i,:,:,:]
+                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[Wname][i,:,:,:]
+                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[Uname][i,:,:,:]
+                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[Vname][i,:,:,:]
                     #conv[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['convname']][i,:,:,:]
 
-        rvar[config['wname']] = (['d','z','y','x'],wvar)
-        rvar[config['uname']] = (['d','z','y','x'],unew)
-        rvar[config['vname']] = (['d','z','y','x'],vnew)
+        rvar[Wname] = (['d','z','y','x'],wvar)
+        rvar[Uname] = (['d','z','y','x'],unew)
+        rvar[Vname] = (['d','z','y','x'],vnew)
         #rvar[config['convname']] = (['d','z','y','x'],conv)
 
     print('\nSending data to RadarData...')
    
-    rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
+    rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=Uname,v=Vname,w=Wname,conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
 
     if config['snd_on'] == True:
         print('In your config file, snd_on is set to True.')
@@ -413,8 +420,4 @@ def polarris_driver(configfile):
 #     rdata.data[rdata.rho_name].values[whbad2] = np.nan
 #     rdata.data[rdata.w_name].values[whbad2] = np.nan
 
-    print('\n\n#################################################')
-    print('####### Returning to run_ipolarris_new.py #######')
-    print('#################################################\n')
-
-    return rdata, config
+    return rdata, config, Uname, Vname, Wname

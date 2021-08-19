@@ -760,14 +760,8 @@ def plot_upstat(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
     axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
         
-def make_single_pplots(rdat,flags,config,outpath,y=None):
+def make_single_pplots(rdat,config,y=None):
     
-    print('\n#######################################')
-    print('####### Starting plot_driver.py #######')
-    print('#######################################\n')
-
-    print('ADVANCED PLOTTING: plot_driver.make_single_pplots')
-    print('Initiating...')
     tspan= [rdat.date[0],rdat.date[-1]]
     tms = np.array(rdat.date)
     #print('DATES',np.array(rdat.date))
@@ -780,10 +774,11 @@ def make_single_pplots(rdat,flags,config,outpath,y=None):
     ylim = config['ylim']
     y = config['y']
     z = config['z']
+    outpath = config['image_dir']
 
     title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
 
-    if flags['cfad_mpanel_flag'] == True:
+    if (config['cfad_mpanel_flag'] | config['all3']):
         
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
@@ -812,41 +807,44 @@ def make_single_pplots(rdat,flags,config,outpath,y=None):
         
         plt.savefig('{d}{p}_CFAD_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
+
+
+    if (config['plot_cs'] | config['all3']):
         
-        if config['plot_cs'] == True:
-            
-            outdir = outpath+'multi_panel/'
-            os.makedirs(outdir,exist_ok=True)
-            
-            fig, ax = plt.subplots(2,2,figsize=(18,12),constrained_layout=True)
-            axf = ax.flatten()
+        outdir = outpath+'multi_panel/'
+        os.makedirs(outdir,exist_ok=True)
+        
+        fig, ax = plt.subplots(2,2,figsize=(18,12),constrained_layout=True)
+        axf = ax.flatten()
 
-            if config['wname'] in rdat.data.variables.keys():
-                dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
-            dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
-            dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
-            dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
-            extrax ='convective'
-            #plt.tight_layout()
-    #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-            plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
-            plt.clf()
+        if config['wname'] in rdat.data.variables.keys():
+            dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
+        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
+        extrax ='convective'
+        #plt.tight_layout()
+#        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
+        plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.clf()
 
-            fig, ax = plt.subplots(2,2,figsize=(18,12))
-            axf = ax.flatten()
-            if config['wname'] in rdat.data.variables.keys():
-                dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
-            dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
-            dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
-            dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
-            extrax ='stratiform'
-            plt.tight_layout()
-    #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-            #plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=outdir,p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype'],x=extrax),dpi=300) 
-            plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
-            plt.clf()
+        fig, ax = plt.subplots(2,2,figsize=(18,12))
+        axf = ax.flatten()
 
-    if flags['cfad_individ_flag'] == True:
+        if config['wname'] in rdat.data.variables.keys():
+            dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
+        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
+        extrax ='stratiform'
+        plt.tight_layout()
+#        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
+        #plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=outdir,p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype'],x=extrax),dpi=300) 
+        plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
+        plt.clf()
+
+
+    if (config['cfad_individ_flag'] | config['all3']):
     #        axf = ax.flatten()
 
         outdir = outpath+'cfad/'
@@ -888,15 +886,17 @@ def make_single_pplots(rdat,flags,config,outpath,y=None):
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.rho_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
-    
-    if flags['hid_cfad_flag'] == True:
+
+
+    if (config['hid_cfad_flag'] | config['all3']):
         fig, ax = rdat.plot_hid_cdf()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         
         plt.savefig('{d}{p}_HID_CFAD.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
-    if flags['joint_flag'] == True:
+
+    if (config['joint_flag'] | config['all3']):
 
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
@@ -934,7 +934,7 @@ def make_single_pplots(rdat,flags,config,outpath,y=None):
         plt.clf()
 
 
-    if flags['hid_prof'] == True:
+    if (config['hid_prof'] | config['all3']):
 
         outdir = outpath+'vertical_profile/'
         os.makedirs(outdir,exist_ok=True)
@@ -960,9 +960,11 @@ def make_single_pplots(rdat,flags,config,outpath,y=None):
         plt.savefig('{d}{p}_HID_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
-    if config['wname'] in rdat.data.variables.keys():
 
-        if flags['up_width'] == True:
+    if (config['up_width'] | config['all3']):
+            
+        if config['wname'] in rdat.data.variables.keys():
+            
             tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
             #print np.max(m_warea_wrf)
 
@@ -980,83 +982,100 @@ def make_single_pplots(rdat,flags,config,outpath,y=None):
             plt.savefig('{d}{p}_updraft_width_{y}_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],y=config['y']),dpi=400,bbox_inches='tight')
             plt.clf()
 
-#     for k in flags.keys():
-#         print('flag keys:',k,flags[k])
 
-    if config['tms_on'] is True:
+    if (config['cappi_multi'] | config['all3']):
+    
+        for ts in tms:
+            #z=2.0
+            #print xlim
+#             print (config['cappi_vars'])
+#             print (config['cappi_multi'])
+            #print('cappi mulit, vars',config['cappi_vars'])
+            #print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
+            
+            fig = rdat.cappi_multiplot(ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
+            #plt.tight_layout()
+#            print np.shape(fig),type(fig), fig
+            nvars = len(eval(config['cappi_vars']))
+            if nvars <=6:
+                yof = 0.01
+            else:
+                yof=-0.02
+            label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
+            #plt.tight_layout()
+            plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+            plt.clf()
+    '''
+    else:
 
         for ts in tms:
-                #z=2.0
-                #print xlim
-    #             print (config['cappi_vars'])
-    #             print (config['cappi_multi'])
-            if config['cappi_multi'] is True:
-                #print('cappi mulit, vars',config['cappi_vars'])
-                #print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
-                
-                fig = rdat.cappi_multiplot(ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
-                #plt.tight_layout()
-    #            print np.shape(fig),type(fig), fig
-                nvars = len(eval(config['cappi_vars']))
-                if nvars <=6:
-                    yof = 0.01
-                else:
-                    yof=-0.02
-                label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
-                #plt.tight_layout()
-                plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+
+            for i,v in enumerate(eval(config['cappi_vars'])):
+            #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
+            #print str(v)
+#                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
+                fig= rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
+                plt.tight_layout()
+                #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
+                plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
                 plt.clf()
 
+        #y=-12.5
+    '''
+
+    if (config['xsec_multi'] | config['all3']):
+    
+        for ts in tms:
+        
+            if rdat.w_name is not None:
+                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
             else:
-                for i,v in enumerate(eval(config['cappi_vars'])):
-                    #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
-                    #print str(v)
-    #                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
-                    fig= rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
-                    plt.tight_layout()
-                    #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
-                    plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
-                    plt.clf()
-
-                #y=-12.5
-            if config['xsec_multi'] == True:
-                if rdat.w_name is not None:
-                    fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
-                else:
-                    fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
-                #plt.tight_layout()
-                nvars = len(eval(config['rhi_vars']))
-                if nvars <=6:
-                    yof = 0.01
-                else:
-                    yof=-0.02
-
-                #plt.tight_layout()
-                
-                label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
-                plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
-                plt.clf()
+                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+            #plt.tight_layout()
+            nvars = len(eval(config['rhi_vars']))
+            if nvars <=6:
+                yof = 0.01
             else:
-                for i,v in enumerate(eval(config['rhi_vars'])):
-                    #print i, v
-                    #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
-                    fig = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'])
-                    plt.tight_layout()
-                    plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
-                    plt.clf()
+                yof=-0.02
 
-            if flags['qr_cappi'] == True:
-                    print ("qr_cappi")
-                    fig = rdat.cappi_multiplot(z=config['z'],ts=ts,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
-                    plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
-                    plt.clf()
+            #plt.tight_layout()
             
-            if flags['qr_rhi'] == True:
-                print ("qr_rhi")
-                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
-                plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+            label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
+            plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
+            plt.clf()
+    '''
+    else:
+
+        for ts in tms:
+        
+            for i,v in enumerate(eval(config['rhi_vars'])):
+                #print i, v
+                #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
+                fig = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'])
+                plt.tight_layout()
+                plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
                 plt.clf()
-            
+    '''
+
+    if (config['qr_cappi'] | config['all3']):
+
+        for ts in tms:
+        
+            print ("qr_cappi")
+            fig = rdat.cappi_multiplot(z=config['z'],ts=ts,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
+            plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+            plt.clf()
+    
+    if (config['qr_rhi'] | config['all3']):
+        
+        for ts in tms:
+        
+            print ("qr_rhi")
+            fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
+            plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+            plt.clf()
+    
+
 def subset_convstrat(data,rdata,zlev=1):
     cssum =(rdata.data[rdata.cs_name].max(dim='z'))
     stratsub=data.sel(z=slice(zlev,zlev+1)).where(cssum==1)
