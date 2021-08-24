@@ -467,6 +467,6 @@ else:
 
     print('\n#################################################')
     print('####### Returning to run_ipolarris_new.py #######')
-    print('#################################################')
+    print('#################################################\n')
 
     print('\niPOLARRIS RUN COMPLETE FOR '+config['exper']+' '+config['sdatetime']+' - '+config['edatetime']+'\n')

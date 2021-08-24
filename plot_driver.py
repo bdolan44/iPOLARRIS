@@ -984,6 +984,9 @@ def make_single_pplots(rdat,config,y=None):
 
 
     if (config['cappi_multi'] | config['all3']):
+ 
+        outdir = outpath+'cappi_multi/'
+        os.makedirs(outdir,exist_ok=True)
     
         for ts in tms:
             #z=2.0
@@ -1003,7 +1006,8 @@ def make_single_pplots(rdat,config,y=None):
                 yof=-0.02
             label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
             #plt.tight_layout()
-            plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+            #plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+            plt.savefig('{i}{e}_multi_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
     '''
     else:
