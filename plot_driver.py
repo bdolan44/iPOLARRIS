@@ -1065,7 +1065,7 @@ def make_single_pplots(rdat,config,y=None):
                 plt.clf()
     '''
 
-    if (config['qr_cappi'] | config['all3']):
+    if config['qr_cappi']:
 
         for ts in tms:
         
@@ -1074,7 +1074,7 @@ def make_single_pplots(rdat,config,y=None):
             plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
             plt.clf()
     
-    if (config['qr_rhi'] | config['all3']):
+    if config['qr_rhi']:
         
         for ts in tms:
         
