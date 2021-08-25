@@ -1027,8 +1027,11 @@ def make_single_pplots(rdat,config,y=None):
         #y=-12.5
     '''
 
-    if (config['xsec_multi'] | config['all3']):
-    
+    if (config['rhi_multi'] | config['all3']):
+
+        outdir = outpath+'rhi_multi/'
+        os.makedirs(outdir,exist_ok=True)
+ 
         for ts in tms:
         
             if rdat.w_name is not None:
@@ -1045,7 +1048,8 @@ def make_single_pplots(rdat,config,y=None):
             #plt.tight_layout()
             
             label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
-            plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
+            #plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
+            plt.savefig('{i}{e}_multi_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
     '''
     else:

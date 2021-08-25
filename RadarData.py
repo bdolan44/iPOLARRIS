@@ -977,6 +977,7 @@ class RadarData(RadarConfig.RadarConfig):
                         y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind).values)
                 else:
                     y_ind = self.get_ind(y,self.data[self.y_name].values)
+
             if xlim is None:
                 xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
             else:
@@ -998,8 +999,6 @@ class RadarData(RadarConfig.RadarConfig):
                             xmaxi = self.get_ind(xlim[1],self.data[self.x_name].values)
                 else:
                     xmini, xmaxi = xlim
-
-
 
             if zlim is None:
                 zmin, zmax = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
@@ -1041,11 +1040,11 @@ class RadarData(RadarConfig.RadarConfig):
 #                print('yind is ',y_ind,tmind,zmini,zmaxi,xmini,xmaxi)
                 data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y_ind,x=slice(xmini,xmaxi)))
             else:
-                data = (self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y,x=slice(xlim[0],xlim[1])).values)
+                #data = (self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y,x=slice(xlim[0],xlim[1])).values)
+                data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=slice(y,y+1),x=slice(xmini,xmaxi)).values)
     #         if np.shape(data) > 2:
     #             data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi)).data)
-
-
+            
             if 'y' in self.data[self.x_name].dims:
                 if 'd' in self.data[self.x_name].dims:
                     xdat = np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
@@ -1176,10 +1175,12 @@ class RadarData(RadarConfig.RadarConfig):
                 xmini, xmaxi = xlim
         if zlim is None:
             print("trying to get Z limits",self.data[self.z_name].values.min(),self.data[self.z_name].values.max())
-            zmini = 0
-            zmaxi = -1
-            
-  #          zmini, zmaxi = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
+            #zmini = 0
+            #zmaxi = -1
+            zmini = np.argmin(self.data[self.z_name].values)
+            zmaxi = np.argmax(self.data[self.z_name].values)
+
+            #zmini, zmaxi = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
             zlim = [zmini,zmaxi]
         else:
             zmini = zlim[0]
@@ -1772,6 +1773,7 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
 #        print 'ln 1274', xmini,xmaxi,y_ind,zmini,zmaxi,skip,xlim,y
+
         if self.u_name in self.data.variables.keys():
 
             try:
@@ -1779,7 +1781,7 @@ class RadarData(RadarConfig.RadarConfig):
                     if 'd' in self.data[self.u_name].dims:
                         udat= np.squeeze(np.squeeze(self.data[self.u_name]).sel(d=tmind,x=slice(xmini,xmaxi),y=y_ind,z=slice(zmini,zmaxi)).values)
                         wdat= np.squeeze(np.squeeze(self.data[self.w_name]).sel(d=tmind,x=slice(xmini,xmaxi),y=y_ind,z=slice(zmini,zmaxi)).values)
-                        xdat= np.squeeze(np.squeeze(self.data[self.x_name]).sel(d=tmind,x=slice(xmini,xmaxi),y=y_ind).values)
+                        xdat= np.squeeze(np.squeeze(self.data[self.x_name]).sel(d=tmind,x=slice(xmini,xmaxi)).values)
 
                         if 'y' in self.data[self.z_name].dims:
                         
@@ -1789,11 +1791,10 @@ class RadarData(RadarConfig.RadarConfig):
                             zdat= np.squeeze(np.squeeze(self.data[self.z_name]).sel(d=tmind,z=slice(zmini,zmaxi)).values)
 
                     else:
-                        udat= np.squeeze(np.squeeze(self.data[self.u_name]).sel(x=slice(xmini,xmaxi),y=y_ind,z=slice(zmini,zmaxi)).values)
-                        wdat= np.squeeze(np.squeeze(self.data[self.w_name]).sel(x=slice(xmini,xmaxi),y=y_ind,z=slice(zmini,zmaxi)).values)
-                        xdat= np.squeeze(np.squeeze(self.data[self.x_name]).sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)).values)
+                        udat= np.squeeze(np.squeeze(self.data[self.u_name]).sel(x=slice(xmini,xmaxi),y=slice(y,y+1),z=slice(zmini,zmaxi)).values)
+                        wdat= np.squeeze(np.squeeze(self.data[self.w_name]).sel(x=slice(xmini,xmaxi),y=slice(y,y+1),z=slice(zmini,zmaxi)).values)
+                        xdat= np.squeeze(np.squeeze(self.data[self.x_name]).sel(x=slice(xmini,xmaxi)).values)
                         if 'y' in self.data[self.z_name].dims:
-                            
                             zdat= np.squeeze(np.squeeze(self.data[self.z_name]).sel(z=slice(zmini,zmaxi),y=y_ind).values)
                         else:
                             zdat= np.squeeze(np.squeeze(self.data[self.z_name]).sel(z=slice(zmini,zmaxi)).values)
@@ -1802,21 +1803,33 @@ class RadarData(RadarConfig.RadarConfig):
 
                 else:
     #                print np.shape(xdat), np.shape(zdat)
-                    xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=y_ind).values)
-                    zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).values)
-                    udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
-                    wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                    #xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=y_ind).values) 
+                    if 'd' in self.data[self.u_name].dims:
+                        xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).values)
+                        zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).values)
+                        #udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                        udat = np.squeeze(self.data[self.u_name].sel(d=tmind,z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
+                        #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                        wdat = np.squeeze(self.data[self.w_name].sel(d=tmind,z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)                  
+                    else: 
+                        xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).values)
+                        zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).values)
+                        #udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                        udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
+                        #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                        wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
 
             except:
 #                print 'uh-oh, exception'
                 xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).values)
                 zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).values)
     #            print np.shape(xdat),np.shape(zdat),np.shape(self.data[self.u_name].data)
-                udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
-                wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                #udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
+                #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
 
 #            print('w is',np.nanmax(wdat[::zskip,::xskip]))
-
 
             if self.y_name == 'latitude':
                 q_handle = ax.quiver(xdat[::xskip], zdat[::zskip]+ht_offset, \
