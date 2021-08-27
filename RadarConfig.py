@@ -77,6 +77,7 @@ class RadarConfig(object):
         self.delta = {dz: 10, zdr: 1, kdp: 1, ldr: 5, rho: 0.005, hid: 1,w:5,vr:5,self.cs_name:1,self.rr_name:10}
         self.units = {dz: '(dBZ)', zdr: '(dB)', kdp: '($^{\circ}$/km)', ldr: '(dB)', rho: '', hid: '',w:'(m s$^{-1}$)',vr:'(m s$^{-1}$)',self.cs_name:'',self.rr_name:'(mm hr$^{-1}$)'}
         self.names = {dz: 'Z', zdr: 'Z$_{DR}$', kdp: 'K$_{dp}$', ldr: 'LDR', rho: r'$\rho_{hv}$', hid: '',w:'',vr:'V$_r$',self.cs_name:'',self.rr_name:'RR'}
+        self.names_uc = {dz: 'Z', zdr: 'ZDR', kdp: 'KDP', ldr: 'LDR', rho: 'RHO', hid: 'HID',w:'W',vr:'V$_{RAD}$',self.cs_name:'',self.rr_name:'RR'}
         self.longnames = {dz: 'Reflectivity', zdr: 'Differntial reflectivity', kdp: 'Specific differential phase',\
                 ldr: 'Linear depolarization ratio', rho: 'Correlation coefficient', hid: 'Hydrometeor identification',w:'Vertical Velocity',vr:'Radial Velocity',\
                 self.cs_name: 'Convective/Stratiform',self.rr_name:'Rain Rate'}
