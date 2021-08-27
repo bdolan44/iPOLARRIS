@@ -6,4 +6,4 @@
 *.pyc
 *.p
 *.npy
-output/*
+*.DS_Store
