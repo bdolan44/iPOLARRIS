@@ -996,15 +996,17 @@ def make_single_pplots(rdat,config,y=None):
             #print('cappi mulit, vars',config['cappi_vars'])
             #print config['cappi_vectres'],eval(config['cvectors']),eval(config['cappi_contours']),config['ylim'],config['xlim'],config['z'],rdat.date,eval(config['cappi_vars'])
             
-            fig = rdat.cappi_multiplot(ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = eval(config['cappi_contours']))
+            fig = rdat.cappi_multiplot(ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = None) #eval(config['cappi_contours']))
+
+
             #plt.tight_layout()
-#            print np.shape(fig),type(fig), fig
+#           print np.shape(fig),type(fig), fig
             nvars = len(eval(config['cappi_vars']))
             if nvars <=6:
                 yof = 0.01
             else:
                 yof=-0.02
-            label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
+            #label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
             #plt.tight_layout()
             #plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
             plt.savefig('{i}{e}_multi_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
@@ -1595,7 +1597,7 @@ def plot_cappi(rdata,var,zvar,hght,time,time_match,resolution='10m',cs_over=Fals
     #ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
 
     # (4) Overlay variable data as a colormesh plot (with colorbar) using PlateCarree projection.
-    rdata.cappi(var,z=whz,ts=time_match,contour='CS',ax=ax)
+    rdata.cappi(var,z=whz,ts=time_match,contour=None,ax=ax)
     #if statpt: ax.plot(rdata.lon_0,rdata.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
     if statpt: ax.plot(0,0,markersize=12,marker='^',color='k')
    

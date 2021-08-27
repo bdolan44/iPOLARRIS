@@ -1208,8 +1208,8 @@ class RadarData(RadarConfig.RadarConfig):
             figx = 7
             figy = 4*nrows
         elif (nvars > 3 and nvars < 7):
-            ncols = 2
-            nrows = int(np.ceil(nvars/2))
+            nrows = 2
+            ncols = int(np.ceil(nvars/2))
             figx = 12
             figy = 4*nrows
         else:
@@ -1264,7 +1264,7 @@ class RadarData(RadarConfig.RadarConfig):
 ######################### Here is the 4 stuff ##############################
 
     def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=None, cblabel=None, 
-        labels=True, res = 2.0, thresh_dz=False,contour = None,**kwargs):
+        labels=False, xlab=False, ylab=False, res = 2.0, thresh_dz=False,contour = None,**kwargs):
         "Just make a Constant Altitude Plan Position Indicator plot of a given variable"
 
         # first, get the appropriate z index from the z that's wanted in altitude
@@ -1491,30 +1491,55 @@ class RadarData(RadarConfig.RadarConfig):
             if cblabel is not None:
                 cb.set_label(cblabel)
         '''
+        
         lur,bur,wur,hur = ax.get_position().bounds
-        cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
-        cbar_ax = fig.add_axes(cbar_ax_dims)
-        cbt = fig.colorbar(dummy,cax=cbar_ax)
+        cbar_ax_dims = [lur+wur+0.015,bur-0.001,0.02,hur]
+        if var.startswith('HID'):
+            cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+        else:
+            cbar_ax = fig.add_axes(cbar_ax_dims)
+            cbt = fig.colorbar(dummy,cax=cbar_ax)
         cbt.ax.tick_params(labelsize=16)
-        if var.startswith('REF'): labtxt = 'Reflectivity (dBZ)'
-        elif var.startswith('RR'): labtxt = 'Rain Rate (mm/hour)'
-        else: labtxt = var
-        cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
-
+        cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
+        
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
             #print('setting min and max',xmin,xmax,ymin,ymax)
             ax.axis([xmin, xmax, ymin, ymax])
             if labels:
-                 ax.set_xlabel('Longitude')
-                 ax.set_ylabel('Latitude')
+                ax.set_xlabel('Longitude')
+                ax.set_ylabel('Latitude')
+                ax.tick_params(axis='both', which='major', labelsize=16)
+            else:
+                if xlab:
+                    ax.set_xlabel('Longitude')
+                    ax.tick_params(axis='x', which='major', labelsize=16)
+                if ylab:
+                    ax.set_ylabel('Latitude')
+                    ax.tick_params(axis='y', which='major', labelsize=16)
         else:
-            ax.axis([xmini, xmaxi, ymini, ymaxi])
+            #ax.axis([xmini, xmaxi, ymini, ymaxi])
             if labels:
                 ax.set_xlabel('Distance E of radar (km)',fontsize=16)
                 ax.set_ylabel('Distance N of radar (km)',fontsize=16)
-        ax.tick_params(axis='both', which='major', labelsize=16)
-
+                ax.tick_params(axis='both', which='major', labelsize=16)
+            else:
+                if xlab:
+                    ax.set_xlabel('Distance E of radar (km)',fontsize=16)
+                    ax.tick_params(axis='x', which='major', labelsize=16)
+                else:
+                    ax.set_xticks([])
+                    ax.set_xticklabels([])
+                    ax.tick_params(axis='x', which='major', labelsize=0)
+                if ylab:
+                    ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+                    ax.tick_params(axis='y', which='major', labelsize=16)
+                else:
+                    ax.set_yticks([])
+                    ax.set_yticklabels([])
+                    ax.tick_params(axis='y', which='major', labelsize=0)
+                    
+       
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
 #            try:
@@ -1526,7 +1551,6 @@ class RadarData(RadarConfig.RadarConfig):
             hts = self.data[self.z_name].sel(d=tmind).values
         else:
             hts = self.data[self.z_name].values
-
 
         if title_flag:
             ax.set_title('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
@@ -1624,10 +1648,12 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             ncols = 2
             nrows = int(np.ceil(nvars/2))
-        figx = 12
-        figy = 4*nrows
+        figx = 16
+        figy = 14
 
-        fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
+        #fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
+        fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.22, 'hspace': 0.07, \
+            'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax], **kwargs)
         axf = ax.flatten()
         
@@ -1642,7 +1668,11 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 vect = None
 #            print 'RadarDAta 1258:',axf[i],xlim,ylim,var,vect,res,vcont
-            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz)
+            botpanels = np.arange(nvars-ncols,nvars)
+            xlabbool = True if i in botpanels else False
+            lspanels = [2*n for n in range(0,nrows)]
+            ylabbool = True if i in lspanels else False
+            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz,xlab=xlabbool,ylab=ylabbool,labels=False)
         # now do the HID plot, call previously defined functions
         # try:
         #     dummy_hid = self.HID_plot(self.HID_from_scores(self.scores, rank = 1)[z_ind,:,:], 
@@ -1652,17 +1682,21 @@ class RadarData(RadarConfig.RadarConfig):
         #     print 'No HID scores, not plotting'
         #     pass
 
-        fig.tight_layout()
-        fig.subplots_adjust(top = 0.94)
-        if 'd' in self.data[self.z_name].dims:
-            hts = self.data[self.z_name].sel(d=tmind).values
-        else:
-            hts = self.data[self.z_name].values
-        fig.suptitle('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
-                    hts[z_ind]), fontsize = 18)
+        axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.radar_name), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        axf[ncols-1].text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes) # (a) Top-left
+        axf[ncols-1].text(0.99, 0.99, 'z = {a} km'.format(a=z), horizontalalignment='right',verticalalignment='top', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes)
+        
+        #fig.tight_layout()
+        #fig.subplots_adjust(top = 0.94)
+        #if 'd' in self.data[self.z_name].dims:
+        #    hts = self.data[self.z_name].sel(d=tmind).values
+        #else:
+        #    hts = self.data[self.z_name].values
+        #fig.suptitle('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
+        #            hts[z_ind]), fontsize = 18)
 
 
-        return fig #, ax
+        return fig
 
 
 #############################################################################################################
