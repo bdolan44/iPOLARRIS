@@ -1341,8 +1341,10 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 ymini = self.get_ind(ylim[0],self.data[self.y_name].values)
                 ymaxi = self.get_ind(ylim[1],self.data[self.y_name].values)
-            ymin = ylim[0]
-            ymax = ylim[1]
+            ymini = ylim[0]
+            ymaxi = ylim[1]
+
+        ymin, ymax = ylim
 
  #            else:
 #                 
@@ -1398,7 +1400,11 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)).values)#,y=slice(ymini,ymaxi)).values)
             ydat = np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi)).values)
-        
+        print(slice(xmini,xmaxi))
+        print(slice(ymini,ymaxi))
+        print(slice(-100,100))
+        input()
+
 #        print 'xmini, xmaxi, xmin,xmax',xmini,xmaxi,xmin,xmax,ymini,ymaxi
 #        print xdat[xmax]
 #        data[dzmask] =np.nan
