@@ -937,7 +937,7 @@ class RadarData(RadarConfig.RadarConfig):
 ########### STARTING WITH CROSS SECTIONS ################
 
     def xsec(self, var, y=None, xlim=None, zlim=None, ts = None,varlist=None, ax=None, title_flag=False, 
-                vectors=None, cblabel=None, res=2.0,cbpad=0.03, **kwargs):
+                vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, **kwargs):
         "Just one axis cross-section plot of a variable"
         # first, get the appropriate y index from the y that's wanted
         if ts is None:
@@ -1087,6 +1087,7 @@ class RadarData(RadarConfig.RadarConfig):
             if range_lim >= 10:
                 cb_format = '%d'
 
+            '''
             cb = fig.colorbar(dummy, ax=ax, fraction=0.03, format=cb_format, pad=cbpad)
             if var in self.lims.keys():
                 cb.set_label(' '.join([self.names[var], self.units[var]]).strip())
@@ -1095,18 +1096,67 @@ class RadarData(RadarConfig.RadarConfig):
                     cb.set_ticklabels(self.ticklabels[var])
             else:
                 cb.set_label(var)
+            '''
+            
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur+wur+0.015,bur-0.001,0.02,hur]
+            if var.startswith('HID'):
+                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+            else:
+                cbar_ax = fig.add_axes(cbar_ax_dims)
+                cbt = fig.colorbar(dummy,cax=cbar_ax)
+            cbt.ax.tick_params(labelsize=16)
+            cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
+            
+            ####### plotting limits getting set here ######
+            if self.x_name == 'longitude':
+                #print('setting min and max',xmin,xmax,ymin,ymax)
+                ax.axis([xmin, xmax, ymin, ymax])
+                if labels:
+                    ax.set_xlabel('Longitude')
+                    ax.set_ylabel('Latitude')
+                    ax.tick_params(axis='both', which='major', labelsize=16)
+                else:
+                    if xlab:
+                        ax.set_xlabel('Longitude')
+                        ax.tick_params(axis='x', which='major', labelsize=16)
+                    if ylab:
+                        ax.set_ylabel('Latitude')
+                        ax.tick_params(axis='y', which='major', labelsize=16)
+            else:
+                #ax.axis([xmini, xmaxi, ymini, ymaxi])
+                if labels:
+                    ax.set_xlabel('Distance E of radar (km)',fontsize=16)
+                    ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+                    ax.tick_params(axis='both', which='major', labelsize=16)
+                else:
+                    if xlab:
+                        ax.set_xlabel('Distance E of radar (km)',fontsize=16)
+                        ax.tick_params(axis='x', which='major', labelsize=16)
+                    else:
+                        ax.set_xticks([])
+                        ax.set_xticklabels([])
+                        ax.tick_params(axis='x', which='major', labelsize=0)
+                    if ylab:
+                        ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+                        ax.tick_params(axis='y', which='major', labelsize=16)
+                    else:
+                        ax.set_yticks([])
+                        ax.set_yticklabels([])
+                        ax.tick_params(axis='y', which='major', labelsize=0)
+                        
 
 
 
             ###### this sets the limits #######
     #        print zmin, zmax
-            if self.x_name == 'longitude':
-                ax.axis([xmin, xmax, zmin, zmax])
+    #        if self.x_name == 'longitude':
+    #            ax.axis([xmin, xmax, zmin, zmax])
     #            ax.set_xlabel('Longitude')
-            else:
-                ax.axis([xmin, xmax, zmin, zmax])
-                ax.set_xlabel('Distance E of radar (km)')
-            ax.set_ylabel('Altitude (km MSL)')
+    #        else:
+    #            ax.axis([xmin, xmax, zmin, zmax])
+    #            ax.set_xlabel('Distance E of radar (km)')
+    #        ax.set_ylabel('Altitude (km MSL)')
 
 
             if vectors:
@@ -1217,8 +1267,12 @@ class RadarData(RadarConfig.RadarConfig):
             nrows = int(np.ceil(nvars/2))
             figx=16
             figy = 4*nrows
-            
-        fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
+        figx = 18
+        figy = 14
+
+        #fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
+        fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.32, 'hspace': 0.07, \
+            'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax])
         axf = ax.flatten()
 
@@ -1230,15 +1284,22 @@ class RadarData(RadarConfig.RadarConfig):
 #                print 'RadarData ln 992 vectors', vectors,vect
             else:
                 vect = None
-            dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res, **kwargs)
+            botpanels = np.arange(nvars-ncols,nvars)
+            xlabbool = True if i in botpanels else False
+            lspanels = [ncols*n for n in range(0,nrows)]
+            ylabbool = True if i in lspanels else False
+            dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,**kwargs)
         # now do the HID plot, call previously defined functions
 
-
+        axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.radar_name), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        axf[ncols-1].text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes) # (a) Top-left
+        axf[ncols-1].text(0.99, 0.99, 'y = {a} km'.format(a=y), horizontalalignment='right',verticalalignment='top', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes)
+ 
 #        fig.tight_layout()
-        fig.tight_layout()
-        fig.subplots_adjust(top = 0.94)
+        #fig.tight_layout()
+        #fig.subplots_adjust(top = 0.94)
 
-        fig.suptitle('%s %s Cross Section y = %s' %(ts, self.radar_name,y), fontsize = 18)
+        #fig.suptitle('%s %s Cross Section y = %s' %(ts, self.radar_name,y), fontsize = 18)
 
         return fig #, ax
 
@@ -1400,10 +1461,6 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)).values)#,y=slice(ymini,ymaxi)).values)
             ydat = np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi)).values)
-        print(slice(xmini,xmaxi))
-        print(slice(ymini,ymaxi))
-        print(slice(-100,100))
-        input()
 
 #        print 'xmini, xmaxi, xmin,xmax',xmini,xmaxi,xmin,xmax,ymini,ymaxi
 #        print xdat[xmax]

@@ -39,8 +39,7 @@ def label_subplots(fig, xoff = 0.0, yoff = 0.02, nlabels = None,**kwargs):
         xmin, ymax = xbox.xmin, xbox.ymax
     # this is the position I want
         if letters[fa] != '-':
-            fig.text(xmin+xoff, ymax+yoff, '({})'.format(letters[fa]),**kwargs)
-
+            fig.text(xmin+xoff, ymax+yoff, '({})'.format(letters[fa]),**kwargs) #,transform=figaxes[fa].transAxes)
 
 
 
@@ -772,6 +771,7 @@ def make_single_pplots(rdat,config,y=None):
 #    print ts, te
     xlim = config['xlim']
     ylim = config['ylim']
+    zlim = config['zlim']
     y = config['y']
     z = config['z']
     outpath = config['image_dir']
@@ -1006,7 +1006,10 @@ def make_single_pplots(rdat,config,y=None):
                 yof = 0.01
             else:
                 yof=-0.02
-            #label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
+            yof = -0.01
+            xof = 0.01
+            #label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars)
+            label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars,horizontalalignment='left',verticalalignment='top',color='k',bbox=dict(facecolor='w', edgecolor='w', pad=2.0),weight='bold')
             #plt.tight_layout()
             #plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
             plt.savefig('{i}{e}_multi_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
@@ -1037,21 +1040,23 @@ def make_single_pplots(rdat,config,y=None):
         for ts in tms:
         
             if rdat.w_name is not None:
-                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],zlim=config['zlim'],varlist=eval(config['rhi_vars']))
             else:
-                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['rhi_vars']))
+                fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],zlim=config['zlim'],varlist=eval(config['rhi_vars']))
             #plt.tight_layout()
             nvars = len(eval(config['rhi_vars']))
             if nvars <=6:
                 yof = 0.01
             else:
                 yof=-0.02
-
+            yof = -0.01
+            xof = 0.01
             #plt.tight_layout()
             
-            label_subplots(fig,yoff=yof,xoff=0.01,size=16,nlabels=nvars)
+            #label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars)
+            label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars,horizontalalignment='left',verticalalignment='top',color='k',bbox=dict(facecolor='w', edgecolor='w', pad=2.0),weight='bold')
             #plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
-            plt.savefig('{i}{e}_multi_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
+            plt.savefig('{i}{e}_multi_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
     '''
     else:
