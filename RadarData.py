@@ -1111,10 +1111,13 @@ class RadarData(RadarConfig.RadarConfig):
             ####### plotting limits getting set here ######
             if self.x_name == 'longitude':
                 #print('setting min and max',xmin,xmax,ymin,ymax)
-                ax.axis([xmin, xmax, ymin, ymax])
+                #ax.axis([xmin, xmax, ymin, ymax])
+                ax.set_xlim([xmin,xmax])
+                ax.set_ylim([zmin,zmax])
                 if labels:
                     ax.set_xlabel('Longitude')
                     ax.set_ylabel('Latitude')
+                    ax.set_xlim([xmin,xmax])
                     ax.tick_params(axis='both', which='major', labelsize=16)
                 else:
                     if xlab:
@@ -1125,6 +1128,8 @@ class RadarData(RadarConfig.RadarConfig):
                         ax.tick_params(axis='y', which='major', labelsize=16)
             else:
                 #ax.axis([xmini, xmaxi, ymini, ymaxi])
+                ax.set_xlim([xmin,xmax])
+                ax.set_ylim([zmin,zmax])
                 if labels:
                     ax.set_xlabel('Distance E of radar (km)',fontsize=16)
                     ax.set_ylabel('Distance N of radar (km)',fontsize=16)
@@ -1144,9 +1149,6 @@ class RadarData(RadarConfig.RadarConfig):
                         ax.set_yticks([])
                         ax.set_yticklabels([])
                         ax.tick_params(axis='y', which='major', labelsize=0)
-                        
-
-
 
             ###### this sets the limits #######
     #        print zmin, zmax
@@ -1568,7 +1570,9 @@ class RadarData(RadarConfig.RadarConfig):
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
             #print('setting min and max',xmin,xmax,ymin,ymax)
-            ax.axis([xmin, xmax, ymin, ymax])
+            #ax.axis([xmin, xmax, ymin, ymax])
+            ax.set_xlim([xmin,xmax])
+            ax.set_ylim([ymin,ymax])
             if labels:
                 ax.set_xlabel('Longitude')
                 ax.set_ylabel('Latitude')
@@ -1582,6 +1586,8 @@ class RadarData(RadarConfig.RadarConfig):
                     ax.tick_params(axis='y', which='major', labelsize=16)
         else:
             #ax.axis([xmini, xmaxi, ymini, ymaxi])
+            ax.set_xlim([xmin,xmax])
+            ax.set_ylim([ymin,ymax])
             if labels:
                 ax.set_xlabel('Distance E of radar (km)',fontsize=16)
                 ax.set_ylabel('Distance N of radar (km)',fontsize=16)
