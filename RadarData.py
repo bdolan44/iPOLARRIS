@@ -1098,16 +1098,7 @@ class RadarData(RadarConfig.RadarConfig):
                 cb.set_label(var)
             '''
             
-            lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur+wur+0.015,bur-0.001,0.02,hur]
-            if var.startswith('HID'):
-                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
-            else:
-                cbar_ax = fig.add_axes(cbar_ax_dims)
-                cbt = fig.colorbar(dummy,cax=cbar_ax)
-            cbt.ax.tick_params(labelsize=16)
-            cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
-            
+           
             ####### plotting limits getting set here ######
             if self.x_name == 'longitude':
                 #print('setting min and max',xmin,xmax,ymin,ymax)
@@ -1132,8 +1123,9 @@ class RadarData(RadarConfig.RadarConfig):
                 ax.set_ylim([zmin,zmax])
                 if labels:
                     ax.set_xlabel('Distance E of radar (km)',fontsize=16)
-                    ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+                    ax.set_ylabel('Altitude (km MSL)',fontsize=16)
                     ax.tick_params(axis='both', which='major', labelsize=16)
+                    cbthickness = 0.03
                 else:
                     if xlab:
                         ax.set_xlabel('Distance E of radar (km)',fontsize=16)
@@ -1143,13 +1135,24 @@ class RadarData(RadarConfig.RadarConfig):
                         ax.set_xticklabels([])
                         ax.tick_params(axis='x', which='major', labelsize=0)
                     if ylab:
-                        ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+                        ax.set_ylabel('Altitude (km MSL)',fontsize=16)
                         ax.tick_params(axis='y', which='major', labelsize=16)
                     else:
                         ax.set_yticks([])
                         ax.set_yticklabels([])
                         ax.tick_params(axis='y', which='major', labelsize=0)
+                    cbthickness = 0.02
 
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur+wur+0.015,bur-0.001,cbthickness,hur]
+            if var.startswith('HID'):
+                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+            else:
+                cbar_ax = fig.add_axes(cbar_ax_dims)
+                cbt = fig.colorbar(dummy,cax=cbar_ax)
+            cbt.ax.tick_params(labelsize=16)
+            cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
+ 
             ###### this sets the limits #######
     #        print zmin, zmax
     #        if self.x_name == 'longitude':
@@ -1159,7 +1162,6 @@ class RadarData(RadarConfig.RadarConfig):
     #            ax.axis([xmin, xmax, zmin, zmax])
     #            ax.set_xlabel('Distance E of radar (km)')
     #        ax.set_ylabel('Altitude (km MSL)')
-
 
             if vectors:
 #                 try:
@@ -1175,7 +1177,7 @@ class RadarData(RadarConfig.RadarConfig):
             dummy = fig
 #        print type(dummy),dummy
 
-        return dummy
+        return dummy, ax
 
 #############################################################################################################
 
@@ -1327,7 +1329,7 @@ class RadarData(RadarConfig.RadarConfig):
 ######################### Here is the 4 stuff ##############################
 
     def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=None, cblabel=None, 
-        labels=False, xlab=False, ylab=False, res = 2.0, thresh_dz=False,contour = None,**kwargs):
+        labels=True, xlab=False, ylab=False, res = 2.0, thresh_dz=False,contour = None,**kwargs):
         "Just make a Constant Altitude Plan Position Indicator plot of a given variable"
 
         # first, get the appropriate z index from the z that's wanted in altitude
@@ -1557,16 +1559,7 @@ class RadarData(RadarConfig.RadarConfig):
                 cb.set_label(cblabel)
         '''
         
-        lur,bur,wur,hur = ax.get_position().bounds
-        cbar_ax_dims = [lur+wur+0.015,bur-0.001,0.02,hur]
-        if var.startswith('HID'):
-            cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
-        else:
-            cbar_ax = fig.add_axes(cbar_ax_dims)
-            cbt = fig.colorbar(dummy,cax=cbar_ax)
-        cbt.ax.tick_params(labelsize=16)
-        cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
-        
+       
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
             #print('setting min and max',xmin,xmax,ymin,ymax)
@@ -1592,6 +1585,7 @@ class RadarData(RadarConfig.RadarConfig):
                 ax.set_xlabel('Distance E of radar (km)',fontsize=16)
                 ax.set_ylabel('Distance N of radar (km)',fontsize=16)
                 ax.tick_params(axis='both', which='major', labelsize=16)
+                cbthickness = 0.03
             else:
                 if xlab:
                     ax.set_xlabel('Distance E of radar (km)',fontsize=16)
@@ -1607,6 +1601,17 @@ class RadarData(RadarConfig.RadarConfig):
                     ax.set_yticks([])
                     ax.set_yticklabels([])
                     ax.tick_params(axis='y', which='major', labelsize=0)
+                cbthickness = 0.02
+
+        lur,bur,wur,hur = ax.get_position().bounds
+        cbar_ax_dims = [lur+wur+0.015,bur-0.001,cbthickness,hur]
+        if var.startswith('HID'):
+            cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+        else:
+            cbar_ax = fig.add_axes(cbar_ax_dims)
+            cbt = fig.colorbar(dummy,cax=cbar_ax)
+        cbt.ax.tick_params(labelsize=16)
+        cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
                     
        
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
@@ -1625,7 +1630,7 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_title('%s %s CAPPI %.1f km MSL' %(ts, self.radar_name, \
                     hts[z_ind]), fontsize = 14)
 #        print type(dummy),dummy
-        return dummy,xdat,ydat,data
+        return dummy,ax
 
 #############################################################################################################
 
