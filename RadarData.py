@@ -2306,9 +2306,9 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_ylim(np.floor(min(hts)),np.ceil(max(hts)))
         else: 
             ax.tick_params(axis='y',labelsize=0,left=False)
-        ax.set_xlim(min(bins),max(bins))
         ax.set_xlabel('%s %s' %(var, self.units[var]),fontsize=22)
         ax.tick_params(axis='x',labelsize=20)
+        ax.set_xlim(np.floor(min(bins)),np.ceil(max(bins)))
 #        ax.set_title("{d} {r} {v}".format(d=self.date,r=self.radar_name,v=self.longnames[var]))
 #        ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
 #       except:
