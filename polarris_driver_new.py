@@ -372,6 +372,11 @@ def polarris_driver(configfile):
         rvar[Vname] = (['d','z','y','x'],vnew)
         #rvar[config['convname']] = (['d','z','y','x'],conv)
 
+    else:
+        Uname = None
+        Vname = None
+        Wname = None
+
     print('\nSending data to RadarData...')
    
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=Uname,v=Vname,w=Wname,conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
