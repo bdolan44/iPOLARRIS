@@ -73,7 +73,7 @@ class RadarConfig(object):
         self.set_cs_colorbar()
 
         # Now just set some defaults
-        self.lims = {dz: [0,80], zdr: [-1, 3], kdp: [-0.5, 3], ldr: [-35, -20], rho: [0.95, 1.00], hid: [0, len(self.species)+1],w:[-25,25],vr:[-25,25],self.cs_name:[0,4],self.rr_name:[0.01,150],self.temp_name:[-30,30]}
+        self.lims = {dz: [0,80], zdr: [-1, 3], kdp: [-0.5, 3], ldr: [-35, -20], rho: [0.95, 1.00], hid: [1, len(self.species)+1],w:[-25,25],vr:[-25,25],self.cs_name:[0,4],self.rr_name:[0.01,150],self.temp_name:[-30,30]}
         self.delta = {dz: 10, zdr: 1, kdp: 1, ldr: 5, rho: 0.005, hid: 1,w:5,vr:5,self.cs_name:1,self.rr_name:10,self.temp_name:5}
         self.units = {dz: '(dBZ)', zdr: '(dB)', kdp: '($^{\circ}$/km)', ldr: '(dB)', rho: '', hid: '',w:'(m s$^{-1}$)',vr:'(m s$^{-1}$)',self.cs_name:'',self.rr_name:'(mm hr$^{-1}$)',self.temp_name:'C'}
         self.names = {dz: 'Z', zdr: 'Z$_{DR}$', kdp: 'K$_{dp}$', ldr: 'LDR', rho: r'$\rho_{hv}$', hid: '',w:'',vr:'V$_r$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
