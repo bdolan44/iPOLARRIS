@@ -622,7 +622,7 @@ class RadarData(RadarConfig.RadarConfig):
                #print('T:',np.shape(tdum))
             else:
                tdum = None
-            print('You have entered hid band:',self.hid_band, 'ln 624 RadarData')
+            #print('You have entered hid band:',self.hid_band, 'ln 624 RadarData')
             hiddum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=np.squeeze(self.data[self.zdr_name].sel(d=v)).values, rho=np.squeeze(self.data[self.rho_name].sel(d=v)).values, 
                                 kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum, return_scores=self.return_scores)
 #            scores.append(scoresdum)
@@ -1073,7 +1073,7 @@ class RadarData(RadarConfig.RadarConfig):
     #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
             if var in self.lims.keys():
                 range_lim = self.lims[var][1] - self.lims[var][0]
-                print(self.lims[var][0],self.lims[var][1],'ln 1076')
+                ##print(self.lims[var][0],self.lims[var][1],'ln 1076')
                 dummy = ax.pcolormesh(xdat,zdat, data,
                     vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
             else:
@@ -2063,36 +2063,27 @@ class RadarData(RadarConfig.RadarConfig):
 
         if self.u_name in self.data.variables.keys():
             if 'd' in self.data[self.x_name].dims:
-                print('found dimension d at 2046')
                 if 'y' in self.data[self.x_name].dims:
-                    print('found dimension y at 2048')
                     xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
                     ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(d=tmind,y=slice(ymini,ymaxi+1),x=slice(xmini,xmaxi+1)).data))
                 
                 else:
-                    print('did not find dimension y at 2053')
                     xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi+1)).data))
                     ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(d=tmind,y=slice(ymini,ymaxi+1)).data))
                 
             else:
-                print('did not find dimension d at 2058')
                 if 'y' in self.data[self.x_name].dims:
-                    print('found dimension y at 2060')
                     xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
                     ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi+1),x=slice(xmini,xmaxi+1)).data))
                 else:
-                    print('did not find dimension y at 2064')
                     print(np.shape(self.data['x']), self.data['x'].dims)
                     print(np.shape(self.data['y']))
                     xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).data))
                     ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi+1)).data))
                     print(np.shape(xdat),np.shape(ydat))
-            print('x and y sizes at 2069:',np.shape(xdat),np.shape(ydat))
             if 'd' in self.data[self.u_name].dims:
-                print('found dimension d at 2069')
                 #udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(d=tmind,z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 #vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(d=tmind,z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
-                print('udat shape ',np.shape(self.data['U']),tmind,z_ind,xmini,xmaxi,ymini,ymax,self.data['U'].dims)
                 udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 if np.shape(udat)[0] == 2:
@@ -2102,7 +2093,6 @@ class RadarData(RadarConfig.RadarConfig):
                 print(np.shape(udat),np.shape(vdat))
                 
             else:
-                print('did not find dimension d at 2069')
                 #udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 #vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values)) 
                 udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
@@ -2149,7 +2139,7 @@ class RadarData(RadarConfig.RadarConfig):
                 xdatskipmesh,ydatskipmesh = np.meshgrid(xdatskip,ydatskip)
 #            print np.shape(xdatskip),np.shape(ydatskip),np.shape(udatskip),np.shape(vdatskip)
 #            print ('RadarData 1516:', xskip, yskip,np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat))
-            print('RadarData line 2111',np.shape(xdatskipmesh),np.shape(ydatskipmesh),np.shape(udatskip),np.shape(vdatskip))
+#            print('RadarData line 2111',np.shape(xdatskipmesh),np.shape(ydatskipmesh),np.shape(udatskip),np.shape(vdatskip))
             q_handle = ax.quiver(xdatskipmesh, ydatskipmesh, \
                 udatskip, vdatskip, \
                     scale=100, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
@@ -2696,7 +2686,7 @@ class RadarData(RadarConfig.RadarConfig):
             # need to add a blank at the beginning of species to align labels correctly
         #labs = np.concatenate((np.array(['']), np.array(self.species)))
         labs = np.array(self.species)
-        print(labs)
+        #print(labs)
         cb.set_ticklabels(labs)
         return cb
 
