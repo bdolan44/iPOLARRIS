@@ -2306,8 +2306,6 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_ylim(np.floor(min(hts)),np.ceil(max(hts)))
         else: 
             ax.tick_params(axis='y',labelsize=0,left=False)
-        print(min(bins),max(bins))
-        input()
         ax.set_xlim(min(bins),max(bins))
         ax.set_xlabel('%s %s' %(var, self.units[var]),fontsize=22)
         ax.tick_params(axis='x',labelsize=20)
