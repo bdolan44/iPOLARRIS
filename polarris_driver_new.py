@@ -111,6 +111,7 @@ def find_snd_match(config):
     for v,cname in enumerate(rdum):
 #            print cname
         base = os.path.basename(cname)
+#        print('base',base)
         radcdate=np.str(base[config['rdstart']:config['rdend']])
         #dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
         dates = datetime.datetime.strptime('{r}'.format(r=radcdate),config['rdate_format'])
@@ -223,17 +224,20 @@ def polarris_driver(configfile):
         rf1=[]
         rf2=[]
         for line in file:
-            print(line)
             if re.search('vtzms', line):
                 rf1.append(line.rstrip('\n'))
             else:
                 #print('other')
                 rf2.append(line.rstrip('\n'))
         #print(rf1)
-        rvar1 = xr.open_mfdataset(rf1,autoclose=True,concat_dim='d',preprocess=fix_my_data)
-        rvar2=  xr.open_mfdataset(rf2,autoclose=True,concat_dim='d')
-        rvar = xr.concat((rvar1,rvar2),dim='d')
-        rfiles =list(np.append(rf1,rf2))
+        if not rf2:
+            rvar = xr.open_mfdataset(rf1,autoclose=True,combine='nested',concat_dim='d',preprocess=fix_my_data)
+        else:
+            rvar1 = xr.open_mfdataset(rf1,autoclose=True,combine='nested',compat='override',preprocess=fix_my_data)
+            rvar2=  xr.open_mfdataset(rf2,autoclose=True,concat_dim='d')
+            rvar = xr.concat((rvar1,rvar2),dim='d')
+            rfiles =list(np.append(rf1,rf2))
+            
     else:
 #        try:
 #            print('trying to read normally')
@@ -306,8 +310,13 @@ def polarris_driver(configfile):
         print('Matching Dual-Doppler')
         dmatch = find_dd_match(rfiles,dfiles1,tm,tmd)
         #print('dmatch is ',dmatch)
-        dvar = xr.open_mfdataset(dfiles1,concat_dim='d')
-
+        try:
+            dvar = xr.open_mfdataset(dfiles1,concat_dim='d')
+        except ValueError as ve:
+            print('Trying nested instead of concat_dim to read DD files')
+            dvar = xr.open_mfdataset(dfiles1,combine='nested',concat_dim='d')
+            nf= len(dfiles1)
+            #dvar.expand_dims("d")
         # NEW! MultiDop names velocity fields in long-form. Shorten fieldnames in dopp files here for plotting labels.
         Uname = 'U'
         Vname = 'V'
@@ -376,7 +385,7 @@ def polarris_driver(configfile):
         print('In your config file, snd_on is set to True.')
         time.sleep(3)
         smatch = find_snd_match(config)
-        #print("rfiles",rfiles[0])
+        #print("rfiles",rfiles[0],smatch)
         sfile = smatch[rfiles[0]]
         print('Matching Sounding')
     else:

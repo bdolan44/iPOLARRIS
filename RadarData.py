@@ -99,7 +99,7 @@ class RadarData(RadarConfig.RadarConfig):
 #             self.nhgts = np.shape(self.data[self.z_name].values)[self.zind][0]
 #         except:
 #             self.nhgts = np.shape(self.data[self.z_name].values)
-        self.nhgts = self.data[self.dz_name].sizes['z']
+        self.nhgts = self.data[self.dz_name].sizes[self.z_name]
 #            self.read_data_from_nc(self.radar_file)
         print ('calculating deltas')
         self.calc_deltas()
@@ -341,7 +341,9 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             vrcomp = self.data[self.vr_name].sel(d=0).max(axis=0).values
             whmask = np.where(vrcomp > -50)
+            
             x,y = self.convert_ll_to_xy(self.data[self.y_name].sel(d=0),self.data[self.x_name].sel(d=0))
+            
             self.x = x.values
             self.y = y.values
             dx = np.average(np.diff(x.sel(y=0)))
@@ -564,6 +566,7 @@ class RadarData(RadarConfig.RadarConfig):
             self.gridded_height[:,i,:,:] = self.data[self.z_name][i]
 
         self.T = np.interp(self.gridded_height, self.snd_height, self.snd_temp)
+        self.add_field((self.data[self.dz_name].dims,self.T,), self.temp_name)
 
 #############################################################################################################
 
@@ -619,7 +622,7 @@ class RadarData(RadarConfig.RadarConfig):
                #print('T:',np.shape(tdum))
             else:
                tdum = None
-
+            #print('You have entered hid band:',self.hid_band, 'ln 624 RadarData')
             hiddum = csu_fhc.csu_fhc_summer(dz=dzhold, zdr=np.squeeze(self.data[self.zdr_name].sel(d=v)).values, rho=np.squeeze(self.data[self.rho_name].sel(d=v)).values, 
                                 kdp=np.squeeze(self.data[self.kdp_name].sel(d=v)).values, band=self.hid_band, use_temp=True, T=tdum, return_scores=self.return_scores)
 #            scores.append(scoresdum)
@@ -1004,7 +1007,6 @@ class RadarData(RadarConfig.RadarConfig):
                 zmin, zmax = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
                 zlim = [zmin,zmax]
                 if 'd' in self.data[self.z_name].dims:
-                    print('getting z mini, zmaxi')
                     zmini = self.get_ind(zlim[0],self.data[self.z_name].sel(d=tmind).values)
                     zmaxi = self.get_ind(zlim[1],self.data[self.z_name].sel(d=tmind).values)
                 else:
@@ -1042,8 +1044,12 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 #data = (self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y,x=slice(xlim[0],xlim[1])).values)
                 data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=slice(y,y+1),x=slice(xmini,xmaxi)).values)
-    #         if np.shape(data) > 2:
-    #             data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi)).data)
+
+
+
+            if len(np.shape(data)) > 2:
+                data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=slice(y,y),x=slice(xmini,xmaxi)).values)
+            #             data = np.squeeze(self.data[var].sel(z=slice(zmini,zmaxi),x=slice(xmini,xmaxi)).data)
             
             if 'y' in self.data[self.x_name].dims:
                 if 'd' in self.data[self.x_name].dims:
@@ -1062,14 +1068,16 @@ class RadarData(RadarConfig.RadarConfig):
                 zdat = np.squeeze(self.data[self.z_name].sel(d=tmind,z=slice(zmini,zmaxi)))
             else:
                 zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi)))
+#            print(np.shape(self.data[var]),self.data[var].dims,'ln 1068')
             data = np.ma.masked_less(data,-900.0)
             data = np.ma.masked_where(~np.isfinite(data),data)
-            print (np.shape(data),np.shape(xdat),np.shape(zdat),'ln 1053')
+            #print (np.shape(data),np.shape(xdat),np.shape(zdat),'ln 1053')
             #print np.shape(xdat),np.shape(zdat)
     #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
             if var in self.lims.keys():
                 range_lim = self.lims[var][1] - self.lims[var][0]
-
+                ##print(self.lims[var][0],self.lims[var][1],'ln 1076')
+#                print(np.shape(data),'data shape 1077')
                 dummy = ax.pcolormesh(xdat,zdat, data,
                     vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
             else:
@@ -1173,7 +1181,7 @@ class RadarData(RadarConfig.RadarConfig):
             if title_flag:
                 ax.set_title('%s %s Cross Section' %(ts, self.radar_name), fontsize = 14)
         else:
-            print ('No data for this variable!')
+            print ('No data for this variable!', var)
             dummy = fig
 #        print type(dummy),dummy
 
@@ -1206,6 +1214,8 @@ class RadarData(RadarConfig.RadarConfig):
                     y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind).values)
             else:
                 y_ind = self.get_ind(y,self.data[self.y_name].values)
+        yvalplot = self.data[self.y_name].values[y_ind]
+#        print(yvalplot, y_ind, 'ln 1211 RadarData')
         if xlim is None:
             xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
         else:
@@ -1254,6 +1264,7 @@ class RadarData(RadarConfig.RadarConfig):
             good_vars = self.valid_vars()
         nvars = len(good_vars)
         if 'scores' in good_vars:
+            print('needing to add + to HID, ln 1257 RadarData')
             if hasattr(self, 'scores'):
                 nvars += 1
         if nvars <= 3:
@@ -1301,7 +1312,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.radar_name), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         axf[ncols-1].text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes) # (a) Top-left
-        axf[ncols-1].text(0.99, 0.99, 'y = {a} km'.format(a=y), horizontalalignment='right',verticalalignment='top', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes)
+        axf[ncols-1].text(0.99, 0.99, 'y = {a} km'.format(a=yvalplot), horizontalalignment='right',verticalalignment='top', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes)
  
 #        fig.tight_layout()
         #fig.tight_layout()
@@ -1356,6 +1367,7 @@ class RadarData(RadarConfig.RadarConfig):
                 z_ind = self.get_ind(z,np.squeeze(self.data[self.z_name].sel(d=tmind).values))
             else:
 #                 print('no d, getting z_ind 1266, z ',z)
+                
                 z_ind = self.get_ind(z,self.data[self.z_name].values)
 #                 print('got z index for z:',z, z_ind)
 #        print('xlims 1203',xlim,tmind)
@@ -1921,13 +1933,20 @@ class RadarData(RadarConfig.RadarConfig):
     #                print np.shape(xdat), np.shape(zdat)
                     #xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=y_ind).values) 
                     if 'd' in self.data[self.u_name].dims:
+#                        print('made line 1936')
                         xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).values)
                         zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).values)
                         #udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
                         udat = np.squeeze(self.data[self.u_name].sel(d=tmind,z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
                         #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
                         wdat = np.squeeze(self.data[self.w_name].sel(d=tmind,z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)                  
+                        if len(np.shape(udat))>2:
+#                            print('Udat shape is too many!')
+                            udat = np.squeeze(self.data[self.u_name].sel(d=tmind,z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y)).values)
+                            #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                            wdat = np.squeeze(self.data[self.w_name].sel(d=tmind,z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y)).values)
                     else: 
+#                        print('made 1949')
                         xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).values)
                         zdat = np.squeeze(self.data[self.z_name].sel(z=slice(zmini,zmaxi+1)).values)
                         #udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
@@ -1944,7 +1963,12 @@ class RadarData(RadarConfig.RadarConfig):
                 udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
                 #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
                 wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y+1)).values)
-
+                if len(np.shape(udat))>2:
+ #                   print('Udat shape is too many!')
+                    udat = np.squeeze(self.data[self.u_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y)).values)
+                    #wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=y_ind).values)
+                    wdat = np.squeeze(self.data[self.w_name].sel(z=slice(zmini,zmaxi+1),x=slice(xmini,xmaxi+1),y=slice(y,y)).values)
+                
 #            print('w is',np.nanmax(wdat[::zskip,::xskip]))
 
             if self.y_name == 'latitude':
@@ -2018,6 +2042,7 @@ class RadarData(RadarConfig.RadarConfig):
                     xmini = self.get_ind(xlim[0],self.data[self.x_name].values)
                     xmaxi = self.get_ind(xlim[1],self.data[self.x_name].values)
         else:
+        
             xmini, xmaxi = xlim
         
         xmin, xmax = xlim
@@ -2067,14 +2092,22 @@ class RadarData(RadarConfig.RadarConfig):
                     xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).data))
                     ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi+1),x=slice(xmini,xmaxi+1)).data))
                 else:
+#                    print(np.shape(self.data['x']), self.data['x'].dims)
+#                    print(np.shape(self.data['y']))
                     xdat = np.squeeze(np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi+1)).data))
                     ydat = np.squeeze(np.squeeze(self.data[self.y_name].sel(y=slice(ymini,ymaxi+1)).data))
-               
+#                    print(np.shape(xdat),np.shape(ydat))
             if 'd' in self.data[self.u_name].dims:
                 #udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(d=tmind,z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 #vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(d=tmind,z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
+                if np.shape(udat)[0] == 2:
+                    udat = udat[0]
+                    vdat = vdat[0]
+                
+                #print(np.shape(udat),np.shape(vdat))
+                
             else:
                 #udat = np.squeeze(np.squeeze(self.data[self.u_name].sel(z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values))
                 #vdat = np.squeeze(np.squeeze(self.data[self.v_name].sel(z=z_ind,x=slice(xmini,xmaxi+1),y=slice(ymini,ymaxi+1)).values)) 
@@ -2117,11 +2150,13 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 xdatskip = xdat[::yskip]#,::xskip]
                 ydatskip = ydat[::yskip]#,::xskip]
-                udatskip = udat[::yskip,::xskip]
-                vdatskip = vdat[::yskip,::xskip]
+                udatskip = np.squeeze(udat[::yskip,::xskip])
+                vdatskip = np.squeeze(vdat[::yskip,::xskip])
+                xdatskipmesh,ydatskipmesh = np.meshgrid(xdatskip,ydatskip)
 #            print np.shape(xdatskip),np.shape(ydatskip),np.shape(udatskip),np.shape(vdatskip)
 #            print ('RadarData 1516:', xskip, yskip,np.shape(xdat),np.shape(ydat),np.shape(udat),np.shape(vdat))
-            q_handle = ax.quiver(xdatskip, ydatskip, \
+#            print('RadarData line 2111',np.shape(xdatskipmesh),np.shape(ydatskipmesh),np.shape(udatskip),np.shape(vdatskip))
+            q_handle = ax.quiver(xdatskipmesh, ydatskipmesh, \
                 udatskip, vdatskip, \
                     scale=100, scale_units='inches', pivot='middle', width=0.0025, headwidth=4, **kwargs)
 
@@ -2668,7 +2703,7 @@ class RadarData(RadarConfig.RadarConfig):
             # need to add a blank at the beginning of species to align labels correctly
         #labs = np.concatenate((np.array(['']), np.array(self.species)))
         labs = np.array(self.species)
-        print(labs)
+        #print(labs)
         cb.set_ticklabels(labs)
         return cb
 
@@ -2917,6 +2952,7 @@ class RadarData(RadarConfig.RadarConfig):
         #print np.shape(self.T[0,:,0,0])
         # now inerpolate this to the temps listed
         self.T = xr.DataArray(data=self.T,dims=['d','z','y','x'])
+
         if 'd' in self.T.dims:
             print('shapes in updraft width',np.shape(uw),np.shape(self.T.sel(x=0,y=0)))
             f_temp_u = sint.interp1d(self.T.sel(d=0,x=0,y=0), uw, bounds_error=False)
