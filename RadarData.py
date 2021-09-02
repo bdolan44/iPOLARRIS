@@ -1073,12 +1073,11 @@ class RadarData(RadarConfig.RadarConfig):
     #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
             if var in self.lims.keys():
                 range_lim = self.lims[var][1] - self.lims[var][0]
-
+                print(self.lims[var][0],self.lims[var][1],'ln 1076')
                 dummy = ax.pcolormesh(xdat,zdat, data,
                     vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], **kwargs)
             else:
                 dat = self.data[var].values
-                print('attempting to threshold values')
                 dat[dat<-900.0]=np.nan
                 range_lim  = np.nanmax(dat) - np.nanmin(dat)
 #                print('workign on {v}, sizes:'.format(v=var),np.nanmin(dat),np.nanmax(dat))
