@@ -155,8 +155,8 @@ else:
 
             fig, ax = plot_driver.plot_cappi(rdata,rdata.dz_name,rdata.z_name,config['z'],i,rtimematch,cs_over=False,statpt=True)
                     
-            #ax.set_xlim(config['xlim'][0],config['xlim'][1])
-            #ax.set_ylim(config['ylim'][0],config['ylim'][1])           
+            ax.set_xlim(config['xlim'][0],config['xlim'][1])
+            ax.set_ylim(config['ylim'][0],config['ylim'][1])           
             #ax.set_extent([minlon, maxlon, minlat,maxlat])
             
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
@@ -188,8 +188,8 @@ else:
             #fig, ax = plt.subplots(1,1,figsize=(10,8))
         #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
             #rdata.cappi(rdata.rr_name,z=whz,ts=rtimematch,contour='CS',ax=ax)
-            #ax.set_xlim(config['xlim'][0],config['xlim'][1])
-            #ax.set_ylim(config['ylim'][0],config['ylim'][1])
+            ax.set_xlim(config['xlim'][0],config['xlim'][1])
+            ax.set_ylim(config['ylim'][0],config['ylim'][1])
             #ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=rtimematch,h=rdata.data['z'].values[2]))
             
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
