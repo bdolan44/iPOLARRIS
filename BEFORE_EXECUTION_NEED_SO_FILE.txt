@@ -1,0 +1,3 @@
+When running on MAC or Linux OS, perform the following commands before running `python run_ipolarris_new.py my_config.txt`:
+1) Put /usr/bin ahead of your "default" executable directories (i.e. before /opt/local/bin) in $PATH, if it is not already. It does not need to be ahead of your custom executable directories (i.e. ~/../anaconda3/bin).
+2) Run: f2py -c calc_kdp_ray_fir.f -m calc_kdp_ray_fir. This will allow you to use the Fortran compiler in /usr/bin to convert your .f file into a readable .so file for your MAC or Linux OS.

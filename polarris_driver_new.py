@@ -1,21 +1,25 @@
 """
-This is the configruation file for setting up iPOLARRIS. Herein, the speicifcs of the dataset need to be defined such as the experiment, location and type of reading, etc.
-Written by Brenda Dolan
-May 2017
+This is the configruation file for setting up iPOLARRIS. Herein, the specifics of the dataset need to be defined such as the experiment, location and type of reading, etc.
+Written by Brenda Dolan (CSU) and Anthony Di Stefano (UBC)
+Released: May 2017
+Last Modified: June 2021
 bdolan@atmos.colostate.edu
 """
 from __future__ import print_function
-import glob
-import os
-import sys
-import re
-from netCDF4 import Dataset
-import pandas as pd
-import xarray as xr
-import RadarData
+
 import datetime
+import glob
 import matplotlib.pyplot as plt
+from netCDF4 import Dataset
 import numpy as np
+import os
+import pandas as pd
+import re
+import sys
+import xarray as xr
+import time
+
+import RadarData
 import GeneralFunctions as GF
 import RadarConfig
 import plot_driver
@@ -40,7 +44,7 @@ def find_dd_match(rdum,ddum,rdate,ddates):
         
         if mval != 'no':
             dfile = ddum[mval[0]]
-            print ('Found DD match!', dfile)
+            print('Found DD match!', dfile)
             mdfiles[cname] = dfile
         else:
             mdfiles[cname] = None
@@ -79,21 +83,25 @@ def match_snd(rdate,sdates):
 
 def find_snd_match(config):
     rdum =[]
-    with open(config['radar_files']) as f: 
-    #    dum.append(foo(f.readline()))
-    #    dum.append(foo(f.readline()))
+    with open(config['rfiles']) as f: 
+        #dum.append(foo(f.readline()))
+        #dum.append(foo(f.readline()))
 
         for line in f:
             dat = (line)
             rdum.append(foo(dat))
     #print('sfiles:',config['sfiles'])
-    slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
+    #rdum = glob.glob(config['rfiles']+'*')
+    #slist = sorted(glob.glob('{p}*{s}_*.txt'.format(p=config['sfiles'],s=(config['sstat']))))
+    with open(config['sfiles']) as f:
+        slist = f.read().splitlines()
+    #slist = glob.glob(config['sfiles']+'*')
     sdates=[]
     for v,sname in enumerate(slist):
 
         base = os.path.basename(sname)
 #            print base
-        radcdate=np.str(base[13:13+10])
+        radcdate=np.str(base[config['sdstart']:config['sdend']])
         #print('radcdate',radcdate)
         dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['sdate_format'])
         sdates.append(dates)
@@ -103,9 +111,14 @@ def find_snd_match(config):
     for v,cname in enumerate(rdum):
 #            print cname
         base = os.path.basename(cname)
-        radcdate=np.str(base[config['doff']:config['doff']+15])
-        dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
-        if (dates >= config['etime']) and (dates <= config['stime']):
+#        print('base',base)
+        radcdate=np.str(base[config['rdstart']:config['rdend']])
+        #dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
+        dates = datetime.datetime.strptime('{r}'.format(r=radcdate),config['rdate_format'])
+        sdt = datetime.datetime.strptime(config['sdatetime'],config['sdatetime_format'])
+        edt = datetime.datetime.strptime(config['edatetime'],config['edatetime_format'])
+        #if (dates >= config['etime']) and (dates <= config['stime']):
+        if (dates <= edt) and (dates >= sdt):
             #print cname
             #now find a sounding match
             mv = match_snd(dates,sdates)
@@ -124,7 +137,7 @@ def reduce_dim(ds):
     try:
         t1= ds['time'][0].values
     except KeyError as ke:
-        print(f"{ke} skipping preprocessing")
+        #print(f"{ke} skipping preprocessing")
         return(ds)
     for v in ds.data_vars.keys():
         try:
@@ -146,25 +159,33 @@ def hasNumbers(inputString):
 
 def polarris_driver(configfile):
 
-    config = {}
-    print('ready to roll')
+    # =====
+    # (1) Read in config file line by line.
+    # =====
+
+    config = {} # Load variable for config file data
+    #print('ready to roll')
+
+    print('\nReading '+str(configfile[0])+'...')
     with open(configfile[0]) as f:
-        for line in f:
+        lines1 = [mm for mm in (line.replace('\t',' ') for line in f) if mm]
+        lines2 = [nn for nn in (line.strip() for line in lines1) if nn] # NEW! Allow new lines in config file - can be skipped over!
+        for line in lines2: #f:
             #print line
             if not line.startswith("#"):
                 #print('line',line)
                 key, val, comment = line.split('==')
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'drop_vars' or key.replace(" ", "") == 'extrax' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'drop_vars' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
                     numck = False
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'extra' or  key.replace(" ", "") == 'ptype' or key.replace(" ", "") == 'extrax':
+                if key.replace(" ", "") == 'exper' or  key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
                 #print numck
                 #print vval,key
                 if key.replace(" ", "") == 'image_dir':
                     numck = True
-                if key.replace(" ", "") == 'radar_files':
+                if key.replace(" ", "") == 'rfiles':
                     numck = True
 
                 if numck is True or vval == 'None' or vval == 'True' or vval == 'False':
@@ -175,89 +196,106 @@ def polarris_driver(configfile):
                             config[(key.replace(" ", ""))] = vval
                 else:
                     config[(key.replace(" ", ""))] = vval
-            
-    print(config['radar_files'])
+    
+    time.sleep(3)
+    print('Read-in complete.\n')
+
+    # =====
+    # (2) Find input radar files and concatenate the data. Rename x, y, z variables. 
+    # =====
+
+    #print('Finding and concatenating radar files in '+config['rfiles']+'...')
     drop_vars=config['drop_vars']
-    with open(config['radar_files'], 'r') as f:
+    with open(config['rfiles'], 'r') as f:
+        #print(config['rfiles'])
         rfiles = f.read().splitlines()
-    #rfiles= glob.glob('*.nc')
-    print((config['exper']),(config['mphys']))
-    if config['exper'] == 'MC3E'  and config['mphys'] == 'obs':
+    
+    #print((config['exper']),(config['mphys']))
+    print('Station/experiment: '+config['exper'])
+    print('Input: '+config['mphys'])
+    print('Start: '+config['sdatetime'])
+    print('End: '+config['edatetime'])
+    time.sleep(3)
+
+    if config['exper'] == 'MC3E' and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
 
-        file = open(config['radar_files'], "r")
+        file = open(config['rfiles'], "r")
         rf1=[]
         rf2=[]
         for line in file:
-            print(line)
             if re.search('vtzms', line):
                 rf1.append(line.rstrip('\n'))
             else:
                 #print('other')
                 rf2.append(line.rstrip('\n'))
         #print(rf1)
-        rvar1 = xr.open_mfdataset(rf1,autoclose=True,concat_dim='d',preprocess=fix_my_data)
-        rvar2=  xr.open_mfdataset(rf2,autoclose=True,concat_dim='d')
-        rvar = xr.concat((rvar1,rvar2),dim='d')
-        rfiles =list(np.append(rf1,rf2))
+        if not rf2:
+            rvar = xr.open_mfdataset(rf1,autoclose=True,combine='nested',concat_dim='d',preprocess=fix_my_data)
+        else:
+            rvar1 = xr.open_mfdataset(rf1,autoclose=True,combine='nested',compat='override',preprocess=fix_my_data)
+            rvar2=  xr.open_mfdataset(rf2,autoclose=True,concat_dim='d')
+            rvar = xr.concat((rvar1,rvar2),dim='d')
+            rfiles =list(np.append(rf1,rf2))
+            
     else:
 #        try:
 #            print('trying to read normally')
 #            rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim,combine='by_coords')
 #        except ValueError as ve:
-            print("trying nesting")
-            rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
+        #rfiles = glob.glob(config['rfiles']+"*")
+        rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
+        #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
+
     try:
         rvar = rvar.rename({'x0':'x'})
         rvar = rvar.rename({'y0':'y'})
         rvar = rvar.rename({'z0':'z'})
     except:
         print('Dims do not need renaming')
-    print('Current dimensions:',rvar.dims)
+    #print('Current dimensions:',rvar.dims)
 
     if drop_vars == True:
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
-    lon_0 = config['lon']
-    lat_0 = config['lat']
+ 
+    print('Radar files ready.\n')
+    time.sleep(3)
 
-    lat_r = config['lat']
-    lon_r = config['lon']
-
-    if config['snd_on'] == True:
-        smatch = find_snd_match(config)
-        #print("rfiles",rfiles[0])
-        sfile = smatch[rfiles[0]]
-        print('matching sounding')
-    else:
-        smatch = None
-
-
+    # =====
+    # (3) Get datetime objects from radar file names.
+    # =====
 
     tm = []
     for d in rfiles:
-        print(d)
-        dformat = config['wdate_format']
+        #print(d)
+        dformat = config['rdate_format']
         base = os.path.basename(d)
-        radcdate=np.str(base[config['time_parse'][0]:config['time_parse'][1]])
+        radcdate=np.str(base[config['rdstart']:config['rdend']])
         date=datetime.datetime.strptime(radcdate,dformat)
         tm.append(date)
 
+    # =====
+    # (4) 
+    # =====
+
     if config['dd_on']==True:
-        with open(config['dd_files'], 'r') as f:
-            dfiles1 = f.read().splitlines()
+        print('In your config file, dd_on is set to True.')
+        time.sleep(3)
+        with open(config['dfiles'], 'r') as g:
+            dfiles1 = g.read().splitlines()
+        #dfiles1 = glob.glob(config['dd_files']+"*")
         tmd = []
         for d in dfiles1:
             dformat = config['ddate_format']
             base = os.path.basename(d)
 #            print('dd base',base,config['ddoff'],config['ddadd'])
-            radcdate = base[config['ddoff']:config['ddadd']]
-#            print (radcdate)
+            radcdate = base[config['ddstart']:config['ddend']]
 #            print('dformat is',dformat,radcdate)
             if dformat == '%H%M':
             
-                hr=int(base[config['ddoff']:config['ddoff']+2])
-                mn=int(base[config['ddoff']+2:config['ddoff']+4])
+                hr=int(base[config['ddstart']:config['ddstart']+2])
+                mn=int(base[config['ddstart']+2:config['ddstart']+4])
                 #print('hr','mn',hr,mn)
             #    print radcdate
                 #date=datetime.datetime.strptime(radcdate,dformat)
@@ -268,11 +306,24 @@ def polarris_driver(configfile):
                 dat2=datetime.datetime.strptime(radcdate,dformat)
                 #dstart=datetime.datetime.strptime(config['date'],'%Y%m%d')
             tmd.append(dat2)
-        
+
         print('Matching Dual-Doppler')
         dmatch = find_dd_match(rfiles,dfiles1,tm,tmd)
         #print('dmatch is ',dmatch)
-        dvar = xr.open_mfdataset(dfiles1,concat_dim='d')
+        try:
+            dvar = xr.open_mfdataset(dfiles1,concat_dim='d')
+        except ValueError as ve:
+            print('Trying nested instead of concat_dim to read DD files')
+            dvar = xr.open_mfdataset(dfiles1,combine='nested',concat_dim='d')
+            nf= len(dfiles1)
+            #dvar.expand_dims("d")
+        # NEW! MultiDop names velocity fields in long-form. Shorten fieldnames in dopp files here for plotting labels.
+        Uname = 'U'
+        Vname = 'V'
+        Wname = 'W'
+        dvar = dvar.rename({config['uname']:Uname})
+        dvar = dvar.rename({config['vname']:Vname})
+        dvar = dvar.rename({config['wname']:Wname})
 
         wvar = np.zeros([rvar.dims['d'],rvar.dims['z'],rvar.dims['y'],rvar.dims['x']])
         wvar.fill(np.nan)
@@ -285,6 +336,13 @@ def polarris_driver(configfile):
 
         conv = np.zeros([rvar.dims['d'],rvar.dims['z'],rvar.dims['y'],rvar.dims['x']])
         conv.fill(np.nan)
+        
+        # NEW! MultiDop only works if distance values are in metres, not km. Need a condition to convert back to km so that doppler and radar distances are comparable.
+        if np.array_equal(dvar.variables['x'].values, 1000.0*rvar.variables['x'].values):
+            dvar['x'] = rvar['x']
+            dvar['y'] = rvar['y']
+            dvar['z'] = rvar['z']
+
         xsubmin = np.where(rvar.variables['x']==np.min(dvar.variables['x']))[0][0]
         xsubmax = np.where(rvar.variables['x']==np.max(dvar.variables['x']))[0][0]
 
@@ -292,44 +350,53 @@ def polarris_driver(configfile):
         ysubmax = np.where(rvar.variables['y']==np.max(dvar.variables['y']))[0][0]
 
         zsubmin = np.where(rvar.variables['z']==np.min(dvar.variables['z']))[0][0]
-        zsubmax = np.where(rvar.variables['z']==np.max(dvar.variables['z']))[0][0]
-        
+        zsubmax = np.where(rvar.variables['z']==np.max(dvar.variables['z']))[0][0]        
+
         for q,d in enumerate(dmatch.keys()):
             #print(q,'i outer',dmatch[d])
             if dmatch[d] is not None:
                 #print('good, dmatch is not none')
                 dfile = dmatch[d]
                 if dfile in dfiles1:
+                    #print(dfile)
                     i = dfiles1.index(dfile)
                     #print(i,'i inner')
-                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
-                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['uname']].sel(d=i)
-                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['vname']].sel(d=i)
-                    conv[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['convname']].sel(d=i)
+                    #wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
+                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[Wname][i,:,:,:]
+                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[Uname][i,:,:,:]
+                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[Vname][i,:,:,:]
+                    #conv[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['convname']][i,:,:,:]
 
+        rvar[Wname] = (['d','z','y','x'],wvar)
+        rvar[Uname] = (['d','z','y','x'],unew)
+        rvar[Vname] = (['d','z','y','x'],vnew)
+        #rvar[config['convname']] = (['d','z','y','x'],conv)
 
-        rvar[config['wname']] = (['d','z','y','x'],wvar)
-        rvar[config['uname']] = (['d','z','y','x'],unew)
-        rvar[config['vname']] = (['d','z','y','x'],vnew)
-        rvar[config['convname']] = (['d','z','y','x'],conv)
+    else:
+        Uname = None
+        Vname = None
+        Wname = None
 
-    print('sending data to RadarData!')
-    rdata = RadarData.RadarData(rvar,tm,ddata = None,dz =config['dz_name'],zdr=config['dr_name'],
-                                                  kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],
-                                                  u=config['uname'],v=config['vname'],w=config['wname'],conv=config['convname'],x=config['xname'],
-                                                  rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=lat_r,lon_r=lon_r,
-                                                  y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=lat_0,lon_0=lon_0,
-                                                  exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],
-                                                  z_thresh=0,conv_types =  config['conv_types'],
-                                                   strat_types = config['strat_types'])
-                                               
+    print('\nSending data to RadarData...')
+   
+    rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=Uname,v=Vname,w=Wname,conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
+
+    if config['snd_on'] == True:
+        print('In your config file, snd_on is set to True.')
+        time.sleep(3)
+        smatch = find_snd_match(config)
+        #print("rfiles",rfiles[0],smatch)
+        sfile = smatch[rfiles[0]]
+        print('Matching Sounding')
+    else:
+        smatch = None
+                                          
     if smatch is not None:
-        print ('Smatch',sfile)
+        print ('Found sounding match!',sfile,'\n')
         snd = SkewT.Sounding(sfile)
         rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
                     # and then will take the heights and temps
         rdata.interp_sounding()
-
 
     if config['convert_Tk_Tc'] == True:
         print('converting T')
@@ -348,8 +415,8 @@ def polarris_driver(configfile):
     if config['comb_vicr'] == True:
         whvi = np.where(rdata.hid == 6)
         rdata.hid[whvi] = 3
-    
- 
+   
+
     #Do some quick masking of the data####
 #     mask = np.zeros([rdata.data.dims['d'],rdata.data.dims['z'],rdata.data.dims['y'],rdata.data.dims['x']])
 #     whbad = np.logical_or(np.logical_or(np.logical_or(np.logical_or(rdata.data[rdata.dz_name].values>-20.,rdata.data[rdata.zdr_name].values>-2.),rdata.data[rdata.kdp_name].values<10.),rdata.data[rdata.zdr_name].values<10.),rdata.data[rdata.dz_name].values<70.)
@@ -367,5 +434,4 @@ def polarris_driver(configfile):
 #     rdata.data[rdata.rho_name].values[whbad2] = np.nan
 #     rdata.data[rdata.w_name].values[whbad2] = np.nan
 
-
-    return rdata, config
+    return rdata, config, Uname, Vname, Wname
