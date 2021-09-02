@@ -17,7 +17,7 @@ from copy import deepcopy
 import RadarData
 import GeneralFunctions as GF
 from matplotlib import colors
-plt.style.use('presentation.mplstyle')
+#plt.style.use('presentation.mplstyle')
 #plt.style.use('default')
 
 from matplotlib.dates import DateFormatter,HourLocator
@@ -1581,8 +1581,14 @@ def plot_cappi(rdata,var,zvar,hght,time,time_match,resolution='10m',cs_over=Fals
             zdiffs = np.median(np.diff(rdata.data[zvar].values))
             whz = np.where(np.isclose(rdata.data[zvar].sel(d=time).values,hght,rtol=zdiffs))
     else:
-        whz = np.where(rdata.data[zvar].values==hght)[0][0]
-
+        #print('you do not have dimension d',rdata.data[zvar].dims,zvar, hght)
+        try:
+            whz = np.where(rdata.data[zvar].values==hght)[0]
+        except ValueError as ve:
+            print(f'You do not have {hght}. Finding closest instead...')
+            dum = abs(rdata.data[zvar].values-hght)
+            whz = np.where(dum == np.min(dum))
+            print(rdata.data[zvar][whz])
     # (2) Find lat/lon array for the basemap. If not found, calculate it using get_latlon_fromxy().
     if not rdata.lat_name in rdata.data.keys():
         print('No latitude. Calculating....')
