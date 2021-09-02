@@ -1283,17 +1283,21 @@ class RadarData(RadarConfig.RadarConfig):
 
         # BF 3/30/16: TAKING OUT IMSHOW AND PUTTING IN PCOLORMESH
         for i, var in enumerate(good_vars):
-            if vectors is not None:
-                vect = vectors[i]
-#                print 'RadarData ln 992 vectors', vectors,vect
+            if var is None:
+                fig.delaxes(axf[i])
+                continue
             else:
-                vect = None
-            botpanels = np.arange(nvars-ncols,nvars)
-            xlabbool = True if i in botpanels else False
-            lspanels = [ncols*n for n in range(0,nrows)]
-            ylabbool = True if i in lspanels else False
-            dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,**kwargs)
-        # now do the HID plot, call previously defined functions
+                if vectors is not None:
+                    vect = vectors[i]
+    #                print 'RadarData ln 992 vectors', vectors,vect
+                else:
+                    vect = None
+                botpanels = np.arange(nvars-ncols,nvars)
+                xlabbool = True if i in botpanels else False
+                lspanels = [ncols*n for n in range(0,nrows)]
+                ylabbool = True if i in lspanels else False
+                dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,**kwargs)
+            # now do the HID plot, call previously defined functions
 
         axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.radar_name), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         axf[ncols-1].text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes) # (a) Top-left
@@ -1732,22 +1736,26 @@ class RadarData(RadarConfig.RadarConfig):
         axf = ax.flatten()
         
         for i, var in enumerate((good_vars)):
-#            print var    
-            if contours is not None:
-                vcont = contours[i]
+            if var is None:
+                fig.delaxes(axf[i])
+                continue
             else:
-                vcont = None
-            if vectors is not None:
-                vect = vectors[i]
-            else:
-                vect = None
-#            print 'RadarDAta 1258:',axf[i],xlim,ylim,var,vect,res,vcont
-            botpanels = np.arange(nvars-ncols,nvars)
-            xlabbool = True if i in botpanels else False
-            lspanels = [2*n for n in range(0,nrows)]
-            ylabbool = True if i in lspanels else False
-            dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz,xlab=xlabbool,ylab=ylabbool,labels=False)
-        # now do the HID plot, call previously defined functions
+    #            print var    
+                if contours is not None:
+                    vcont = contours[i]
+                else:
+                    vcont = None
+                if vectors is not None:
+                    vect = vectors[i]
+                else:
+                    vect = None
+    #            print 'RadarDAta 1258:',axf[i],xlim,ylim,var,vect,res,vcont
+                botpanels = np.arange(nvars-ncols,nvars)
+                xlabbool = True if i in botpanels else False
+                lspanels = [2*n for n in range(0,nrows)]
+                ylabbool = True if i in lspanels else False
+                dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz,xlab=xlabbool,ylab=ylabbool,labels=False)
+            # now do the HID plot, call previously defined functions
         # try:
         #     dummy_hid = self.HID_plot(self.HID_from_scores(self.scores, rank = 1)[z_ind,:,:], 
         #             axis = axf[-1],extent=ext)

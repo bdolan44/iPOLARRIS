@@ -784,14 +784,22 @@ def make_single_pplots(rdat,config,y=None):
         os.makedirs(outdir,exist_ok=True)
 
         print ('Working on Cfad mpanel')
-        fig, ax = plt.subplots(2,2,figsize=(16,12),gridspec_kw={'wspace': 0.05, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
+        
+        if config['wname'] in rdat.data.variables.keys():
+            numr,numc = 2,2
+            figsize=(16,12)
+        else:
+            numr,numc = 1,3
+            figsize=(16,8)
+        
+        fig, ax = plt.subplots(numr,numc,figsize=figsize,gridspec_kw={'wspace': 0.05, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
 
         if config['wname'] in rdat.data.variables.keys():
             dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,ylab=True)
-        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan, ylab=True)
-        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[numr*numc-3],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[numr*numc-2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan, ylab=True)
+        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[numr*numc-1],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
         
@@ -901,7 +909,14 @@ def make_single_pplots(rdat,config,y=None):
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
  
-        fig, ax = plt.subplots(2,2,figsize=(16,14),gridspec_kw={'wspace': 0.25, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
+        if config['wname'] in rdat.data.variables.keys():
+            numr,ncol = 2,2
+            figsize = (16,14)
+        else:
+            numr,ncol = 1,2
+            figsize = (10,8)
+        
+        fig, ax = plt.subplots(numr,ncol,figsize=figsize,gridspec_kw={'wspace': 0.25, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
 
         zzdr_wrf,ed = rdat.hist2d(varx=rdat.dz_name,vary=rdat.zdr_name,binsx=config['dzbins'],binsy=config['drbins'])
@@ -917,18 +932,19 @@ def make_single_pplots(rdat,config,y=None):
         axf[1].set_xlabel(rdat.kdp_name+' '+rdat.units[rdat.kdp_name],fontsize=26)
         axf[1].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
 
-        zw_wrf,edw = rdat.hist2d(varx=rdat.dz_name,vary=rdat.w_name,binsx=config['dzbins'],binsy=config['wbins'])
-        rdat.plot_2dhist(zw_wrf,edw,ax=axf[2])
-        #axf[2].set_title(title_string)
-        axf[2].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
-        axf[2].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
+        if config['wname'] in rdat.data.variables.keys():
+            zw_wrf,edw = rdat.hist2d(varx=rdat.dz_name,vary=rdat.w_name,binsx=config['dzbins'],binsy=config['wbins'])
+            rdat.plot_2dhist(zw_wrf,edw,ax=axf[2])
+            #axf[2].set_title(title_string)
+            axf[2].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
+            axf[2].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
 
-        zr_wrf,edr = rdat.hist2d(varx=rdat.rr_name,vary=rdat.w_name,binsx=config['rrbins'],binsy=config['wbins'],xthr=0.00000)
-        cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3])
-        #axf[3].set_title(title_string)
-        axf[3].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
-        axf[3].set_ylabel(rdat.rr_name+' '+rdat.units[rdat.rr_name],fontsize=26,labelpad=10)
-        axf[3].set_ylim(0,50)
+            zr_wrf,edr = rdat.hist2d(varx=rdat.rr_name,vary=rdat.w_name,binsx=config['rrbins'],binsy=config['wbins'],xthr=0.00000)
+            cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3])
+            #axf[3].set_title(title_string)
+            axf[3].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
+            axf[3].set_ylabel(rdat.rr_name+' '+rdat.units[rdat.rr_name],fontsize=26,labelpad=10)
+            axf[3].set_ylim(0,50)
 
         plt.savefig('{d}{p}_2dPDF_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
@@ -1075,21 +1091,24 @@ def make_single_pplots(rdat,config,y=None):
         for ts in tms:
         
             for i,v in enumerate(eval(config['rhi_vars'])):
- 
-                outdir = outpath+'rhi_individ/'+v+'/'
-                os.makedirs(outdir,exist_ok=True)
-                #print i, v
-                #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
-                fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],zlim=config['zlim'])
-                #plt.tight_layout()
-                #plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
-                
-                ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-                plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
-                plt.clf()
+                if v is None:
+                    continue
+                else:
+                    outdir = outpath+'rhi_individ/'+v+'/'
+                    os.makedirs(outdir,exist_ok=True)
+                    #print i, v
+                    #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
+                    fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],zlim=config['zlim'])
+                    #plt.tight_layout()
+                    #plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+                    
+                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+
+                    plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                    plt.clf()
 
 
     if config['qr_cappi']:
