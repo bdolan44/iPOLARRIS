@@ -914,11 +914,13 @@ def make_single_pplots(rdat,config,y=None):
         if config['wname'] in rdat.data.variables.keys():
             numr,ncol = 2,2
             figsize = (16,14)
+            wspace = 0.25
         else:
             numr,ncol = 1,2
-            figsize = (10,8)
+            figsize = (12,8)
+            wspace = 0.5
         
-        fig, ax = plt.subplots(numr,ncol,figsize=figsize,gridspec_kw={'wspace': 0.25, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
+        fig, ax = plt.subplots(numr,ncol,figsize=figsize,gridspec_kw={'wspace': wspace, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         axf = ax.flatten()
 
         zzdr_wrf,ed = rdat.hist2d(varx=rdat.dz_name,vary=rdat.zdr_name,binsx=config['dzbins'],binsy=config['drbins'])
