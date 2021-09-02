@@ -797,8 +797,8 @@ def make_single_pplots(rdat,config,y=None):
 
         if config['wname'] in rdat.data.variables.keys():
             dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,ylab=True)
-        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[numr*numc-3],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan)
-        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[numr*numc-2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,ylab=True if numr*numc==4 else False)
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[numr*numc-3],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,ylab=True if numr==1 else False)
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[numr*numc-2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,ylab=True if numr==2 else False)
         dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[numr*numc-1],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
         #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
@@ -807,9 +807,11 @@ def make_single_pplots(rdat,config,y=None):
         lur2,bur2,wur2,hur2 = axf[-1].get_position().bounds
         cbar_ax_dims = [lur2+wur2+0.02,bur2-0.001,0.03,bur1+hur1]
         cbar_ax = fig.add_axes(cbar_ax_dims)
-        cbt = plt.colorbar(dum[-1],cax=cbar_ax)
+        cbt = plt.colorbar(dum[-2],cax=cbar_ax)
         cbt.ax.tick_params(labelsize=20)
         cbt.set_label('Frequency (%)', fontsize=22, rotation=270, labelpad=20)
+        cbt.set_ticks(dum[-1])
+        cbt.set_ticklabels(dum[-1])
 
         axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         
