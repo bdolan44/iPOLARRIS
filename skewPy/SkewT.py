@@ -910,7 +910,7 @@ class Sounding(UserDict):
     # This *should* be a convenient way to read a uwyo sounding
     #--------------------------------------------------------------------
         if self.fmt == 'UWYO': # READING IN STANDARD UNIVERSITY OF WYOMING FILES
-
+            print('working with UWYO sounding!')
             fid = open(fname)
             lines = fid.readlines()
             nlines = len(lines)
@@ -921,107 +921,113 @@ class Sounding(UserDict):
             ndata = nlines-skip
             output = {}
 
+            fields = lines[3].split()
+            units = lines[4].split()
+            
             txtfields = lines[0].split()
-            fields = deepcopy(txtfields)
-            for ii, var in enumerate(fields):
-                if var == 'pressure':
-                    fields[ii] = 'pres'
-                elif var == 'height':
-                    fields[ii] = 'hght'
-                elif var == 'temperature':
-                    fields[ii] = 'temp'
-                elif var == 'dewpoint':
-                    fields[ii] = 'dwpt'
+            #Look for soundings that start with the column labels and handle them slightly differently
+            if 'pressure' in txtfields:
+                fields = deepcopy(txtfields)
+                for ii, var in enumerate(fields):
+                    if var == 'pressure':
+                        fields[ii] = 'pres'
+                    elif var == 'height':
+                        fields[ii] = 'hght'
+                    elif var == 'temperature':
+                        fields[ii] = 'temp'
+                    elif var == 'dewpoint':
+                        fields[ii] = 'dwpt'
 
-            #print(fields[0].lower())
-            #fields = lines[3].split()
-            #units = lines[4].split()
-            #print(fields)
-            #print(units)
-
-            # First line for WRF profiles differs from the UWYO soundings
-            header = lines[1]
-            if header[:5] == '00000':
-            # WRF profile
-                self.station = '-99999'
-                self['Longitude'] = float(header.split()[5].strip(","))
-                self['Latitude'] = float(header.split()[6])
-                self.sounding_date = header.split()[-1]
-            else:
-                #self.station = header[:5]
-                findstat = np.where([x.isalpha() for x in str(header)])[0]
-                self.station = header[min(findstat):max(findstat)+1]
-                #self.station = header[header.find(header.isalpha())]
-                #dstr = (' ').join(header.split()[-4:])
-                dstr = (' ').join(header.split()[-5:-4])
-                #self.sounding_date = datetime.strptime(dstr, "%HZ %d %b %Y").strftime("%Y-%m-%d_%H:%M:%S") 
-                self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d").strftime("%Y-%m-%d_%H:%M:%S") 
+                # First line for WRF profiles differs from the UWYO soundings
+                header = lines[1]
+                if header[:5] == '00000':
+                # WRF profile
+                    self.station = '-99999'
+                    self['Longitude'] = float(header.split()[5].strip(","))
+                    self['Latitude'] = float(header.split()[6])
+                    self.sounding_date = header.split()[-1]
+                else:
+                    findstat = np.where([x.isalpha() for x in str(header)])[0]
+                    self.station = header[min(findstat):max(findstat)+1]
+                    dstr = (' ').join(header.split()[-5:-4])
+                    self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d").strftime("%Y-%m-%d_%H:%M:%S") 
             
-            if self.station_name is not None: self.station = self.station_name
-
-           
-            #print(output)
-            #print 'output keys: {}'.format(output.keys())
+                if self.station_name is not None: self.station = self.station_name
             
-            lhi=[1, 9,16,23,30,37,46,53,58,65,72]
-            rhi=[7,14,21,28,35,42,49,56,63,70,77]
+                lhi=[1, 9,16,23,30,37,46,53,58,65,72]
+                rhi=[7,14,21,28,35,42,49,56,63,70,77]
             
-            ''' 
-            #lcounter = 1
-            #for line,idx in zip(lines[6:],range(ndata)):
-            for line,idx in zip(lines[1:],range(ndata)):
-                #lcounter += 1
-
-                #print(line)
-                #print(line[0],line[1],line[2])
-                #print(line[lhi[0]:rhi[0]])
-                #print('')
-                try: output[fields[0].lower()][idx] = float(line[lhi[0]:rhi[0]])
-                except ValueError: 
-                    print('BREAK')
-                    break
-                #print(line)
-                #print(idx)
-                #print(output[fields[0].lower()][idx])
-                
-                #input()
-
-                for ii in range(1, len(rhi)):
-                    try: 
-            # Debug only:
-            # print fields[ii].lower(), float(line[lhi[ii]:rhi[ii]].strip())
-                        output[fields[ii].lower()][idx]=float(line[lhi[ii]:rhi[ii]].strip())
-                        #print(output[fields[ii].lower()][idx])
-                    except ValueError: 
-                        pass
             
-            #print(output)
-            #input()
-            '''
-            # NEW! For loop to read in output data from sounding file
-            # First, determine number of columns, and find lines in the text file where data is missing ==> omit. May not be necessary if masking handles missing values properly...
-            numcols = len(lines[0].split())+1
-            for line in lines[1:]:
-                if len(line.split()) != numcols:
-                    lines.remove(line)
-                    continue
-            
-            for ff in fields:
-                output[ff.lower()] = zeros((len(lines[1:])-1)) - 999.
-            
-            # Next, read each column into a dictionary.
-            for line, ii in zip(lines[1:],range(1,len(lines[1:]))):
-                for jj in range(0,numcols-1):
-                    try:
-                        output[fields[jj].lower()][ii-1] = float(line.split()[jj+1])
-                    except ValueError:
+                # NEW! For loop to read in output data from sounding file
+                # First, determine number of columns, and find lines in the text file where data is missing ==> omit. May not be necessary if masking handles missing values properly...
+                numcols = len(lines[0].split())+1
+                for line in lines[1:]:
+                    if len(line.split()) != numcols:
+                        lines.remove(line)
                         continue
             
-            for field in fields:
-                #print field
-                ff=field.lower()
-                # here is where the copy is made from output to self.data
-                self.data[ff]=ma.masked_values(output[ff], -999.)
+                for ff in fields:
+                    output[ff.lower()] = zeros((len(lines[1:])-1)) - 999.
+            
+                # Next, read each column into a dictionary.
+                for line, ii in zip(lines[1:],range(1,len(lines[1:]))):
+                    for jj in range(0,numcols-1):
+                        try:
+                            output[fields[jj].lower()][ii-1] = float(line.split()[jj+1])
+                        except ValueError:
+                            continue
+            
+                for field in fields:
+                    #print field
+                    ff=field.lower()
+                    # here is where the copy is made from output to self.data
+                    self.data[ff]=ma.masked_values(output[ff], -999.)
+            
+            else:
+
+                # First line for WRF profiles differs from the UWYO soundings
+                header = lines[0]
+                if header[:5] == '00000':
+                # WRF profile
+                    self.station = '-99999'
+                    self['Longitude'] = float(header.split()[5].strip(","))
+                    self['Latitude'] = float(header.split()[6])
+                    self.sounding_date = header.split()[-1]
+                else:
+                    self.station = header[:5]
+                    dstr = (' ').join(header.split()[-4:])
+                    self.sounding_date = datetime.strptime(dstr, "%HZ %d %b %Y").strftime("%Y-%m-%d_%H:%M:%S") 
+                    print('station ',self.station)
+                if self.station_name is not None: self.station = self.station_name
+
+                for ff in fields:
+                    output[ff.lower()]=zeros((nlines-skip)) - 999.
+            
+                lhi=[1, 9,16,23,30,37,46,53,58,65,72]
+                rhi=[7,14,21,28,35,42,49,56,63,70,77]
+            
+                lcounter = 5
+                for line,idx in zip(lines[6:],range(ndata)):
+                    lcounter += 1
+
+                    try: output[fields[0].lower()][idx] = float(line[lhi[0]:rhi[0]])
+                    except ValueError: 
+                        break
+
+                    for ii in range(1, len(rhi)):
+                        try: 
+                # Debug only:
+                # print fields[ii].lower(), float(line[lhi[ii]:rhi[ii]].strip())
+                            output[fields[ii].lower()][idx]=float(line[lhi[ii]:rhi[ii]].strip())
+                        except ValueError: 
+                            pass
+
+                for field in fields:
+                    #print field
+                    ff=field.lower()
+                    # here is where the copy is made from output to self.data
+                    self.data[ff]=ma.masked_values(output[ff], -999.)
+
 
 
         elif self.fmt == 'EDT': # THIS IS FOR READING IN VAISALA EDITED DATA FILE FORMATS, FOR SPECIAL FIELD OPS SOUNDINGS
@@ -1100,7 +1106,7 @@ class Sounding(UserDict):
         """
         from numpy import interp
 
-        #print(startp, startt, startdp)
+        print ('vals',startp, startt, startdp)
         assert startt >startdp, "Not a valid parcel. Check Td<Tc"
         Pres=linspace(startp, 50, 100)
 
