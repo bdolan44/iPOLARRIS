@@ -1074,6 +1074,8 @@ class RadarData(RadarConfig.RadarConfig):
             #print (np.shape(data),np.shape(xdat),np.shape(zdat),'ln 1053')
             #print np.shape(xdat),np.shape(zdat)
     #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
+            if var.startswith('HID'):
+                data = np.ma.masked_where(data < 1,data)
             if var in self.lims.keys():
                 range_lim = self.lims[var][1] - self.lims[var][0]
                 ##print(self.lims[var][0],self.lims[var][1],'ln 1076')
@@ -1488,6 +1490,8 @@ class RadarData(RadarConfig.RadarConfig):
         data = np.ma.masked_where(~np.isfinite(data),data)
         #print(np.max(data))
 #        print 'about to do plotting, ln 1113'
+        if var.startswith('HID'):
+            data = np.ma.masked_where(data < 1,data)
         if var in self.lims.keys():
             range_lim = self.lims[var][1] - self.lims[var][0]
 #            print 'in var',var
