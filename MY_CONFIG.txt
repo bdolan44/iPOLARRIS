@@ -46,7 +46,7 @@ alt	== 354	== # Altitude of the radar
 #------ Doppler Radar File Reading (Optional) ------
 #---------------------------------------------------
 
-dd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 dfiles		    == ./inputtxt/doppfiles.txt	    == # Location of dual-Doppler files
@@ -137,7 +137,7 @@ convert_Tk_Tc	== False	== # Convert temperature in K to deg C
 #-----------------------------
 
 # Args
-image_dir	== './outputfig_test/'	== # Output figure directory
+image_dir	== './outputfig/'	== # Output figure directory
 ptype		== 'png'		== # Output figure file extenstion (i.e. .png, .jpg, ...)
 cb_friendly	== True			== # Use color-blindness palette for output (i.e. reflectivity)
 
