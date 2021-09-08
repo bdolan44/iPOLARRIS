@@ -116,10 +116,10 @@ joint_flag		    == False	    == # 15) Set to True to plot 4-panel of comparison 
 cfad_individ_flag	== False 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W and RHO
 hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grouped HID species with height
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
-cappi_multi		    == False	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
+cappi_multi		    == True	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
 cappi_individ	    == True	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
-rhi_multi		    == False	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
-rhi_individ		    == False	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
+rhi_multi		    == True	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
+rhi_individ		    == True	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 
 # Model Only
 qr_cappi		    == False	== # FK) Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
@@ -148,7 +148,7 @@ y	== 100			==#Lat of the y cross-section for RHI
 #xlim	== [-127.0,-121.0]	==#lat / lon zoom for CAPPIS
 #ylim	== [45.0,49.0]		==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
-z	== 5.5			==#Height of the CAPPIs
+z   == 0.5			==#Height of the CAPPIs
 zlim    == [0,12]    ==
 
 # Histogram Bins for Radar Observables
