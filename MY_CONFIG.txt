@@ -46,7 +46,7 @@ alt	== 354	== # Altitude of the radar
 #------ Doppler Radar File Reading (Optional) ------
 #---------------------------------------------------
 
-dd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 dfiles		    == ./inputtxt/doppfiles.txt	    == # Location of dual-Doppler files
@@ -90,8 +90,8 @@ t_name	==	T	==  # Name of the temperature field
 #----------------------------------------------------------
 
 # SET 1) Plots created in run_ipolarris_new.py
-all1		    == True	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+all1		    == False	    == # Set to True to output ALL figures in SET 1 below
+compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_ref	    == False	    == # 2) Set to True to plot reflectivity CAPPI at some altitude z (set z below)
 cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
@@ -100,14 +100,14 @@ vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflec
 refcfad		    == False	    == # 6) Set to True to plot CFAD of reflectivity with height
 
 # Text files created in run_ipolarris_new.py
-all2			    == True	    == # Set to TRUE to output ALL text files in SET 2 below
+all2			    == False	    == # Set to TRUE to output ALL text files in SET 2 below
 rrstats_txt		    == False	    == # 7)
 rrhist_txt		    == False	    == # 8)
 rrstats_areas_txt	== False	    == # 9)
 percentiles_txt		== False	    == # 10)
 
 # Plots created in plot_driver.py
-all3			    == True	    == Set to TRUE to output ALL figures in SET 3 below
+all3			    == False	    == Set to TRUE to output ALL figures in SET 3 below
 plot_int		    == False	    == # 11) Set to True to plot integrated parameters over the whole time frame
 plot_cs			    == False	    == # 12) Set to True to plot separate convective and stratiform CFADs
 cfad_mpanel_flag	== False	    == # 13) Set to True to plot 4-panel of CFADs of Z, ZDR, KDP and W
