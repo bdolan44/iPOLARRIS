@@ -778,7 +778,7 @@ def make_single_pplots(rdat,config,y=None):
 
     title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
 
-    if (config['cfad_mpanel_flag'] | config['all3']):
+    if (config['cfad_multi'] | config['all3']):
         
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
@@ -819,7 +819,7 @@ def make_single_pplots(rdat,config,y=None):
         plt.clf()
 
 
-    if (config['plot_cs'] | config['all3']):
+    if (config['cfad_conv_strat'] | config['all3']):
         
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
@@ -854,7 +854,7 @@ def make_single_pplots(rdat,config,y=None):
         plt.clf()
 
 
-    if (config['cfad_individ_flag'] | config['all3']):
+    if (config['cfad_individ'] | config['all3']):
     #        axf = ax.flatten()
 
         outdir = outpath+'cfad/'
@@ -898,7 +898,7 @@ def make_single_pplots(rdat,config,y=None):
         plt.clf()
 
 
-    if (config['hid_cfad_flag'] | config['all3']):
+    if (config['cfad_hid'] | config['all3']):
         fig, ax = rdat.plot_hid_cdf()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         
@@ -906,7 +906,7 @@ def make_single_pplots(rdat,config,y=None):
         plt.clf()
 
 
-    if (config['joint_flag'] | config['all3']):
+    if (config['polcomp_multi'] | config['all3']):
 
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
