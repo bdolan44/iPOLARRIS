@@ -779,7 +779,10 @@ def make_single_pplots(rdat,config,y=None):
     title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
 
     if (config['cfad_multi'] | config['all3']):
-        
+     
+        print('\nIN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating CFADs.')
+        print('\nPlotting aggregate CFADs at height z = '+str(config['z'])+' for variable '+rdata.dz_name+'...')
+    
         outdir = outpath+'multi_panel/'
         os.makedirs(outdir,exist_ok=True)
 
