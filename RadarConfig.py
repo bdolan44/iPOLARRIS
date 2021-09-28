@@ -61,7 +61,7 @@ class RadarConfig(object):
         self.species = np.array(['DZ','RN','CR','AG','WS','VI','LDG','HDG','HA','BD'])
         #self.hid_colors = ['White','LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
         #    'Lime','Yellow','Red','Fuchsia']
-        self.hid_colors = ['LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
+        self.hid_colors = ['LightBlue','MediumBlue','Darkorange','Purple','Cyan','DarkGray',\
             'Lime','Yellow','Red','Fuchsia']       
         self.pol_vars = np.array([self.dz_name, self.zdr_name, self.kdp_name, self.ldr_name, self.rho_name, self.hid_name])
 
