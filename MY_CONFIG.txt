@@ -46,7 +46,7 @@ alt	== 354	== # Altitude of the radar
 #------ Doppler Radar File Reading (Optional) ------
 #---------------------------------------------------
 
-dd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 dfiles		    == ./inputtxt/doppfiles.txt	    == # Location of dual-Doppler files
@@ -90,7 +90,7 @@ t_name	==	T	==  # Name of the temperature field
 #----------------------------------------------------------
 
 # SET 1) Plots created in run_ipolarris_new.py
-all1		    == False	    == # Set to True to output ALL figures in SET 1 below
+all1		    == True	    == # Set to True to output ALL figures in SET 1 below
 compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_ref	    == False	    == # 2) Set to True to plot reflectivity CAPPI at some altitude z (set z below)
 cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
@@ -107,12 +107,10 @@ rrstats_areas_txt	== False	    == # 9)
 percentiles_txt		== False	    == # 10)
 
 # Plots created in plot_driver.py
-all3			    == False	    == Set to TRUE to output ALL figures in SET 3 below
-cfad_conv_strat		    == False	    == # 12) Set to True to plot separate convective and stratiform CFADs
+all3			    == True	    == Set to TRUE to output ALL figures in SET 3 below
 cfad_multi		== False	    == # 13) Set to True to plot 4-panel of CFADs of Z, ZDR, KDP and W
-cfad_hid		== False	    == # 14) Set to True to plot CFAD of HID
-polcomp_multi		    == False	    == # 15) Set to True to plot 4-panel of comparison figures between various polarimetric vars
-cfad_individ		== False 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W and RHO
+hist_multi		    == False	    == # 15) Set to True to plot 4-panel of comparison figures between various polarimetric vars
+cfad_individ		== False 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W, RHO and HID
 hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grouped HID species with height
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
 cappi_multi		    == True	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)

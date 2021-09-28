@@ -780,14 +780,11 @@ def make_single_pplots(rdat,config,y=None):
 
     if (config['cfad_multi'] | config['all3']):
      
-        print('\nIN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating CFADs.')
-        print('\nPlotting aggregate CFADs at height z = '+str(config['z'])+' for variable '+rdata.dz_name+'...')
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel CFADs for various polarimetric vars.\n')
     
-        outdir = outpath+'multi_panel/'
+        outdir = outpath+'cfad_multi/'
         os.makedirs(outdir,exist_ok=True)
 
-        print ('Working on Cfad mpanel')
-        
         if config['wname'] in rdat.data.variables.keys():
             numr,numc = 2,2
             figsize=(16,12)
@@ -800,12 +797,17 @@ def make_single_pplots(rdat,config,y=None):
 
         if config['wname'] in rdat.data.variables.keys():
             dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,ylab=True)
+            print('Panel 1: '+rdat.w_name)
+
         dum =rdat.cfad_plot(rdat.dz_name,ax = axf[numr*numc-3],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,ylab=True if numr==1 else False)
+        print('Panel '+str(numr*numc-2)+': '+rdat.dz_name)
+
         dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[numr*numc-2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,ylab=True if numr==2 else False)
+        print('Panel '+str(numr*numc-1)+': '+rdat.zdr_name)
+
         dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[numr*numc-1],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan)
-        #plt.tight_layout()
-#        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-        
+        print('Panel '+str(numr*numc)+': '+rdat.kdp_name)
+
         lur1,bur1,wur1,hur1 = axf[1].get_position().bounds
         lur2,bur2,wur2,hur2 = axf[-1].get_position().bounds
         cbar_ax_dims = [lur2+wur2+0.02,bur2-0.001,0.03,bur1+hur1]
@@ -821,46 +823,72 @@ def make_single_pplots(rdat,config,y=None):
         plt.savefig('{d}{p}_CFAD_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
-
-    if (config['cfad_conv_strat'] | config['all3']):
+        print('\nDone! Saved to '+outdir)
+        print('\nIN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel CONVECTIVE CFADs for various polarimetric vars.\n')
         
-        outdir = outpath+'multi_panel/'
-        os.makedirs(outdir,exist_ok=True)
+        if config['wname'] in rdat.data.variables.keys():
+            numr,numc = 2,2
+            figsize=(16,12)
+        else:
+            numr,numc = 1,3
+            figsize=(16,8)
         
         fig, ax = plt.subplots(2,2,figsize=(18,12),constrained_layout=True)
         axf = ax.flatten()
 
         if config['wname'] in rdat.data.variables.keys():
             dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
-        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
-        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
-        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
-        extrax ='convective'
+            print('Panel 1: '+rdat.w_name)
+        
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[numr*numc-3],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
+        print('Panel '+str(numr*numc-2)+': '+rdat.dz_name)
+        
+        dum =rdat.cfad_plot(rdat.zdr_name,ax = axf[numr*numc-2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='convective',cont=True)
+        print('Panel '+str(numr*numc-1)+': '+rdat.zdr_name)
+        
+        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[numr*numc-1],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='convective',cont=True)
+        print('Panel '+str(numr*numc)+': '+rdat.kdp_name)
+        
+        extrax ='conv'
         #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
         plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
+        
+        print('\nDone! Saved to '+outdir)
+        print('\nIN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel STRATIFORM CFADs for various polarimetric vars.\n')
 
         fig, ax = plt.subplots(2,2,figsize=(18,12))
         axf = ax.flatten()
 
         if config['wname'] in rdat.data.variables.keys():
             dum =rdat.cfad_plot(rdat.w_name,ax = axf[0],bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
-        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[1],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
-        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
-        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[3],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
-        extrax ='stratiform'
-        plt.tight_layout()
+            print('Panel 1: '+rdat.w_name)
+        
+        dum =rdat.cfad_plot(rdat.dz_name,ax = axf[numr*numc-3],bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
+        print('Panel '+str(numr*numc-2)+': '+rdat.dz_name)
+        
+        dum =rdat.cfad_plot(rdat.zdr_name,ax= axf[numr*numc-2],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cscfad='stratiform')
+        print('Panel '+str(numr*numc-1)+': '+rdat.zdr_name)
+        
+        dum =rdat.cfad_plot(rdat.kdp_name,ax = axf[numr*numc-1],bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cscfad='stratiform')
+        print('Panel '+str(numr*numc)+': '+rdat.kdp_name)
+        
+        extrax ='strat'
+        #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
         #plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=outdir,p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype'],x=extrax),dpi=300) 
         plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
+        print('Done! Saved to '+outdir)
+        print('Moving on.\n')
+ 
 
     if (config['cfad_individ'] | config['all3']):
-    #        axf = ax.flatten()
 
-        outdir = outpath+'cfad/'
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating individual CFADs for various polarimetric vars.\n')
+        outdir = outpath+'cfad_individ/'
         os.makedirs(outdir,exist_ok=True)
  
         if config['wname'] in rdat.data.variables.keys():
@@ -871,47 +899,55 @@ def make_single_pplots(rdat,config,y=None):
             ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
             plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.w_name,t=config['ptype']),dpi=400,bbox_inches='tight')
             plt.clf()
-
+            print(rdat.w_name)
+            
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.dz_name,ax = ax,bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
         #plt.tight_layout()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.dz_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
-
+        print(rdat.dz_name)
+        
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
         #plt.tight_layout()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)       
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.zdr_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
-
+        print(rdat.zdr_name)
+        
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.kdp_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         #plt.tight_layout()
         plt.clf()
-
+        print(rdat.kdp_name)
+        
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
         #plt.tight_layout()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.rho_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
+        print(rdat.rho_name)
 
-
-    if (config['cfad_hid'] | config['all3']):
         fig, ax = rdat.plot_hid_cdf()
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         
         plt.savefig('{d}{p}_HID_CFAD.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
+        print('HID')
 
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+ 
 
-    if (config['polcomp_multi'] | config['all3']):
+    if (config['hist_multi'] | config['all3']):
 
-        outdir = outpath+'multi_panel/'
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel histograms comparing various polarimetric vars.\n')
+        outdir = outpath+'hist_multi/'
         os.makedirs(outdir,exist_ok=True)
  
         if config['wname'] in rdat.data.variables.keys():
@@ -932,32 +968,41 @@ def make_single_pplots(rdat,config,y=None):
         axf[0].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
         #axf[0].set_title(title_string)
         axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
-        
+        print('Panel 1: '+rdat.zdr_name+' vs. '+rdat.dz_name)
+
         zkdp_wrf,edk = rdat.hist2d(varx=rdat.dz_name,vary=rdat.kdp_name,binsx=config['dzbins'],binsy=config['kdbins'])
         rdat.plot_2dhist(zkdp_wrf,edk,ax=axf[1])
         #axf[1].set_title(title_string)
         axf[1].set_xlabel(rdat.kdp_name+' '+rdat.units[rdat.kdp_name],fontsize=26)
         axf[1].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
+        print('Panel 2: '+rdat.kdp_name+' vs. '+rdat.dz_name)
 
         if config['wname'] in rdat.data.variables.keys():
             zw_wrf,edw = rdat.hist2d(varx=rdat.dz_name,vary=rdat.w_name,binsx=config['dzbins'],binsy=config['wbins'])
             rdat.plot_2dhist(zw_wrf,edw,ax=axf[2])
             #axf[2].set_title(title_string)
-            axf[2].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
+            axf[2].set_xlabel(rdat.w_name+' '+rdat.units[rdat.w_name],fontsize=26)
             axf[2].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
+            print('Panel 3: '+rdat.w_name+' vs. '+rdat.dz_name)
 
             zr_wrf,edr = rdat.hist2d(varx=rdat.rr_name,vary=rdat.w_name,binsx=config['rrbins'],binsy=config['wbins'],xthr=0.00000)
             cb6 = rdat.plot_2dhist(zr_wrf,edr,ax=axf[3])
             #axf[3].set_title(title_string)
-            axf[3].set_xlabel('W '+rdat.units[rdat.w_name],fontsize=26)
+            axf[3].set_xlabel(rdat.w_name+' '+rdat.units[rdat.w_name],fontsize=26)
             axf[3].set_ylabel(rdat.rr_name+' '+rdat.units[rdat.rr_name],fontsize=26,labelpad=10)
             axf[3].set_ylim(0,50)
+            print('Panel 4: '+rdat.w_name+' vs. '+rdat.rr_name)
 
         plt.savefig('{d}{p}_2dPDF_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+ 
 
     if (config['hid_prof'] | config['all3']):
+
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating vertical profiles of water, graupel, hail and snow.')
 
         outdir = outpath+'vertical_profile/'
         os.makedirs(outdir,exist_ok=True)
@@ -983,10 +1028,15 @@ def make_single_pplots(rdat,config,y=None):
         plt.savefig('{d}{p}_HID_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+ 
 
     if (config['up_width'] | config['all3']):
             
         if config['wname'] in rdat.data.variables.keys():
+        
+            print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating vertical profile of updraft width as a function of temperature.\n')
             
             tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
             #print np.max(m_warea_wrf)
@@ -1005,9 +1055,15 @@ def make_single_pplots(rdat,config,y=None):
             plt.savefig('{d}{p}_updraft_width_{y}_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],y=config['y']),dpi=400,bbox_inches='tight')
             plt.clf()
 
+            print('\nDone! Saved to '+outdir)
+            print('Moving on.\n')
+     
 
     if (config['cappi_multi'] | config['all3']):
  
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel CAPPIs for various polarimetric vars.')
+        print('Plotting CAPPIs at height z = '+str(config['z'])+'km by time for variables '+str(eval(config['cappi_vars']))+'...\n')
+        
         outdir = outpath+'cappi_multi/'
         os.makedirs(outdir,exist_ok=True)
     
@@ -1037,36 +1093,52 @@ def make_single_pplots(rdat,config,y=None):
             #plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
             plt.savefig('{i}{e}_multi_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
-    
+            print(ts)
+   
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+ 
     
     if (config['cappi_individ'] | config['all3']):
 
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating individual CAPPIs for various polarimetric vars.')
+        print('Plotting CAPPIs at height z = '+str(config['z'])+'km by time.\n')
+ 
         for ts in tms:
 
             for i,v in enumerate(eval(config['cappi_vars'])):
  
-                outdir = outpath+'cappi_individ/'+v+'/'
-                os.makedirs(outdir,exist_ok=True)
-            #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
-            #print str(v)
-#                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
-                fig, ax = rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
-                #plt.tight_layout()
-                #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
-                #plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
-                ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+                if v is None:
+                    continue
+                else:
+                    outdir = outpath+'cappi_individ/'
+                    os.makedirs(outdir,exist_ok=True)
+                #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
+                #print str(v)
+    #                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
+                    fig, ax = rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i])
+                    #plt.tight_layout()
+                    #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
+                    #plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+     
+                    
+                    plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir+v+'/',e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                    plt.clf()
+                    print(v)
+            print(ts)
+
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
  
-                
-                plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
-                plt.clf()
-
-        #y=-12.5
-
 
     if (config['rhi_multi'] | config['all3']):
 
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel RHIs for various polarimetric vars.')
+        print('Plotting RHIs at y = '+str(config['y'])+'km north of the radar by time for variables '+str(eval(config['cappi_vars']))+'...\n')
+ 
         outdir = outpath+'rhi_multi/'
         os.makedirs(outdir,exist_ok=True)
  
@@ -1091,10 +1163,17 @@ def make_single_pplots(rdat,config,y=None):
             #plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
             plt.savefig('{i}{e}_multi_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
+            print(ts)
 
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+ 
 
     if (config['rhi_individ'] | config['all3']):
 
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating individual RHIs for various polarimetric vars.')
+        print('Plotting RHIs at y = '+str(config['y'])+'km north of the radar by time.\n')
+ 
         for ts in tms:
         
             for i,v in enumerate(eval(config['rhi_vars'])):
@@ -1102,7 +1181,7 @@ def make_single_pplots(rdat,config,y=None):
                 if v is None:
                     continue
                 else:
-                    outdir = outpath+'rhi_individ/'+v+'/'
+                    outdir = outpath+'rhi_individ/'
                     os.makedirs(outdir,exist_ok=True)
                     #print i, v
                     #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
@@ -1114,9 +1193,14 @@ def make_single_pplots(rdat,config,y=None):
                     ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                     ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-                    plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                    plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir+v+'/',e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
                     plt.clf()
+                    print(v)
+            print(ts)
 
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+ 
 
     if config['qr_cappi']:
 
@@ -1127,6 +1211,7 @@ def make_single_pplots(rdat,config,y=None):
             plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
             plt.clf()
     
+
     if config['qr_rhi']:
         
         for ts in tms:

@@ -115,7 +115,7 @@ else:
 
     if (config['compo_ref'] | config['all1']):
     
-        print('IN RUN_IPOLARRIS_NEW... creating COMPOSITE figures.')
+        print('\nIN RUN_IPOLARRIS_NEW... creating COMPOSITE figures.')
         print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
             
         outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
@@ -175,8 +175,6 @@ else:
     if (config['cappi_rr'] | config['all1']):
 
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
-        print('\nPlotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.dz_name+'...')
- 
         print('Plotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.rr_name+'...')
  
         outdir = config['image_dir']+'cappi_'+rdata.rr_name+'/'
