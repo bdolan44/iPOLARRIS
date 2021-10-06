@@ -1275,20 +1275,18 @@ class RadarData(RadarConfig.RadarConfig):
             figx = 7
             figy = 4*nrows
         elif (nvars > 3 and nvars < 7):
-            nrows = 2
-            ncols = int(np.ceil(nvars/2))
-            figx = 12
-            figy = 4*nrows
+            ncols = 2
+            nrows = int(np.ceil(nvars/2))
+            figx = 18
+            figy = 18
         else:
             ncols = 2
             nrows = int(np.ceil(nvars/2))
-            figx=16
-            figy = 4*nrows
-        figx = 18
-        figy = 14
+            figx= 18
+            figy = 18
 
         #fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
-        fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.32, 'hspace': 0.07, \
+        fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.2, 'hspace': 0.07, \
             'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax])
         axf = ax.flatten()
