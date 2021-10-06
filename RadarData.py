@@ -1344,7 +1344,7 @@ class RadarData(RadarConfig.RadarConfig):
 ######################### Here is the 4 stuff ##############################
 
     def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=None, cblabel=None, 
-        labels=True, xlab=False, ylab=False, res = 2.0, thresh_dz=False,contour = None,**kwargs):
+        labels=True, xlab=False, ylab=False, res = 2.0, thresh_dz=False,contour = None,statpt=False,**kwargs):
         "Just make a Constant Altitude Plan Position Indicator plot of a given variable"
 
         # first, get the appropriate z index from the z that's wanted in altitude
@@ -1595,6 +1595,7 @@ class RadarData(RadarConfig.RadarConfig):
                 if ylab:
                     ax.set_ylabel('Latitude')
                     ax.tick_params(axis='y', which='major', labelsize=16)
+            if statpt: ax.plot(rdata.lon_0,rdata.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
         else:
             #ax.axis([xmini, xmaxi, ymini, ymaxi])
             ax.set_xlim([xmin,xmax])
@@ -1620,6 +1621,7 @@ class RadarData(RadarConfig.RadarConfig):
                     ax.set_yticklabels([])
                     ax.tick_params(axis='y', which='major', labelsize=0)
                 cbthickness = 0.02
+            if statpt: ax.plot(0,0,markersize=12,marker='^',color='k')
 
         lur,bur,wur,hur = ax.get_position().bounds
         cbar_ax_dims = [lur+wur+0.015,bur-0.001,cbthickness,hur]
@@ -1653,7 +1655,7 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
     def cappi_multiplot(self, z=1.0, xlim=None, ylim=None, ts=None,res = 2, varlist=None, vectors=None,
-        contours = None,thresh_dz = False, **kwargs):
+        contours = None,thresh_dz = False, statpt=False, **kwargs):
         "6 panel CAPPI plot showing all the polarimetric variables and HID"
         
         # first, get the appropriate z index from the z that's wanted in altitude
@@ -1768,7 +1770,7 @@ class RadarData(RadarConfig.RadarConfig):
                 xlabbool = True if i in botpanels else False
                 lspanels = [2*n for n in range(0,nrows)]
                 ylabbool = True if i in lspanels else False
-                dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz,xlab=xlabbool,ylab=ylabbool,labels=False)
+                dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz,xlab=xlabbool,ylab=ylabbool,labels=False,statpt=statpt)
             # now do the HID plot, call previously defined functions
         # try:
         #     dummy_hid = self.HID_plot(self.HID_from_scores(self.scores, rank = 1)[z_ind,:,:], 
