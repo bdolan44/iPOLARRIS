@@ -1149,8 +1149,8 @@ def make_single_pplots(rdat,config,y=None):
             else:
                 fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],zlim=config['zlim'],varlist=eval(config['rhi_vars']))
             #plt.tight_layout()
-            nvars = len(eval(config['rhi_vars']))
-            if nvars <=6:
+            nvars = len(eval(config['rhi_vars']))-1*(rdat.w_name is None)
+            if nvars <= 6:
                 yof = 0.01
             else:
                 yof=-0.02
