@@ -142,7 +142,8 @@ else:
         
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
-        
+    
+    '''
     if (config['cappi_ref'] | config['all1']):
         
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
@@ -171,7 +172,8 @@ else:
 
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
-    
+    '''
+
     if (config['cappi_rr'] | config['all1']):
 
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
