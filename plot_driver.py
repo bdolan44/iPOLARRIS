@@ -17,7 +17,7 @@ from copy import deepcopy
 import RadarData
 import GeneralFunctions as GF
 from matplotlib import colors
-#plt.style.use('presentation.mplstyle')
+#plt.style.use('./presentation.mplstyle')
 #plt.style.use('default')
 
 from matplotlib.dates import DateFormatter,HourLocator
@@ -1111,7 +1111,7 @@ def make_single_pplots(rdat,config,y=None):
                 if v is None:
                     continue
                 else:
-                    outdir = outpath+'cappi_individ/'
+                    outdir = outpath+'cappi_individ/'+v+'/'
                     os.makedirs(outdir,exist_ok=True)
                 #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
                 #print str(v)
@@ -1125,7 +1125,7 @@ def make_single_pplots(rdat,config,y=None):
                     ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
      
                     
-                    plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir+v+'/',e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                    plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
                     plt.clf()
                     print(v)
             print(ts)
@@ -1181,7 +1181,7 @@ def make_single_pplots(rdat,config,y=None):
                 if v is None:
                     continue
                 else:
-                    outdir = outpath+'rhi_individ/'
+                    outdir = outpath+'rhi_individ/'+v+'/'
                     os.makedirs(outdir,exist_ok=True)
                     #print i, v
                     #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
@@ -1193,7 +1193,7 @@ def make_single_pplots(rdat,config,y=None):
                     ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                     ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-                    plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir+v+'/',e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                    plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
                     plt.clf()
                     print(v)
             print(ts)
