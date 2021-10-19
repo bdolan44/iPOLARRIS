@@ -2,6 +2,27 @@
 #============== RUN_IPOLARRIS_NEW.PY ===============
 #===================================================
 
+import sys
+import time
+
+# WARNING TO USERS to activate conda environment #
+print("\n####################################")
+print("### Welcome, user, to iPOLARRIS! ###")
+print("####################################\n")
+
+print("WARNING: Before proceeding, ensure that you have: \n\n (a) installed the Anaconda package manager. Latest versions and instructions can be found here: \n https://conda.io/projects/conda/en/latest/user-guide/install/index.html \n\n (b) installed the Conda environment required to run iPOLARRIS with the command `conda env create -f env.yml` \n\n (c) activated the new environment with the command `conda activate pol` \n")
+
+print("If you have NOT performed the required setup above, click x to exit. Otherwise, press any other key. \n")
+usersays=input()
+if usersays.lower().startswith('x'): 
+    print('\nExiting gracefully.\n')
+    import sys
+    sys.exit()
+else: 
+    print('\niPOLARRIS INITIATING... If Conda env activated, no import errors...\n')
+    import time
+    time.sleep(3)
+
 # Import core Python packages
 from collections import OrderedDict
 import csv
@@ -30,8 +51,9 @@ from skewPy import SkewT
 
 #--------------- Main Program ----------------
 
-print('\niPOLARRIS INITIATING...')
 time.sleep(3)
+
+print('\nSUCCESS! Requisite packages loaded.')
 
 print('\n#############################################')
 print('####### Starting run_ipolarris_new.py #######')
