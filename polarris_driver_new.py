@@ -415,8 +415,7 @@ def polarris_driver(configfile):
     if config['comb_vicr'] == True:
         whvi = np.where(rdata.hid == 6)
         rdata.hid[whvi] = 3
-   
-
+  
     #Do some quick masking of the data####
 #     mask = np.zeros([rdata.data.dims['d'],rdata.data.dims['z'],rdata.data.dims['y'],rdata.data.dims['x']])
 #     whbad = np.logical_or(np.logical_or(np.logical_or(np.logical_or(rdata.data[rdata.dz_name].values>-20.,rdata.data[rdata.zdr_name].values>-2.),rdata.data[rdata.kdp_name].values<10.),rdata.data[rdata.zdr_name].values<10.),rdata.data[rdata.dz_name].values<70.)
