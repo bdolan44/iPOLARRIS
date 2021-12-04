@@ -205,17 +205,28 @@ def polarris_driver(configfile):
     # =====
 
     #print('Finding and concatenating radar files in '+config['rfiles']+'...')
-    drop_vars=config['drop_vars']
-    with open(config['rfiles'], 'r') as f:
-        #print(config['rfiles'])
-        rfiles = f.read().splitlines()
-    
     #print((config['exper']),(config['mphys']))
     print('Station/experiment: '+config['exper'])
     print('Input: '+config['mphys'])
     print('Start: '+config['sdatetime'])
     print('End: '+config['edatetime'])
     time.sleep(3)
+
+    drop_vars = config['drop_vars']
+    sdatetime = int(config['sdatetime'][0:8]+config['sdatetime'][9:13])
+    edatetime = int(config['edatetime'][0:8]+config['edatetime'][9:13])
+    rfiles = []
+    with open(config['rfiles'], 'r') as f:
+        allrfiles = f.read().splitlines()
+        for rfile in allrfiles:
+            fullname = os.path.basename(rfile)
+            filedate = int(fullname[5:13]+fullname[14:18])
+            if filedate >= sdatetime and filedate <= edatetime:
+                rfiles.append(rfile)
+    
+    if rfiles == []:
+        print("\nOops! There is no radar data for the dates given in your config file. Exiting...\n")
+        sys.exit(1)
 
     if config['exper'] == 'MC3E' and config['mphys'] == 'obs':
         print("special handling for ",config['exper'])
