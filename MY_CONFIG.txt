@@ -15,7 +15,7 @@ mphys	    == obs	    == # Type of microphysics used in model: 'obs' OR '<scheme>
 #-----------------------------------------------
 
 # Args
-sdatetime		        == '20151203-0105'	== # Start time of analysis of interest
+sdatetime		        == '20151203-0100'	== # Start time of analysis of interest
 sdatetime_format	    == %Y%m%d-%H%M		== # Start time format
 edatetime		        == '20151203-0200'	== # End time of analysis of interest
 edatetime_format	    == %Y%m%d-%H%M		== # End time format
@@ -91,9 +91,9 @@ t_name	==	T	==  # Name of the temperature field
 
 # SET 1) Plots created in run_ipolarris_new.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
-cappi_rr	    == True	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
-rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
+compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
+rr_timeseries	    == False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
 vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflectivity with height
 refcfad		    == False	    == # 6) Set to True to plot CFAD of reflectivity with height
@@ -133,8 +133,8 @@ convert_Tk_Tc	== False	== # Convert temperature in K to deg C
 #-----------------------------
 
 # Args
-image_dir	== '/Users/adistefano/ipol/outputfig/'	== # Output figure directory
-ptype		== 'png'		== # Output figure file extenstion (i.e. .png, .jpg, ...)
+image_dir	== './outputfig/'	== # Output figure directory
+ptype		== 'mp4'		== # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
 cb_friendly	== True			== # Use color-blindness palette for output (i.e. reflectivity)
 
 # Constant-Altitude Plan-Position Indicator (CAPPI) 
