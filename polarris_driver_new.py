@@ -142,7 +142,8 @@ def reduce_dim(ds):
     for v in ds.data_vars.keys():
         try:
             ds[v]=ds[v].sel(time=t1).drop('time')
-        except ValueError as e:
+        except KeyError as k:
+        #except ValueError as e:
             pass
 #            print(e)
 #            print(v)
