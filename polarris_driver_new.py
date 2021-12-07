@@ -220,7 +220,8 @@ def polarris_driver(configfile):
         allrfiles = f.read().splitlines()
         for rfile in allrfiles:
             fullname = os.path.basename(rfile)
-            filedate = int(fullname[5:13]+fullname[14:18])
+            filedatestr = fullname[config['rdstart']:config['rdend']].replace('_','').replace(':','').replace('-','')
+            filedate = int(filedatestr[0:-2])
             if filedate >= sdatetime and filedate <= edatetime:
                 rfiles.append(rfile)
     
@@ -257,7 +258,6 @@ def polarris_driver(configfile):
         #rfiles = glob.glob(config['rfiles']+"*")
         rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
         #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
-
     try:
         rvar = rvar.rename({'x0':'x'})
         rvar = rvar.rename({'y0':'y'})
@@ -270,7 +270,7 @@ def polarris_driver(configfile):
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
  
-    print('Radar files ready.\n')
+    print('Radar files ready.')
     time.sleep(3)
 
     # =====
@@ -389,7 +389,7 @@ def polarris_driver(configfile):
         Wname = None
 
     print('\nSending data to RadarData...')
-   
+    
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=Uname,v=Vname,w=Wname,conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
 
     if config['snd_on'] == True:
