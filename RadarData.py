@@ -96,11 +96,18 @@ class RadarData(RadarConfig.RadarConfig):
         self.yind = 2
         self.xind = 3
         self.ntimes =1
-#         if 'd' in self.data[self.z_name].dims:
-#             self.nhgts = np.shape(self.data[self.z_name].values)[self.zind][0]
-#         except:
-#             self.nhgts = np.shape(self.data[self.z_name].values)
-        self.nhgts = self.data[self.dz_name].sizes[self.z_name]
+        if 'd' in self.data[self.z_name].dims:
+            self.nhgts = len(self.data[self.z_name].values[0])
+        else:
+            self.nhgts = len(self.data[self.z_name].values)
+            #self.data[self.z_name].values = self.data[self.z_name].values[0]
+#        if 'd' in self.data[self.z_name].dims:
+#            self.nhgts = np.shape(self.data[self.z_name].values)[self.zind][0]
+#        else:
+#            self.nhgts = np.shape(self.data[self.z_name].values)
+#        print(self.data[self.z_name].values)
+#        print(self.data[self.dz_name].sizes[self.z_name])
+#        self.nhgts = self.data[self.dz_name].sizes[self.z_name]
 #            self.read_data_from_nc(self.radar_file)
         print ('calculating deltas')
         self.calc_deltas()
@@ -327,8 +334,13 @@ class RadarData(RadarConfig.RadarConfig):
 
     def convert_t(self):    
         # if want to pass a dictionary already
-        self.T.values=np.ma.masked_less(self.T.values,0)
-        self.T.values = self.T.values-273.15
+        print(np.min(self.T))
+        print(np.max(self.T))
+        input()
+        self.T = np.ma.masked_less(self.T, 0)
+        #self.T.values=np.ma.masked_less(self.T.values,0)
+        self.T = self.T - 273.15
+        #self.T.values = self.T.values-273.15
         
 #############################################################################################################
     def set_masks(self):
@@ -562,9 +574,13 @@ class RadarData(RadarConfig.RadarConfig):
         """This will take the sounding data and interpolate it to the radar coordinates"""
         self.gridded_height = np.zeros(self.data[self.dz_name].shape)
         #print(self.x)
-        for i in range(self.data[self.z_name].shape[0]):
-            #self.gridded_height[:,:,i,...] = self.data[self.z_name][i]
-            self.gridded_height[:,i,:,:] = self.data[self.z_name][i]
+        if 'd' in self.data[self.z_name].dims:
+            for i in range(self.data[self.z_name].shape[1]):
+                self.gridded_height[:,i,:,:] = self.data[self.z_name][0,i]
+        else:
+            for i in range(self.data[self.z_name].shape[0]):
+                #self.gridded_height[:,:,i,...] = self.data[self.z_name][i]
+                self.gridded_height[:,i,:,:] = self.data[self.z_name][i]
 
         self.T = np.interp(self.gridded_height, self.snd_height, self.snd_temp)
         self.add_field((self.data[self.dz_name].dims,self.T,), self.temp_name)
