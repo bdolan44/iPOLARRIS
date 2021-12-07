@@ -15,9 +15,9 @@ mphys	    == obs	    == # Type of microphysics used in model: 'obs' OR '<scheme>
 #-----------------------------------------------
 
 # Args
-sdatetime		        == '20151203-0100'	== # Start time of analysis of interest
+sdatetime		        == '20151203-0300'	== # Start time of analysis of interest
 sdatetime_format	    == %Y%m%d-%H%M		== # Start time format
-edatetime		        == '20151203-0200'	== # End time of analysis of interest
+edatetime		        == '20151203-0400'	== # End time of analysis of interest
 edatetime_format	    == %Y%m%d-%H%M		== # End time format
 
 date		    == '20151203'			        == # Date of the case
@@ -46,7 +46,7 @@ alt	== 354	== # Altitude of the radar
 #------ Doppler Radar File Reading (Optional) ------
 #---------------------------------------------------
 
-dd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 dfiles		    == ./inputtxt/doppfiles.txt	    == # Location of dual-Doppler files
