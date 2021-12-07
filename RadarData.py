@@ -334,9 +334,6 @@ class RadarData(RadarConfig.RadarConfig):
 
     def convert_t(self):    
         # if want to pass a dictionary already
-        print(np.min(self.T))
-        print(np.max(self.T))
-        input()
         self.T = np.ma.masked_less(self.T, 0)
         #self.T.values=np.ma.masked_less(self.T.values,0)
         self.T = self.T - 273.15
