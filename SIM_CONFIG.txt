@@ -23,8 +23,8 @@ edatetime_format	    == %Y%m%d-%H%M		== # End time format
 date		    == '20151203'			        == # Date of the case
 rfiles		    == './inputtxt/wrfpolfiles.txt'	== # Input directory of radar files to read in
 rdate_format	== %Y-%m-%d_%H:%M:%S	        == # Format for the radar file date
-rdend		    == 35				            == # End of date timestamp in radar filename
-rdstart		    == 15				            == # Start of date timestamp in radar filename
+rdend		    == 33				            == # End of date timestamp in radar filename
+rdstart		    == 14				            == # Start of date timestamp in radar filename
 
 # Variables (NOTE: use NCDUMP to locate variable names of radar observables and info)
 dz_name		== zhh01		== # Name of the reflectivity field
