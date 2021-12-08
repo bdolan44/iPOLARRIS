@@ -2217,10 +2217,10 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             sz=np.shape(self.data[self.z_name].values)[0]
             hts=np.squeeze(self.data[self.z_name].values)
-        
         #print( np.shape(sz),sz, multiple)
         looped = np.arange(0, sz, multiple)
-        cfad_out = np.zeros((sz//multiple, nbins-1))
+        #cfad_out = np.zeros((sz//multiple, nbins-1))
+        cfad_out = np.zeros((len(looped), nbins-1))
         #print (np.shape(cfad_out),'cfad shape')
         #print looped
         #print cfad_out.shape, multiple
