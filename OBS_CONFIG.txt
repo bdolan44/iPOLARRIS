@@ -136,7 +136,7 @@ convert_Tk_Tc	== False	== # Convert temperature in K to deg C
 
 # Args
 image_dir	== './outputfig/'	== # Output figure directory
-ptype		== 'mp4'		== # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
+ptype		== 'png'		== # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
 cb_friendly	== True			== # Use color-blindness palette for output (i.e. reflectivity)
 
 # Constant-Altitude Plan-Position Indicator (CAPPI) 
