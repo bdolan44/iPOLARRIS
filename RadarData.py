@@ -3100,9 +3100,6 @@ class RadarData(RadarConfig.RadarConfig):
         print ('Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
 #        print(cs_z,'cs_z in 2424')
-        print(self.lat_name)
-        print(self.data.keys())
-        input()
         for q in tqdm(range(self.data.dims['d'])):
             if self.lat_name in self.data.keys():
 #                         lat = self.data[self.lat_name].sel(d=q).values
