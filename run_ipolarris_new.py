@@ -63,7 +63,7 @@ configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
 print('\n#################################################')
-print('############ Calling polarris_driver_new.py ####')
+print('############ Calling polarris_driver_new.py #####')
 print('#################################################')
 time.sleep(3)
 
@@ -81,43 +81,50 @@ config['image_dir'] = config['image_dir']+\
 # If a second argument is passed for WRF config file, produce a bunch of comparison plots!
 # More comments in this section TBD!
 if sys.argv[2:]:
+    
+    print('\n#################################################')
+    print('############ Calling polarris_driver_new.py #####')
+    print('#################################################')
+    time.sleep(3)
+
     configfile1 = sys.argv[2:]
-    rdata2, config2 = polarris_driver(configfile1)
+    rdata2, config2, config2['uname'], config2['vname'], config2['wname'] = polarris_driver(configfile1)
 
-    print('calculating CFAD differences')
-
+    print('\nSIM MODE.')
+    
+    print('\nIN RUN_IPOLARRIS_NEW... creating CFAD COMPARISON figures.')
+    print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
+ 
+    outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
+    os.makedirs(outdir,exist_ok=True)
+    
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=False,cscfad=False)
     ax[0].set_title(rdata.exper)
     ax[1].set_title(rdata2.exper)
     ax[2].set_title("{e} - {v}".format(e=rdata.exper,v=rdata2.exper))    
     plt.suptitle("Reflectivity")
-    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}.{p}'.format(p=config['ptype'],d=config['image_dir'],c='ALL',e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
+    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}.{p}'.format(p=config['ptype'],d=outdir,c='ALL',e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
     plt.close()
 
-
+    '''
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,'Z$_{dr}$',config,config2,bins=np.arange(-2,8,0.2),savefig=True,cscfad=False)
     
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,'K$_{dp}$',config,config2,bins=np.arange(-2,6,0.2),savefig=True,cscfad=False)
-    
-    
+        
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
 
-
     fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
-    ##Convective
 
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=True,cscfad='convective')
-    
-    
+        
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,'Z$_{dr}$',config,config2,bins=np.arange(-2,8,0.2),savefig=True,cscfad='convective')
     
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,'K$_{dp}$',config,config2,bins=np.arange(-2,6,0.2),savefig=True,cscfad='convective')
     
-    
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad='convective')
 
-
     fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad='convective',savefig=True)
+    '''
 
 ################################################################################
 ################## Now you can just start plotting! ############################
@@ -134,6 +141,8 @@ else:
     # tdate = datetime.datetime(2011,5,23,22,00)
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
+
+    print('\nOBS MODE.')
 
     if (config['compo_ref'] | config['all1']):
     
