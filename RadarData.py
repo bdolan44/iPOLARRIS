@@ -3100,29 +3100,29 @@ class RadarData(RadarConfig.RadarConfig):
         print ('Unfortunatley have to run the convective stratiform per timestep. Might take a minute....{n}'.format(n=self.data.dims['d']))
         rntypetot = []
 #        print(cs_z,'cs_z in 2424')
+        print(self.lat_name)
+        print(self.data.keys())
+        input()
         for q in tqdm(range(self.data.dims['d'])):
             if self.lat_name in self.data.keys():
 #                         lat = self.data[self.lat_name].sel(d=q).values
 #                         lon = self.data[self.lon_name].sel(d=q).values
-                    if 'd' in self.data[self.lat_name].dims:
-                        lat = self.data[self.lat_name].sel(d=q).values
-                        lon = self.data[self.lon_name].sel(d=q).values
-                        zlev = np.where(self.data[self.z_name].sel(d=q).values ==cs_z)[0]
-                        nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
-                    else:
-                        lat = self.data[self.lat_name].values
-                        lon = self.data[self.lon_name].values
-                        zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
-                        nlevs = np.shape(self.data[self.z_name].values)[0]
-
-                        
+                if 'd' in self.data[self.lat_name].dims:
+                    lat = self.data[self.lat_name].sel(d=q).values
+                    lon = self.data[self.lon_name].sel(d=q).values
+                    zlev = np.where(self.data[self.z_name].sel(d=q).values ==cs_z)[0]
+                    nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
+                else:
+                    lat = self.data[self.lat_name].values
+                    lon = self.data[self.lon_name].values
+                    zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
+                    nlevs = np.shape(self.data[self.z_name].values)[0]
             else:
-                        self.get_latlon_fromxy()
-                        lat = self.data[self.lat_name].values
-                        lon = self.data[self.lon_name].values
-                        zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
-                        nlevs = np.shape(self.data[self.z_name].values)[0]
-
+                self.get_latlon_fromxy()
+                lat = self.data[self.lat_name].values
+                lon = self.data[self.lon_name].values
+                zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
+                nlevs = np.shape(self.data[self.z_name].values)[0]
 #            print (np.shape(self.data[self.lat_name]))
 #            print 'q is '
             #print np.shape(self.data[self.z_name].sel(d=q))
