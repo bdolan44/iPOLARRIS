@@ -38,9 +38,11 @@ vdop_name   == vdop01       == # Name of Doppler velocity
 uname		== u       	    == # Name of the zonal wind field
 vname		== v    	    == # Name of the meridional wind field
 wname		== w        	== # Name of the vertical wind field
-xname		== x            == # Name of the zonal directional variable
-yname		== y            == # Name of the meridional directional variables
+xname		== longitude    == # Name of the zonal directional variable
+yname		== latitude     == # Name of the meridional directional variables
 zname		== hgt	        == # Name of the vertical level field
+latname     == latitude	    ==
+lonname     == longitude    ==
 band		== S		    == # Radar band: X, C OR S. Note: needs to be capital letter.
 exper		== KLGX		    == # Radar location
 lat		    == 47.116806	== # Latitude of the radar station
@@ -165,8 +167,6 @@ hidsnow		== [3,4,5,6]	== # Group ice crystals, snow, wet snow and VI
 #=========================================================
 
 ###############Set up variable names and how to read the data###############
-latname == latitude			   ==
-lonname == longitude 			   ==
 pol_on == True                        ==#Calculate the pol data such as HID and RR
 z_resolution == 1.0                   ==#Vertical resolution for CFADs. If comparing 2, they need to be the same.
 zthresh == -10.                       ==#Threshold for good data
