@@ -3,7 +3,7 @@
 ####################################################
 
 type	    == wrf      == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
-mphys	    == WSM6	    == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
+mphys	    == wsm6	    == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
 
 
 #==============
@@ -44,7 +44,7 @@ zname		== hgt	        == # Name of the vertical level field
 latname     == latitude	    ==
 lonname     == longitude    ==
 band		== S		    == # Radar band: X, C OR S. Note: needs to be capital letter.
-exper		== KLGX		    == # Radar location
+exper		== KLGX         == # Radar location
 lat		    == 47.116806	== # Latitude of the radar station
 lon		    == -124.10625	== # Longitude of the radar station
 radarname	== S-band	    == # 
