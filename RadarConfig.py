@@ -78,8 +78,8 @@ class RadarConfig(object):
         self.units = {dz: '(dBZ)', zdr: '(dB)', kdp: '($^{\circ}$/km)', ldr: '(dB)', rho: '', hid: '',w:'(m s$^{-1}$)',vr:'(m s$^{-1}$)',self.cs_name:'',self.rr_name:'(mm hr$^{-1}$)',self.temp_name:'C'}
         self.names = {dz: 'Z', zdr: 'Z$_{DR}$', kdp: 'K$_{dp}$', ldr: 'LDR', rho: r'$\rho_{hv}$', hid: '',w:'',vr:'V$_r$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
         self.names_uc = {dz: 'Z', zdr: 'ZDR', kdp: 'KDP', ldr: 'LDR', rho: 'RHO', hid: 'HID',w:'W',vr:'V$_{RAD}$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
-        self.longnames = {dz: 'Reflectivity', zdr: 'Differntial reflectivity', kdp: 'Specific differential phase',\
-                ldr: 'Linear depolarization ratio', rho: 'Correlation coefficient', hid: 'Hydrometeor identification',w:'Vertical Velocity',vr:'Radial Velocity',\
+        self.longnames = {dz: 'Reflectivity', zdr: 'Differential Reflectivity', kdp: 'Specific Differential Phase',\
+                ldr: 'Linear Depolarization Ratio', rho: 'Correlation Coefficient', hid: 'Hydrometeor Identification',w:'Vertical Velocity',vr:'Radial Velocity',\
                 self.cs_name: 'Convective/Stratiform',self.rr_name:'Rain Rate',self.temp_name:'Temperature'}
         self.cmaps = {dz: self.temp_cmap, zdr: plt.cm.Spectral_r, kdp: plt.cm.gist_heat_r, \
                 ldr: plt.cm.gist_rainbow_r, rho: plt.cm.jet, hid: self.hid_cmap,w:plt.cm.seismic,vr:plt.cm.bwr,self.cs_name: self.cs_cmap,self.rr_name:plt.cm.Spectral_r,self.temp_name:'RdYlBu_r'}
