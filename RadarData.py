@@ -2195,7 +2195,6 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             pass
         #print('value bins',value_bins)
-
         nbins = value_bins.shape[0]
         if above is not None:
             bot_index, top_index = self._get_ab_incides(above=above, below=below)
@@ -2342,7 +2341,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             if levels is not None:
                 #print cmap
-                pc = ax.pcolormesh(bins, hts, cfad_ma, norm=norm, cmap=cmap)
+                pc = ax.pcolormesh(bins[0:-1], hts, cfad_ma, norm=norm, cmap=cmap)
             else:
                 #cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
                 pc = ax.pcolormesh(bins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm,cmap=cmap, **kwargs)
