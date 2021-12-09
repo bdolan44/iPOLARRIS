@@ -428,7 +428,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         plt.savefig('{d}{e1}_{e2}_wr_comp.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
-def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False,ylim=None,xlim=None):
+def plot_difference_cfad(rdata1,rdata2,var1,var2,config1,bins=np.arange(0,82,2),xlab=None,savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False,ylim=None,xlim=None):
     ###Pass a value for nor in order to normalize the colorbar over a standard range rather than normalization across values within the data. To normalize within the data, pass a value of False
     r1cdf,r1bins,r1ht = rdata1.cfad(var1,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     r2cdf,r2bins,r2ht = rdata2.cfad(var2,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
@@ -439,8 +439,8 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
         n2 = rdata2.exper
     if n3 is None:
         n3 = '{a}-{b}'.format(a=rdata1.exper,b=rdata2.exper)
-    
-    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,n1=n1,n2=n2,n3=n3,typ='dz',nor=nor,ylim=ylim,xlim=xlim)
+
+    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,xlab=xlab,n1=n1,n2=n2,n3=n3,typ='dz',nor=nor,ylim=ylim,xlim=xlim)
     #if cscfad is not False:
     #    plt.suptitle('{c} {l}'.format(c=cscfad,l=lonvar),y=1.05,fontsize=30)
     #else:
@@ -459,7 +459,7 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
     #    
     return fig,axf
 
-def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False,nor=False,ylim=False,xlim=False):
+def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',xlab = None, n1 = None,n2 = None,n3= None,savefig=False,nor=False,ylim=False,xlim=False):
     ###Pass a value for nor in order to normalize the colorbar over a standard range rather than normalization across values within the data. To normalize within the data, pass a value of False
     fig, ax = plt.subplots(1,4,figsize=(14,8),gridspec_kw={'wspace': 0.1,'hspace': 0.05,'width_ratios': [4,4,1.2,4],\
         'top':1., 'bottom':0., 'left':0., 'right':1.})
@@ -479,14 +479,14 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
 #     print np.nanmax(cfad2_all)
     
     if typ == 'w':
-        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),data = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf =config,tspan = dat1['time'],maxval=20,cont=True,levels = True,cbyes=0, xlim=xlim, ylim=ylim)
+        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),data = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf =config,tspan = dat1['time'],maxval=20,cont=True,levels = True,cbyes=0, xlim=xlim, ylim=ylim, xlab=xlab)
 
-        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad2_all, hts =ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = confing,tspan = dat2['time'],maxval=20,cont=True,levels = True,cbyes=1, xlim=xlim, ylim=ylim)
+        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad2_all, hts =ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = confing,tspan = dat2['time'],maxval=20,cont=True,levels = True,cbyes=1, xlim=xlim, ylim=ylim, xlab=xlab)
 
     else:
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True,cbyes=0, xlim=xlim, ylim=ylim)
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True,cbyes=0, xlim=xlim, ylim=ylim, xlab=xlab)
 
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True,cbyes=1, xlim=xlim, ylim=ylim)
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True,cbyes=1, xlim=xlim, ylim=ylim, xlab=xlab)
     
     #axf[0].set_title('{n}'.format(n=n1))
     #axf[1].set_title('{n}'.format(n=n2))
@@ -545,8 +545,7 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
     
     axf[3].set_xlim(xlim)
     axf[3].set_ylim(ylim)
-    axf[3].set_xlabel('Reflectivity (dBZ)',fontsize=16)
-    axf[3].set_xticks(np.linspace(np.min(xlim),np.max(xlim),7))
+    axf[3].set_xlabel(xlab,fontsize=16)
     axf[3].set_yticks([])
     axf[3].set_yticklabels([])
     axf[3].tick_params(axis='x', which='major', labelsize=16)
@@ -556,7 +555,7 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
     cbar_ax_dims = [lur+wur+0.02,bur,0.02,hur]
     cbar_ax = fig.add_axes(cbar_ax_dims)
     cbt = plt.colorbar(cb,cax=cbar_ax)
-    cbt.set_ticks(np.arange(-1*nor,nor+1,5))
+    cbt.set_ticks(np.arange(-1*nor,nor+1,0.5*nor))
     cbt.ax.tick_params(labelsize=16)
     cbt.set_label('Relative Difference (%)', fontsize=16, rotation=270, labelpad=15)
 
