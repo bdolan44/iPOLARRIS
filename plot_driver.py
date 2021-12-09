@@ -428,7 +428,7 @@ def plot_joint_comp(dat1,dat2,config,typ='zzdr',n1= None,n2=None):
         plt.savefig('{d}{e1}_{e2}_wr_comp.{t}'.format(d=outdir,e1=dat1['rconf'].exper,e2=dat2['rconf'].exper,t=config['ptype']),dpi=300)
         plt.clf()
 
-def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False):
+def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.arange(0,82,2),savefig=True,n1=None,n2=None,n3=None,cscfad=None, nor=False,ylim=None,xlim=None):
     ###Pass a value for nor in order to normalize the colorbar over a standard range rather than normalization across values within the data. To normalize within the data, pass a value of False
     r1cdf,r1bins,r1ht = rdata1.cfad(var1,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
     r2cdf,r2bins,r2ht = rdata2.cfad(var2,ret_z=1,z_resolution=1.0,value_bins=bins,cscfad=cscfad)
@@ -440,36 +440,36 @@ def plot_difference_cfad(rdata1,rdata2,var1,var2,lonvar,config1,config2,bins=np.
     if n3 is None:
         n3 = '{a}-{b}'.format(a=rdata1.exper,b=rdata2.exper)
     
+    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,n1=n1,n2=n2,n3=n3,typ='dz',nor=nor,ylim=ylim,xlim=xlim)
+    #if cscfad is not False:
+    #    plt.suptitle('{c} {l}'.format(c=cscfad,l=lonvar),y=1.05,fontsize=30)
+    #else:
+    #    plt.suptitle('{l}'.format(l=lonvar),y=1.05,fontsize=30)
     
-    fig, axf = plot_cfad_compare(r1cdf,r2cdf,r1ht,r2ht,r1bins,r2bins,config1,n1=n1,n2=n2,n3=n3,typ='dz',nor=nor)
-    if cscfad is not False:
-        plt.suptitle('{c} {l}'.format(c=cscfad,l=lonvar),y=1.05,fontsize=30)
-    else:
-        plt.suptitle('{l}'.format(l=lonvar),y=1.05,fontsize=30)
-    
-    axf[0].set_xlabel('{l} bin'.format(l=lonvar))
-    axf[1].set_xlabel('{l} bin'.format(l=lonvar))
-    axf[2].set_xlabel('{l} bin'.format(l=lonvar))
-    if savefig == True:
-        if cscfad is not False:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}.{p}'.format(p=config['ptype'],d=config1['image_dir'],c=cscfad,e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
-        else:
-            plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}.{p}'.format(p=config['ptype'],d=config1['image_dir'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
-        return fig, axf
-    else:
-        return fig,axf
+    #axf[0].set_xlabel('{l} bin'.format(l=lonvar))
+    #axf[1].set_xlabel('{l} bin'.format(l=lonvar))
+    #axf[2].set_xlabel('{l} bin'.format(l=lonvar))
+    #if savefig == True:
+    #    if cscfad is not False:
+    #        plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}.{p}'.format(p=config['ptype'],d=config1['image_dir'],c=cscfad,e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+    #    else:
+    #        plt.savefig('{d}CFAD_diff_{e1}_{e2}_{l}.{p}'.format(p=config['ptype'],d=config1['image_dir'],e1=rdata1.exper,e2=rdata2.exper,l=var1),dpi=400,bbox_inches='tight')
+    #    return fig, axf
+    #else:
+    #    
+    return fig,axf
 
-def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False,nor=False):
+def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 = None,n3= None,savefig=False,nor=False,ylim=False,xlim=False):
     ###Pass a value for nor in order to normalize the colorbar over a standard range rather than normalization across values within the data. To normalize within the data, pass a value of False
-    fig, ax = plt.subplots(1,3,figsize=(18,8))
+    fig, ax = plt.subplots(1,4,figsize=(14,8),gridspec_kw={'wspace': 0.1,'hspace': 0.05,'width_ratios': [4,4,1.2,4],\
+        'top':1., 'bottom':0., 'left':0., 'right':1.})
     axf = ax.flatten()
 
-    dat1cnt = np.shape(dat1)[0]
-    dat2cnt = np.shape(dat2)[0]
-#
+    #dat1cnt = np.shape(dat1)[0]
+    #dat2cnt = np.shape(dat2)[0]
 
-    cfad1_all = np.sum(dat1,axis=0)/dat1cnt
-    cfad2_all = np.sum(dat2,axis=0)/dat2cnt
+    #cfad1_all = np.sum(dat1,axis=0)/dat1cnt
+    #cfad2_all = np.sum(dat2,axis=0)/dat2cnt
     
     cfad1_all = dat1
     cfad2_all = dat2
@@ -479,20 +479,21 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
 #     print np.nanmax(cfad2_all)
     
     if typ == 'w':
-        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),data = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf =config,tspan = dat1['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),data = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf =config,tspan = dat1['time'],maxval=20,cont=True,levels = True,cbyes=0, xlim=xlim, ylim=ylim)
 
-        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad2_all, hts =ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = confing,tspan = dat2['time'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot('{t}var'.format(t=typ.upper()),cfad = cfad2_all, hts =ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = confing,tspan = dat2['time'],maxval=20,cont=True,levels = True,cbyes=1, xlim=xlim, ylim=ylim)
 
     else:
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True)
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad1_all, hts = ht1,  bins = bin1,ax=axf[0],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True,cbyes=0, xlim=xlim, ylim=ylim)
 
-        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True)
-    axf[0].set_title('{n}'.format(n=n1))
-    axf[1].set_title('{n}'.format(n=n2))
+        fig, ax = GF.cfad_plot(typ.upper(),cfad = cfad2_all, hts = ht2,  bins = bin2,ax=axf[1],cfad_on = 0,rconf = config,tspan = config['date'],maxval=20,cont=True,levels = True,cbyes=1, xlim=xlim, ylim=ylim)
+    
+    #axf[0].set_title('{n}'.format(n=n1))
+    #axf[1].set_title('{n}'.format(n=n2))
 
-    axf[0].set_ylim(0,18)
-    axf[1].set_ylim(0,18)
-    axf[2].set_ylim(0,18)
+    #axf[0].set_ylim(0,18)
+    #axf[1].set_ylim(0,18)
+    #axf[2].set_ylim(0,18)
 
     if len(ht1) != len(ht2):
         print('fixing heights')
@@ -518,12 +519,13 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
     else:
         diff_cfad = cfad1_all - cfad2_all
         hts = ht1
-
     
     cfad_ma = np.ma.masked_where(diff_cfad == 0, diff_cfad)
     maxa = np.nanpercentile(np.abs(cfad_ma),98)
     levels=np.linspace(-1*maxa,maxa,50)
     
+    axf[2].remove()
+
     if nor is False:
     #    print typ, maxa
         if typ=='w':
@@ -532,22 +534,38 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
             delt = np.around((maxa+maxa)/50,decimals=2)
             print( maxa,nor,delt)
             levels = np.arange(-1 * maxa, maxa+delt, delt)
-            cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
+            cb=axf[3].contourf(bin1[:-1],hts,cfad_ma,levels=levels,norm=colors.Normalize(vmin=-1*nor,vmax=nor),cmap='bwr',extend='both')
 
         else:
             nor = np.around(np.nanpercentile(np.abs(cfad_ma),98),decimals=1)
-            cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
+            cb=axf[3].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
     else:
         nor=nor
-        cb=axf[2].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
+        cb=axf[3].contourf(bin1[:-1],hts,cfad_ma,levels,cmap='bwr',norm=colors.Normalize(vmin=-1.*nor,vmax=nor),extend='both')
+    
+    axf[3].set_xlim(xlim)
+    axf[3].set_ylim(ylim)
+    axf[3].set_xlabel('Reflectivity (dBZ)',fontsize=16)
+    axf[3].set_xticks(np.linspace(np.min(xlim),np.max(xlim),7))
+    axf[3].set_yticks([])
+    axf[3].set_yticklabels([])
+    axf[3].tick_params(axis='x', which='major', labelsize=16)
+    axf[3].tick_params(axis='y', which='major', labelsize=0)
 
-    
-    
-    cb3= plt.colorbar(cb,ax=axf[2])
-    cb3.set_label('Relative difference (%)')
-    cb3.set_ticks(np.linspace(-1.*nor,nor,9))
+    lur,bur,wur,hur = axf[3].get_position().bounds
+    cbar_ax_dims = [lur+wur+0.02,bur,0.02,hur]
+    cbar_ax = fig.add_axes(cbar_ax_dims)
+    cbt = plt.colorbar(cb,cax=cbar_ax)
+    cbt.set_ticks(np.arange(-1*nor,nor+1,5))
+    cbt.ax.tick_params(labelsize=16)
+    cbt.set_label('Relative Difference (%)', fontsize=16, rotation=270, labelpad=15)
+
+    #cb3 = plt.colorbar(cb,ax=axf[2])
+    #cb3.set_label('Relative difference (%)',fontsize=16,rotation=270,labelpad=20)
+    #cb3.ax.tick_params(labelsize=16)
+    #cb3.set_ticks(np.linspace(-1.*nor,nor,9))
 #    print('nor',nor)
-    axf[2].set_ylabel('Height (km MSL)',fontsize=18)
+    #axf[2].set_ylabel('Height (km MSL)',fontsize=18)
 
     if typ == 'drc' or typ == 'drs' or typ == 'dr':
         varn = 'DR'
@@ -559,23 +577,24 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',n1 = None,n2 =
         varn = 'Wvar'
     else:
         varn = typ
-    try:
+    #try:
 
-        axf[2].set_xlabel('{n} {u}'.format(n=dat1['rconf'].names[varn],u=dat1['rconf'].units[varn]),fontsize = 18)
-    except:
+    #    axf[2].set_xlabel('{n} {u}'.format(n=dat1['rconf'].names[varn],u=dat1['rconf'].units[varn]),fontsize = 18)
+    #except:
     #     print 'Exception!'
-        axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
-    axf[2].set_title('{v}'.format(v=n3))
+    #axf[2].set_xlabel('{tp}'.format(tp=typ.upper()),fontsize = 18)
+    #axf[2].set_title('{v}'.format(v=n3))
 
 
-    plt.tight_layout()
-    if savefig==True:
-    
-        st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
-
-        plt.savefig('{id}CFAD_{tp}_{s}.{t}'.format(id=outdir,s=st_diff,t=config['ptype'],tp=typ.upper()),dpi=200)
-    else:
-        return fig, axf
+    #plt.tight_layout()
+    #if savefig==True:
+    #
+    #    st_diff = '{e1}-{e2}'.format(e1=dat1['rconf'].exper,e2=dat2['rconf'].exper)
+    #
+    #    plt.savefig('{id}CFAD_{tp}_{s}.{t}'.format(id=outdir,s=st_diff,t=config['ptype'],tp=typ.upper()),dpi=200)
+    #else:
+       
+    return fig, axf
 #    plt.clf()
 
 def plot_hid_2panel(dat1,dat2,config,typ='hid',n1 = None,n2 = None,):
@@ -1538,9 +1557,9 @@ def plot_cfad(fig,cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=N
     cfad_ma = np.ma.masked_where(cfad==0, cfad)
     #print('CFAD shape',np.shape(cfad_ma))
 
+    levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
+    cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
     if cont is True:
-        levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
-        cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
             #print(np.shape(cfad_ma),np.shape(hts),'ln 1283')
             pc = ax.contourf(vbins[0:-1],hts,cfad_ma,levs,colors=cols,extend = 'both')
@@ -1550,7 +1569,7 @@ def plot_cfad(fig,cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=N
     else:
 
         if levels is not None:
-            cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
+            cmap, norm = from_levels_and_colors(levs,cols) # mention levels and colors here
             #print cmap
             pc = ax.pcolormesh(vbins, hts, cfad_ma, norm=norm, cmap=cmap)
         else:
