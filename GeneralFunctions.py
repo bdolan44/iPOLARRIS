@@ -119,7 +119,7 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
 #############################################################################################################
 
 def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.0, above=2.0, below=15.0, bins=None, 
-        log=False, pick=None, ylim=None, xlim=None, cbyes=0, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
+        log=False, pick=None, ylim=None, xlim=None, xlab=None, cbyes=0, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
 
     if hts is None:
         print ('please provide nominal heights to cfad_plot')
@@ -176,11 +176,10 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
             
             pc = ax.pcolormesh(bins, reshts, cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
 
-    ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
+    ax.set_xlabel(xlab,fontsize=16)
     ax.tick_params(axis='both', which='major', labelsize=16)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax.set_xticks(np.linspace(np.min(xlim),np.max(xlim),7))
     if cbyes == 1:
         lur,bur,wur,hur = ax.get_position().bounds
         cbar_ax_dims = [lur+wur+0.02,bur,0.02,hur]
