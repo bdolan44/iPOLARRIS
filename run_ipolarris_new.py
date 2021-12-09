@@ -73,15 +73,13 @@ print('\n#################################################')
 print('####### Returning to run_ipolarris_new.py #######')
 print('#################################################')
 
-config['image_dir'] = config['image_dir']+\
-        config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
-        config['type']+'/'
 #print(,'EXTRA 1 is')
 
 # If a second argument is passed for WRF config file, produce a bunch of comparison plots!
 # More comments in this section TBD!
 if sys.argv[2:]:
-    
+ 
+  
     print('\n#################################################')
     print('############ Calling polarris_driver_new.py #####')
     print('#################################################')
@@ -90,22 +88,29 @@ if sys.argv[2:]:
     configfile1 = sys.argv[2:]
     rdata2, config2, config2['uname'], config2['vname'], config2['wname'] = polarris_driver(configfile1)
 
+    config2['image_dir'] = config2['image_dir']+\
+        config2['exper']+'_'+config2['sdatetime']+'_'+config2['edatetime']+'/'+\
+        config2['type']+'-'+config2['mphys']+'/'
+ 
     print('\nSIM MODE.')
     
     print('\nIN RUN_IPOLARRIS_NEW... creating CFAD COMPARISON figures.')
     print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
  
-    outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
+    outdir = config2['image_dir']+'composite_'+rdata.dz_name+'/'
     os.makedirs(outdir,exist_ok=True)
     
-    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=False,cscfad=False)
-    ax[0].set_title(rdata.exper)
-    ax[1].set_title(rdata2.exper)
-    ax[2].set_title("{e} - {v}".format(e=rdata.exper,v=rdata2.exper))    
-    plt.suptitle("Reflectivity")
-    plt.savefig('{d}CFAD_diff_{e1}_{e2}_{c}{l}.{p}'.format(p=config['ptype'],d=outdir,c='ALL',e1=rdata.exper,e2=rdata2.exper,l='reflectivity'),dpi=400,bbox_inches='tight')
-    plt.close()
+    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=False,cscfad=False,xlim=[0,np.max(config['dzbins'])+1],ylim=config['zlim'],nor=15)
+    ax[0].set_title(rdata.exper,fontsize=16,fontweight='bold')
+    ax[0].set_ylabel('Height (km MSL)',fontsize=16)
+    ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
+    ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
+    plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys,v=rdata.dz_name),dpi=400,bbox_inches='tight')
+    plt.close(fig)
 
+    print('\nDone! Saved to '+outdir)
+    print('Moving on.\n')
+    
     '''
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,'Z$_{dr}$',config,config2,bins=np.arange(-2,8,0.2),savefig=True,cscfad=False)
     
@@ -143,6 +148,10 @@ else:
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
 
     print('\nOBS MODE.')
+
+    config['image_dir'] = config['image_dir']+\
+        config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
+        config['type']+'/'
 
     if (config['compo_ref'] | config['all1']):
     
