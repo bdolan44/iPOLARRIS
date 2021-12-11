@@ -2610,14 +2610,12 @@ class RadarData(RadarConfig.RadarConfig):
 #            print('in d version of looped')
             looped = np.arange(0, int(self.data[self.z_name].values.shape[1]), multiple)
 #            print('looped',looped)
-            vol = np.zeros(int(self.data[self.z_name].values.shape[1]/multiple))
-            hts = np.zeros(int(self.data[self.z_name].values.shape[1]/multiple))
+            vol = np.zeros(int(self.data[self.z_name].values.shape[1]/multiple)+1)
+            hts = np.zeros(int(self.data[self.z_name].values.shape[1]/multiple)+1)
         else:
             looped = np.arange(0, int(self.data[self.z_name].values.shape[0]), multiple)
             vol = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
             hts = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
-            
-#        print (looped,multiple)
         for vi,vl in enumerate(looped):
             lev_hid = data[:,vl:vl+multiple,...] # go to vl+multiple cuz not inclusive
             #print 'lev_hid',np.shape(lev_hid)
@@ -2722,9 +2720,10 @@ class RadarData(RadarConfig.RadarConfig):
         labs = np.array(self.species)
         #print(labs)
         cb.set_ticklabels(labs)
+        cb.ax.tick_params(labelsize=16)
         return cb
 
-    def plot_hid_cdf(self, data=None, z_resolution=1.0, ax=None, pick=None,cscfad = None):
+    def plot_hid_cdf(self, ylab=1, cbar=1, data=None, z_resolution=1.0, ax=None, pick=None,cscfad = None):
         # this will just plot it
         ts=np.array(self.date)[0]
         if data is not None:
@@ -2757,18 +2756,22 @@ class RadarData(RadarConfig.RadarConfig):
                 #ax.barh(vl, data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec+1], edgecolor = 'none')
 
         ax.set_xlim(0,100)
-        ax.set_xlabel('Cumulative frequency (%)')
-        ax.set_ylabel('Height (km MSL)')
+        ax.set_xlabel('Cumulative Frequency (%)',fontsize=16)
+        ax.tick_params(axis='x',which='major',labelsize=16)
+        
+        if ylab == 1:
+            ax.set_ylabel('Height (km MSL)',fontsize=16)
+            ax.tick_params(axis='y',which='major',labelsize=16)
+        else:
+            ax.tick_params(axis='y',which='major',labelsize=0)
+            ax.set_yticks([])
+            ax.set_yticklabels([])
+        
         # now have to do a custom colorbar?
-
-        lur,bur,wur,hur = ax.get_position().bounds
-        cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
-        #cbar_ax = fig.add_axes(cbar_ax_dims)
-        #cbt = plt.colorbar(pc,cax=cbar_ax)
-        #cbt.ax.tick_params(labelsize=16)
-        #cbt.set_label('Frequency (%)', fontsize=16, rotation=270, labelpad=20)
-
-        self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+        if cbar == 1:  # call separate HID colorbar function for bar plots
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.02,hur]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
 
             #fig.suptitle('%04d/%02d/%02d - %02d:%02d:%02d %s, cell %d, HID CDF' \
             #                %(self.year,self.month,self.date,self.hour,self.minute,self.second, \
