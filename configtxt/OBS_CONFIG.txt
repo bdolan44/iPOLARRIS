@@ -92,7 +92,7 @@ t_name	==	T	==  # Name of the temperature field
 #----------------------------------------------------------
 
 # SET 1) Plots created in run_ipolarris_new.py
-all1		    == False	    == # Set to True to output ALL figures in SET 1 below
+all1		    == True	    == # Set to True to output ALL figures in SET 1 below
 compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
@@ -101,17 +101,17 @@ vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflec
 refcfad		    == False	    == # 6) Set to True to plot CFAD of reflectivity with height
 
 # Text files created in run_ipolarris_new.py
-all2			    == False	    == # Set to TRUE to output ALL text files in SET 2 below
+all2			    == True	    == # Set to TRUE to output ALL text files in SET 2 below
 rrstats_txt		    == False	    == # 7)
 rrhist_txt		    == False	    == # 8)
 rrstats_areas_txt	== False	    == # 9)
 percentiles_txt		== False	    == # 10)
 
 # Plots created in plot_driver.py
-all3			    == False	    == Set to TRUE to output ALL figures in SET 3 below
+all3			    == True	    == Set to TRUE to output ALL figures in SET 3 below
 cfad_multi		    == False	    == # 13) Set to True to plot 4-panel of CFADs of Z, ZDR, KDP and W
 hist_multi		    == False	    == # 15) Set to True to plot 4-panel of comparison figures between various polarimetric vars
-cfad_individ		== True 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W, RHO and HID
+cfad_individ		== False 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W, RHO and HID
 hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grouped HID species with height
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
 cappi_multi		    == False	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
@@ -136,8 +136,8 @@ convert_Tk_Tc	== False	== # Convert temperature in K to deg C
 
 # Args
 image_dir	== './outputfig/'	== # Output figure directory
-ptype		== 'png'		== # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
-cb_friendly	== True			== # Use color-blindness palette for output (i.e. reflectivity)
+ptype		== 'png'		    == # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
+cb_friendly	== True			    == # Use color-blindness palette for output (i.e. reflectivity)
 
 # Constant-Altitude Plan-Position Indicator (CAPPI) 
 xlim	== [-200,200]		==#lat / lon zoom for CAPPIS
