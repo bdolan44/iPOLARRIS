@@ -43,7 +43,7 @@ import xarray as xr
 
 # Import iPOLARRIS functions
 import GeneralFunctions as GF
-from polarris_driver_new import polarris_driver
+from polarris_driver import polarris_driver
 import plot_driver
 import RadarData
 import RadarConfig
