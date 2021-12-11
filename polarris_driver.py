@@ -208,7 +208,7 @@ def polarris_driver(configfile):
     #print('Finding and concatenating radar files in '+config['rfiles']+'...')
     #print((config['exper']),(config['mphys']))
     print('Station/experiment: '+config['exper'])
-    print('Input: '+config['mphys'])
+    print('Input: '+config['mphys'].upper())
     print('Start: '+config['sdatetime'])
     print('End: '+config['edatetime'])
     time.sleep(3)
