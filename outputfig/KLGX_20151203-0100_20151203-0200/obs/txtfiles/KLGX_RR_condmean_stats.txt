@@ -1,3 +1,0 @@
- Date   Conv_RR   Strat_RR   Tot_RR 
- 20151203-010200  nan nan nan
- 20151203-010607  nan nan nan
