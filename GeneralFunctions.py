@@ -157,7 +157,7 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
 
     # plot the CFAD
     cfad_ma = np.ma.masked_where(cfad==0, cfad)
-    print(np.shape(cfad_ma),'cfad shape')
+    #print(np.shape(cfad_ma),'cfad shape')
     levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
     cols = ['lightgrey','silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet','thistle']
     if cont is True:
