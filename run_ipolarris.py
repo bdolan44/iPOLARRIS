@@ -19,7 +19,7 @@ if usersays.lower().startswith('x'):
     import sys
     sys.exit()
 else: 
-    print('\niPOLARRIS INITIATING... If Conda env activated, no import errors...\n')
+    print('\niPOLARRIS INITIATING... If Conda env activated, no import errors...')
     import time
     time.sleep(3)
 
@@ -55,7 +55,7 @@ time.sleep(3)
 
 print('\nSUCCESS! Requisite packages loaded.')
 
-if len(sys.argv) > 1:
+if len(sys.argv) > 2:
     print('\n***Entering SIMULATION MODE: you are about to compare radar observations with simulated radar observables created from wrfout files by POLARRIS-f!***')
 else:
     print('\n***Entering OBSERVATION MODE: you are about to analyze radar observations recorded by a station!***')
@@ -110,7 +110,7 @@ if sys.argv[2:]:
     os.makedirs(outdir,exist_ok=True)
         
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[np.min(config['dzbins']),np.max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
-    ax[0].set_title(rdata.exper,fontsize=16,fontweight='bold')
+    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
     ax[0].set_ylabel('Height (km MSL)',fontsize=16)
     ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
     ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
@@ -122,7 +122,7 @@ if sys.argv[2:]:
     print('\nPlotting composites by time for variable '+rdata.zdr_name+'...')
     
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,config,bins=config['drbins'],xlab=rdata.longnames[rdata.zdr_name]+' '+rdata.units[rdata.zdr_name],cscfad=False,xlim=[np.min(config['drbins']),np.max(config['drbins'])+1],ylim=config['zlim'],nor=3)
-    ax[0].set_title(rdata.exper,fontsize=16,fontweight='bold')
+    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
     ax[0].set_ylabel('Height (km MSL)',fontsize=16)
     ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
     ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
@@ -134,7 +134,7 @@ if sys.argv[2:]:
     print('\nPlotting composites by time for variable '+rdata.kdp_name+'...')
 
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,config,bins=config['kdbins'],xlab=rdata.longnames[rdata.kdp_name]+' '+rdata.units[rdata.kdp_name],cscfad=False,xlim=[np.min(config['kdbins']),np.max(config['kdbins'])+1],ylim=config['zlim'],nor=3)
-    ax[0].set_title(rdata.exper,fontsize=16,fontweight='bold')
+    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
     ax[0].set_ylabel('Height (km MSL)',fontsize=16)
     ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
     ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
@@ -148,7 +148,7 @@ if sys.argv[2:]:
     #fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
     
     fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
-    ax[0].set_title(rdata.exper,fontsize=16,fontweight='bold')
+    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
     ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
     plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.hid_name),dpi=400,bbox_inches='tight')
     plt.close(fig)
