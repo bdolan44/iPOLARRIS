@@ -1,5 +1,5 @@
 #===================================================
-#============== RUN_IPOLARRIS_NEW.PY ===============
+#================ RUN_IPOLARRIS.PY =================
 #===================================================
 
 import sys
@@ -55,22 +55,29 @@ time.sleep(3)
 
 print('\nSUCCESS! Requisite packages loaded.')
 
+if len(sys.argv) > 1:
+    print('\n***Entering SIMULATION MODE: you are about to compare radar observations with simulated radar observables created from wrfout files by POLARRIS-f!***')
+else:
+    print('\n***Entering OBSERVATION MODE: you are about to analyze radar observations recorded by a station!***')
+
+time.sleep(5)
+
 print('\n#############################################')
-print('####### Starting run_ipolarris_new.py #######')
+print('########## Starting run_ipolarris.py ########')
 print('#############################################')
 
 configfile = sys.argv[1:] # Feed config file name as arg
 #print sys.argv[1:]
 
-print('\n#################################################')
-print('############ Calling polarris_driver_new.py #####')
-print('#################################################')
+print('\n##########################################################')
+print('############ Calling polarris_driver.py to read in obs ###')
+print('##########################################################')
 time.sleep(3)
 
 rdata, config, config['uname'], config['vname'], config['wname'] = polarris_driver(configfile)
 
 print('\n#################################################')
-print('####### Returning to run_ipolarris_new.py #######')
+print('########## Returning to run_ipolarris.py ########')
 print('#################################################')
 
 #print(,'EXTRA 1 is')
@@ -78,22 +85,24 @@ print('#################################################')
 # If a second argument is passed for WRF config file, produce a bunch of comparison plots!
 # More comments in this section TBD!
 if sys.argv[2:]:
- 
-  
-    print('\n#################################################')
-    print('############ Calling polarris_driver_new.py #####')
-    print('#################################################')
+   
+    configfile1 = sys.argv[2:]
+
+    print('\n###############################################################')
+    print('############ Calling polarris_driver.py to read in sim data ###')
+    print('###############################################################')
     time.sleep(3)
 
-    configfile1 = sys.argv[2:]
     rdata2, config2, config2['uname'], config2['vname'], config2['wname'] = polarris_driver(configfile1)
+
+    print('\n#################################################')
+    print('########## Returning to run_ipolarris.py ########')
+    print('#################################################')
 
     config2['image_dir'] = config2['image_dir']+\
         config2['exper']+'_'+config2['sdatetime']+'_'+config2['edatetime']+'/'+\
         config2['type']+'-'+config2['mphys']+'/'
  
-    print('\nSIM MODE.')
-    
     print('\nIN RUN_IPOLARRIS_NEW... creating CFAD COMPARISON figures.')
     print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
  
@@ -155,7 +164,7 @@ if sys.argv[2:]:
 
     fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad='convective',savefig=True)
     '''
-    print('\niPOLARRIS RUN COMPLETE FOR '+config['mphys'].upper()+' '+config['sdatetime']+' - '+config['edatetime']+'\n')
+    print('\niPOLARRIS RUN COMPLETE FOR '+config2['mphys'].upper()+' '+config['sdatetime']+' - '+config['edatetime']+'\n')
 
 ################################################################################
 ################## Now you can just start plotting! ############################
@@ -172,8 +181,6 @@ else:
     # tdate = datetime.datetime(2011,5,23,22,00)
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-
-    print('\nOBS MODE.')
 
     config['image_dir'] = config['image_dir']+\
         config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
