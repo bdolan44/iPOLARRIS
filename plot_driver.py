@@ -1467,12 +1467,12 @@ def plot_hid_comparison_cfad(rdata1,rdata2,z_res=1.0,config=None,n1=None,n2=None
     hidtest1,hts1 = rdata1.hid_cdf(z_resolution=z_res,cscfad=cscfad)
     hidtest2,hts2 = rdata2.hid_cdf(z_resolution=z_res,cscfad=cscfad)
     
-    fig, ax = plt.subplots(1,2,figsize=(18,8))
-    axf = ax.flatten()
+    fig, bigax = plt.subplots(1,2,figsize=(14,8),gridspec_kw={'hspace': 0.05, 'wspace': 0.1})
+    axf = bigax.flatten()
   
-    fig,ax = plot_hid_cdf(hidtest1,hts1,rdata1,ax=axf[0])
-    fig,ax = plot_hid_cdf(hidtest2,hts2,rdata2,ax=axf[1])
-    
+    fig,ax = rdata1.plot_hid_cdf(ylab=1,cbar=0,ax=axf[0])
+    fig,ax = rdata2.plot_hid_cdf(ylab=0,cbar=1,ax=axf[1])
+    '''    
     if n1 is None:
         n1 = rdata1.exper
     if n2 is None:
@@ -1494,9 +1494,8 @@ def plot_hid_comparison_cfad(rdata1,rdata2,z_res=1.0,config=None,n1=None,n2=None
         return fig, axf
     else:
         return fig,axf
-    
-    
-    
+    '''
+    return fig,axf
 
 def cfad(data,rdata,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_z=0,z_resolution=1.0,cscfad = False):
 # pick a variable and do a CFAD for the cell
