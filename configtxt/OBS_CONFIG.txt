@@ -20,11 +20,11 @@ sdatetime_format	    == %Y%m%d-%H%M		== # Start time format
 edatetime		        == '20151203-0400'	== # End time of analysis of interest
 edatetime_format	    == %Y%m%d-%H%M		== # End time format
 
-date		    == '20151203'			        == # Date of the case
-rfiles		    == './inputtxt/radfiles.txt'	== # Input directory of radar files to read in
-rdate_format	== %Y%m%d_%H%M%S		        == # Format for the radar file date
-rdend		    == 20				            == # End of date timestamp in radar filename
-rdstart		    == 5				            == # Start of date timestamp in radar filename
+date		    == '20151203'			                    == # Date of the case
+rfiles		    == './inputtxt/testing/test_radfiles.txt'	== # Input directory of radar files to read in
+rdate_format	== %Y%m%d_%H%M%S		                    == # Format for the radar file date
+rdend		    == 20				                        == # End of date timestamp in radar filename
+rdstart		    == 5				                        == # Start of date timestamp in radar filename
 
 # Variables (NOTE: use NCDUMP to locate variable names of radar observables and info)
 dz_name		== REF		            == # Name of the reflectivity field
@@ -57,10 +57,10 @@ alt	== 354	== # Altitude of the radar
 dd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
-dfiles		    == ./inputtxt/doppfiles.txt	    == # Location of dual-Doppler files
-ddate_format	== %Y%m%d_%H%M%S		        == # Format for the dual-Doppler file date
-ddstart	    	== 10				            == # Offset for dual-Doppler timestamp in filename
-ddend		    == 25				            == # Offset for dual-Doppler timestamp in filename
+dfiles		    == ./inputtxt/testing/test_doppfiles.txt	    == # Location of dual-Doppler files
+ddate_format	== %Y%m%d_%H%M%S		                        == # Format for the dual-Doppler file date
+ddstart	    	== 10				                            == # Offset for dual-Doppler timestamp in filename
+ddend		    == 25				                            == # Offset for dual-Doppler timestamp in filename
 
 # Variables (NOTE: use NCDUMP to locate variable names of Doppler radar fields and info)
 convname	== None			        == # Name of 
@@ -72,12 +72,12 @@ convname	== None			        == # Name of
 snd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
-ad		        == config['date']+'_'		    == # Extra characters
-sdate_format	== %Y%m%d_%H%M%S		        == # Sounding file date format
-sfiles		    == ./inputtxt/soundfiles.txt	== # Sounding file directory
-sdstart		    == 4				            == # Offset for date timestamp in radar filename 
-sdend		    == 19				            == # Number of characters in timestamp on radar file
-sstat		    == UIL				            == # Sounding station identification
+ad		        == config['date']+'_'		                == # Extra characters
+sdate_format	== %Y%m%d_%H%M%S		                    == # Sounding file date format
+sfiles		    == ./inputtxt/testing/test_soundfiles.txt	== # Sounding file directory
+sdstart		    == 4				                        == # Offset for date timestamp in radar filename 
+sdend		    == 19				                        == # Number of characters in timestamp on radar file
+sstat		    == UIL				                        == # Sounding station identification
 
 # Variables
 t_name	==	T	==  # Name of the temperature field
