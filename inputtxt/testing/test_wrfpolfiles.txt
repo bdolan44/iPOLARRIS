@@ -1,0 +1,2 @@
+samples/wrfout_06_d03_2015-12-03_03:00:00.POLARRIS.matsui2018.nc
+samples/wrfout_06_d03_2015-12-03_03:05:00.POLARRIS.matsui2018.nc
