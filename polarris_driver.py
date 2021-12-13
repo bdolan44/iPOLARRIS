@@ -267,6 +267,10 @@ def polarris_driver(configfile):
         print('Dims do not need renaming')
     #print('Current dimensions:',rvar.dims)
 
+    #print(np.min(rvar.dimensions[config['xname']].values),np.max(rvar.dimensions[config['xname']].values))
+    #print(np.min(rvar.dimensions[config['yname']].values),np.max(rvar.dimensions[config['yname']].values))
+    #input()
+
     if drop_vars == True:
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
@@ -410,9 +414,9 @@ def polarris_driver(configfile):
                     # and then will take the heights and temps
         rdata.interp_sounding()
 
-    if config['convert_Tk_Tc'] == True:
-        print('converting T')
-        rdata.convert_t()
+    #if config['convert_Tk_Tc'] == True:
+    #    print('converting T')
+    #    rdata.convert_t()
     #print 'Calculating polarimetric fields like HID and rain...'
     #if config['pol_on'] == True:
     if config['mask_model'] == True:
