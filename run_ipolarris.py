@@ -101,57 +101,63 @@ if sys.argv[2:]:
 
     config2['image_dir'] = config2['image_dir']+\
         config2['exper']+'_'+config2['sdatetime']+'_'+config2['edatetime']+'/'+\
-        config2['type']+'-'+config2['mphys']+'/'
- 
-    print('\nIN RUN_IPOLARRIS_NEW... creating CFAD COMPARISON figures.')
-    print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
- 
-    outdir = config2['image_dir']+'cfad_diff_individ/'
-    os.makedirs(outdir,exist_ok=True)
-        
-    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[np.min(config['dzbins']),np.max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
-    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
-    ax[0].set_ylabel('Height (km MSL)',fontsize=16)
-    ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
-    ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
-    plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.dz_name),dpi=400,bbox_inches='tight')
-    plt.close(fig)
+        config2['mphys']+'/'
 
-    print('\nDone! Saved to '+outdir)
-    print('Moving on.')
-    print('\nPlotting composites by time for variable '+rdata.zdr_name+'...')
-    
-    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,config,bins=config['drbins'],xlab=rdata.longnames[rdata.zdr_name]+' '+rdata.units[rdata.zdr_name],cscfad=False,xlim=[np.min(config['drbins']),np.max(config['drbins'])+1],ylim=config['zlim'],nor=3)
-    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
-    ax[0].set_ylabel('Height (km MSL)',fontsize=16)
-    ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
-    ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
-    plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.zdr_name),dpi=400,bbox_inches='tight')
-    plt.close(fig)
+    if (config2['cfad_individ'] | config2['all3']):
 
-    print('\nDone! Saved to '+outdir)
-    print('Moving on.')
-    print('\nPlotting composites by time for variable '+rdata.kdp_name+'...')
-
-    fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,config,bins=config['kdbins'],xlab=rdata.longnames[rdata.kdp_name]+' '+rdata.units[rdata.kdp_name],cscfad=False,xlim=[np.min(config['kdbins']),np.max(config['kdbins'])+1],ylim=config['zlim'],nor=3)
-    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
-    ax[0].set_ylabel('Height (km MSL)',fontsize=16)
-    ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
-    ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
-    plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.kdp_name),dpi=400,bbox_inches='tight')
-    plt.close(fig)
-
-    print('\nDone! Saved to '+outdir)
-    print('Moving on.')
-    print('\nPlotting composites by time for variable '+rdata.hid_name+'...')
+        print('\nIN RUN_IPOLARRIS... creating CFAD COMPARISON figures.')
+        print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
      
-    #fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
-    
-    fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
-    ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
-    ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
-    plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.hid_name),dpi=400,bbox_inches='tight')
-    plt.close(fig)
+        outdir = config2['image_dir']+'cfad_diff_individ/'
+        os.makedirs(outdir,exist_ok=True)
+            
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[np.min(config['dzbins']),np.max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
+        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_ylabel('Height (km MSL)',fontsize=16)
+        ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
+        ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
+        plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.dz_name),dpi=400,bbox_inches='tight')
+        plt.close(fig)
+
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.')
+        print('\nPlotting composites by time for variable '+rdata.zdr_name+'...')
+        
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,config,bins=config['drbins'],xlab=rdata.longnames[rdata.zdr_name]+' '+rdata.units[rdata.zdr_name],cscfad=False,xlim=[np.min(config['drbins']),np.max(config['drbins'])+1],ylim=config['zlim'],nor=3)
+        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_ylabel('Height (km MSL)',fontsize=16)
+        ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
+        ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
+        plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.zdr_name),dpi=400,bbox_inches='tight')
+        plt.close(fig)
+
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.')
+        print('\nPlotting composites by time for variable '+rdata.kdp_name+'...')
+
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,config,bins=config['kdbins'],xlab=rdata.longnames[rdata.kdp_name]+' '+rdata.units[rdata.kdp_name],cscfad=False,xlim=[np.min(config['kdbins']),np.max(config['kdbins'])+1],ylim=config['zlim'],nor=3)
+        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_ylabel('Height (km MSL)',fontsize=16)
+        ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
+        ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
+        plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.kdp_name),dpi=400,bbox_inches='tight')
+        plt.close(fig)
+
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.')
+        print('\nPlotting composites by time for variable '+rdata.hid_name+'...')
+         
+        #fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
+        
+        fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
+        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
+        plt.setp(ax, ylim=[0,14])
+        plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.hid_name),dpi=400,bbox_inches='tight')
+        plt.close(fig)
+
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.')
 
     '''
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=True,cscfad='convective')
@@ -184,7 +190,7 @@ else:
 
     config['image_dir'] = config['image_dir']+\
         config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
-        config['type']+'/'
+        config['mphys']+'/'
 
     if (config['compo_ref'] | config['all1']):
     
