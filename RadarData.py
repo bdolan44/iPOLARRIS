@@ -334,9 +334,10 @@ class RadarData(RadarConfig.RadarConfig):
 
     def convert_t(self):    
         # if want to pass a dictionary already
-        self.T = np.ma.masked_less(self.T, 0)
+        #self.T = np.ma.masked_less(self.T, 0)
         #self.T.values=np.ma.masked_less(self.T.values,0)
-        self.T = self.T - 273.15
+        self.T = self.T #- 273.15
+        
         #self.T.values = self.T.values-273.15
         
 #############################################################################################################
@@ -352,12 +353,17 @@ class RadarData(RadarConfig.RadarConfig):
             vrcomp = self.data[self.vr_name].sel(d=0).max(axis=0).values
             whmask = np.where(vrcomp > -50)
             
-            x,y = self.convert_ll_to_xy(self.data[self.y_name].sel(d=0),self.data[self.x_name].sel(d=0))
-            
+            if 'd' in self.data[self.x_name].dims:
+                x,y = self.convert_ll_to_xy(self.data[self.lat_name].sel(d=0),self.data[self.lon_name].sel(d=0))
+                dx = np.average(np.diff(x.sel(y=0)))
+                dy = np.average(np.diff(y.sel(x=0)))
+            else:
+                x,y = self.convert_ll_to_xy(self.data[self.lat_name],self.data[self.lon_name])
+                dx = np.average(np.diff(x))
+                dy = np.average(np.diff(y))
+
             self.x = x.values
             self.y = y.values
-            dx = np.average(np.diff(x.sel(y=0)))
-            dy = np.average(np.diff(y.sel(x=0)))
             self.dx = dx
             self.dy = dy
             dummy=np.zeros_like(vrcomp)
