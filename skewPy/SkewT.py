@@ -12,6 +12,7 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
+import re
 
 from .thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
     VirtualTempFromMixR,MixR2VaporPress,DewPoint,Theta,TempK
@@ -950,8 +951,11 @@ class Sounding(UserDict):
                     findstat = np.where([x.isalpha() for x in str(header)])[0]
                     self.station = header[min(findstat):max(findstat)+1]
                     dstr = (' ').join(header.split()[-5:-4])
-                    self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d").strftime("%Y-%m-%d_%H:%M:%S") 
-            
+                    try:
+                        self.sounding_date = datetime.strptime(dstr, "%Y-%m-%d").strftime("%Y-%m-%d_%H:%M:%S") 
+                    except ValueError:
+                        self.sounding_date = datetime.strptime(dstr, '"%Y-%m-%d_%H:%M:%S"').strftime("%Y-%m-%d_%H:%M:%S")
+                
                 if self.station_name is not None: self.station = self.station_name
             
                 lhi=[1, 9,16,23,30,37,46,53,58,65,72]
