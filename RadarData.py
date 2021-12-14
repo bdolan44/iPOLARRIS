@@ -3007,7 +3007,7 @@ class RadarData(RadarConfig.RadarConfig):
         #First calculate the domain averaged rain rates at a given level.
         #if self.rr_name is not None:
         #    rr_timeseries_uncond = rr.mean(dim=['x','y','z'],skipna=True)
-        data = deepcopy(self.data[var].sel(z=slice(ht_lev,ht_lev+1)))
+        data = deepcopy(self.data[var].sel(z=slice(int(ht_lev),int(ht_lev)+1)))
         whbad= np.where(data.values<thresh)
 
         if make_zeros==True:
