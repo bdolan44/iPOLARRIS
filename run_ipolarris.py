@@ -105,12 +105,12 @@ if sys.argv[2:]:
         config2['mphys']+'/'
 
     if (config2['cfad_individ'] | config2['all3']):
-
-        print('\nIN RUN_IPOLARRIS... creating CFAD COMPARISON figures.')
-        print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
-     
+        
         outdir = config2['image_dir']+'cfad_diff_individ/'
         os.makedirs(outdir,exist_ok=True)
+        
+        print('\nIN RUN_IPOLARRIS... creating CFAD COMPARISON figures.')
+        print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
             
         fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[np.min(config['dzbins']),np.max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
         ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
@@ -149,11 +149,10 @@ if sys.argv[2:]:
         print('\nPlotting composites by time for variable '+rdata.hid_name+'...')
          
         #fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
-        
         fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
         ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
-        plt.setp(ax, ylim=[0,14])
+        plt.setp(ax, ylim=[0,10])
         plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.hid_name),dpi=400,bbox_inches='tight')
         plt.close(fig)
 
