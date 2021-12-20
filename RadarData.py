@@ -2714,16 +2714,17 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def HID_barplot_colorbar(self, figure, location = [0.9, 0.1, 0.03, 0.8]):
+    def HID_barplot_colorbar(self, figure, location = [0.9, 0.1, 0.03, 0.8], orientation='vertical', names='shortnames'):
 
         scalarMap = plt.cm.ScalarMappable(norm=self.normhid,cmap=self.hid_cmap)
         axcb = figure.add_axes(location) # x pos, y pos, x width, y width
-        cb = mpl.colorbar.ColorbarBase(axcb, cmap=self.hid_cmap, norm=self.normhid, boundaries=self.boundshid, orientation = 'vertical')
+        cb = mpl.colorbar.ColorbarBase(axcb, cmap=self.hid_cmap, norm=self.normhid, boundaries=self.boundshid, orientation = orientation)
         #cb.set_ticks(np.arange(0,10))
         cb.set_ticks(np.arange(len(self.species))+0.5)
             # need to add a blank at the beginning of species to align labels correctly
         #labs = np.concatenate((np.array(['']), np.array(self.species)))
-        labs = np.array(self.species)
+        if names.startswith('long'): labs = np.array(self.species_long)
+        else: labs = np.array(self.species)
         #print(labs)
         cb.set_ticklabels(labs)
         cb.ax.tick_params(labelsize=16)
@@ -2778,6 +2779,11 @@ class RadarData(RadarConfig.RadarConfig):
             lur,bur,wur,hur = ax.get_position().bounds
             cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.02,hur]
             self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+        
+        if cbar == 2:
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur,bur-0.13,2*wur+0.04,0.03]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')  # call separate HID colorbar function for bar plots
 
             #fig.suptitle('%04d/%02d/%02d - %02d:%02d:%02d %s, cell %d, HID CDF' \
             #                %(self.year,self.month,self.date,self.hour,self.minute,self.second, \
