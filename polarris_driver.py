@@ -130,6 +130,8 @@ def find_snd_match(config):
         
     return msfiles
 
+#def find_wrf_match(inradfiles,inwrfoutfiles):
+
 def foo(s1):
     return '{}'.format(s1.rstrip())
 
@@ -272,7 +274,7 @@ def polarris_driver(configfile):
     #print(np.min(rvar.dimensions[config['yname']].values),np.max(rvar.dimensions[config['yname']].values))
     #input()
 
-    if drop_vars == True:
+    if drop_vars:
         print("dropping extra variables for memory!")
         rvar= rvar.drop(['vrad03','vdop02','elev03','elev02','vdop03','vang02','vang03','vrad02','zhh02','zhh03','zdr02','zdr03','kdp02','kdp03','rhohv02','rhohv03'])
  
@@ -296,7 +298,7 @@ def polarris_driver(configfile):
     # (4) 
     # =====
 
-    if config['dd_on']==True:
+    if config['dd_on']:
         print('In your config file, dd_on is set to True.')
         time.sleep(3)
         with open(config['dfiles'], 'r') as g:
@@ -398,29 +400,29 @@ def polarris_driver(configfile):
     
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=Uname,v=Vname,w=Wname,conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
 
-    if config['snd_on'] == True:
+    if config['snd_on']:
         print('In your config file, snd_on is set to True.')
         time.sleep(3)
         smatch = find_snd_match(config)
-        #print("rfiles",rfiles[0],smatch)
-        sfile = smatch[rfiles[0]]
-        print('Matching Sounding')
-    else:
-        smatch = None
-                                          
-    if smatch is not None:
-        print ('Found sounding match!',sfile,'\n')
-        snd = SkewT.Sounding(sfile)
-        rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
+        if len(smatch) > 0:
+            sfile = smatch[rfiles[0]]
+            print ('Found sounding match!',sfile,'\n')
+            snd = SkewT.Sounding(sfile)
+            rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
                     # and then will take the heights and temps
-        rdata.interp_sounding()
+            rdata.interp_sounding()
+    
+    elif config['wrfT_on']:
+        print('In your config file, snd_on is set to True.')
+        time.sleep(3)
+
 
     #if config['convert_Tk_Tc'] == True:
     #    print('converting T')
     #    rdata.convert_t()
     #print 'Calculating polarimetric fields like HID and rain...'
     #if config['pol_on'] == True:
-    if config['mask_model'] == True:
+    if config['mask_model']:
         print('masking model data')
         rdata.mask_model()
         
@@ -429,7 +431,7 @@ def polarris_driver(configfile):
     rdata.calc_cs_shy(cs_z=config['cs_z'])
     rdata.raintype=rdata.data['CSS'].values#    rdata.set_hid()
     
-    if config['comb_vicr'] == True:
+    if config['comb_vicr']:
         whvi = np.where(rdata.hid == 6)
         rdata.hid[whvi] = 3
   
