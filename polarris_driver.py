@@ -178,8 +178,8 @@ def reduce_dim(ds):
     for v in ds.data_vars.keys():
         try:
             ds[v]=ds[v].sel(time=t1).drop('time')
-        #except KeyError as k:
-        except ValueError as e:
+        except KeyError as k:
+        #except ValueError as e:
             pass
 #            print(e)
 #            print(v)
@@ -431,7 +431,19 @@ def polarris_driver(configfile):
         Wname = None
 
     print('\nSending data to RadarData...')
-    
+ 
+    if config['wrft_on']:
+        print('In your config file, wrft_on is set to True.')
+        time.sleep(3)
+        wmatch = find_wrfpol_match(config)
+        if len(wmatch) > 0:
+            print ('Found POLARRIS-f files! ',list(wmatch.values()),'\n')
+            try:
+                tvar = xr.open_mfdataset(list(wmatch.values()),concat_dim='d')
+            except ValueError as ve:
+                tvar = xr.open_mfdataset(list(wmatch.values()),combine='nested',concat_dim='d')
+            rvar[config['t_name']] = tvar['t_air']-273.15
+
     rdata = RadarData.RadarData(rvar,tm,ddata = None,dz=config['dz_name'],zdr=config['dr_name'],kdp=config['kd_name'],rho=config['rh_name'],temp=config['t_name'],u=Uname,v=Vname,w=Wname,conv=config['convname'],x=config['xname'],rr=config['rr_name'],band = config['band'],vr = config['vr_name'],lat_r=config['lat'],lon_r=config['lon'],y=config['yname'],z=config['zname'],lat=config['latname'], lon=config['lonname'],lat_0=config['lat'],lon_0=config['lon'],exper=config['exper'],mphys=config['mphys'],radar_name =config['radarname'],z_thresh=0,conv_types=config['conv_types'],strat_types=config['strat_types'],color_blind=config['cb_friendly'])
 
     if config['snd_on']:
@@ -446,17 +458,6 @@ def polarris_driver(configfile):
                     # and then will take the heights and temps
             rdata.interp_sounding()
     
-    elif config['wrft_on']:
-        print('In your config file, wrft_on is set to True.')
-        time.sleep(3)
-        wmatch = find_wrfpol_match(config)
-        if len(wmatch) > 0:
-            print ('Found sounding match!',sfile,'\n')
-            rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
-                    # and then will take the heights and temps
-            rdata.interp_sounding()
- 
-
     #if config['convert_Tk_Tc'] == True:
     #    print('converting T')
     #    rdata.convert_t()

@@ -33,6 +33,7 @@ kd_name		== KDP		            == # Name of the Kdp field
 rh_name		== RHO		            == # Name of the RhoHV field
 rr_name		== None		            == # Name of the Rain rate / precipitation field
 vr_name		== VEL		            == # Name of radial velocity field
+t_name	    == T	                ==  # Name of the temperature field
 uname		== eastward_wind	    == # Name of the zonal wind field
 vname		== northward_wind	    == # Name of the meridional wind field
 wname		== upward_air_velocity	== # Name of the vertical wind field
@@ -79,9 +80,6 @@ sdstart		    == 4				                        == # Offset for date timestamp in r
 sdend		    == 19				                        == # Number of characters in timestamp on radar file
 sstat		    == UIL				                        == # Sounding station identification
 
-# Variables
-#t_name	==	T	==  # Name of the temperature field
-
 #-------------------------------------------
 #------ POL-f File Reading (Optional) ------
 #-------------------------------------------
@@ -95,10 +93,6 @@ wfiles		    == ./inputtxt/testing/test_modpolfiles.txt	== # Sounding file direct
 wdstart		    == 14				                        == # Offset for date timestamp in radar filename 
 wdend		    == 33				                        == # Number of characters in timestamp on radar file
 sstat		    == UIL				                        == # Sounding station identification
-
-# Variables
-t_name	==	t_air	==  # Name of the temperature field
-
 
 #===============
 #### OUTPUT ####

@@ -954,7 +954,10 @@ def make_single_pplots(rdat,config,y=None):
         fig, ax = rdat.plot_hid_cdf(ylab=1,cbar=1)
         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         
-        plt.savefig('{d}{p}_HID_CFAD.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
+        if config['wrft_on']: ext = '_wrft'
+        elif config['snd_on']: ext = '_snd'
+        else: ext = ''
+        plt.savefig('{d}{p}_HID_CFAD{x}.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],x=ext),dpi=400,bbox_inches='tight')
         plt.clf()
         print('HID')
 
