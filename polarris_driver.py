@@ -159,12 +159,10 @@ def find_wrfpol_match(config):
         if (dates <= edt) and (dates >= sdt):
             mv = match_snd(dates,wdates)
             if mv != 'no':
-                #print ('sounding match',mv[0][0])
                 msfiles[cname] = np.array(slist)[mv[0][0]]
             else:
                 return None
-    print(msfiles)
-    input() 
+    
     return msfiles
 
 
@@ -452,7 +450,12 @@ def polarris_driver(configfile):
         print('In your config file, wrft_on is set to True.')
         time.sleep(3)
         wmatch = find_wrfpol_match(config)
-
+        if len(wmatch) > 0:
+            print ('Found sounding match!',sfile,'\n')
+            rdata.add_sounding_object(snd) # this will add the sounding object to the radar object
+                    # and then will take the heights and temps
+            rdata.interp_sounding()
+ 
 
     #if config['convert_Tk_Tc'] == True:
     #    print('converting T')
