@@ -130,7 +130,43 @@ def find_snd_match(config):
         
     return msfiles
 
-#def find_wrf_match(inradfiles,inwrfoutfiles):
+def find_wrfpol_match(config):
+    rdum =[]
+    with open(config['rfiles']) as f: 
+        for line in f:
+            dat = (line)
+            rdum.append(foo(dat))
+    
+    with open(config['wfiles']) as f:
+        slist = f.read().splitlines()
+    
+    wdates=[]
+    for v,sname in enumerate(slist):
+
+        base = os.path.basename(sname)
+        radcdate=np.str(base[config['wdstart']:config['wdend']])
+        dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['wdate_format'])
+        wdates.append(dates)
+
+    msfiles = {}
+
+    for v,cname in enumerate(rdum):
+        base = os.path.basename(cname)
+        radcdate=np.str(base[config['rdstart']:config['rdend']])
+        dates = datetime.datetime.strptime('{r}'.format(r=radcdate),config['rdate_format'])
+        sdt = datetime.datetime.strptime(config['sdatetime'],config['sdatetime_format'])
+        edt = datetime.datetime.strptime(config['edatetime'],config['edatetime_format'])
+        if (dates <= edt) and (dates >= sdt):
+            mv = match_snd(dates,wdates)
+            if mv != 'no':
+                #print ('sounding match',mv[0][0])
+                msfiles[cname] = np.array(slist)[mv[0][0]]
+            else:
+                return None
+    print(msfiles)
+    input() 
+    return msfiles
+
 
 def foo(s1):
     return '{}'.format(s1.rstrip())
@@ -412,9 +448,10 @@ def polarris_driver(configfile):
                     # and then will take the heights and temps
             rdata.interp_sounding()
     
-    elif config['wrfT_on']:
-        print('In your config file, snd_on is set to True.')
+    elif config['wrft_on']:
+        print('In your config file, wrft_on is set to True.')
         time.sleep(3)
+        wmatch = find_wrfpol_match(config)
 
 
     #if config['convert_Tk_Tc'] == True:

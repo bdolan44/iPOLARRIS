@@ -69,7 +69,7 @@ convname	== None			        == # Name of
 #------ Sounding File Reading (Optional) ------
 #----------------------------------------------
 
-snd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+snd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 ad		        == config['date']+'_'		                == # Extra characters
@@ -80,7 +80,24 @@ sdend		    == 19				                        == # Number of characters in timesta
 sstat		    == UIL				                        == # Sounding station identification
 
 # Variables
-t_name	==	T	==  # Name of the temperature field
+#t_name	==	T	==  # Name of the temperature field
+
+#-------------------------------------------
+#------ POL-f File Reading (Optional) ------
+#-------------------------------------------
+
+wrft_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+# Args
+ad		        == config['date']+'_'		                == # Extra characters
+wdate_format	== %Y-%m-%d_%H:%M:%S		                    == # Sounding file date format
+wfiles		    == ./inputtxt/testing/test_modpolfiles.txt	== # Sounding file directory
+wdstart		    == 14				                        == # Offset for date timestamp in radar filename 
+wdend		    == 33				                        == # Number of characters in timestamp on radar file
+sstat		    == UIL				                        == # Sounding station identification
+
+# Variables
+t_name	==	t_air	==  # Name of the temperature field
 
 
 #===============
