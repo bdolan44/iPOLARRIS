@@ -1137,13 +1137,15 @@ def make_single_pplots(rdat,config,y=None):
                 #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
                 #print str(v)
     #                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
-                    fig, ax = rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i],statpt=True)
+                    if v.startswith('HID'): cbar = 2
+                    else: cbar = 1
+                    fig, ax = rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],cbar=cbar,z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i],statpt=True)
                     #plt.tight_layout()
                     #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
                     #plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
-                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                    ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes)
      
                     
                     plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
@@ -1206,13 +1208,15 @@ def make_single_pplots(rdat,config,y=None):
                     os.makedirs(outdir,exist_ok=True)
                     #print i, v
                     #print eval(config['rvectors'])[i],config['rhi_vectres'][i],config['xlim'],config['y']
-                    fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],zlim=config['zlim'])
+                    if v.startswith('HID'): cbar = 2
+                    else: cbar = 1
+                    fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],cbar=cbar,zlim=config['zlim'])
                     #plt.tight_layout()
                     #plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
                     
-                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                    ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=14, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
                     plt.savefig('{i}{e}_{v}_individ_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts,v=v),dpi=400,bbox_inches='tight')
                     plt.clf()
