@@ -256,6 +256,7 @@ def polarris_driver(configfile):
     rfiles = []
     with open(config['rfiles'], 'r') as f:
         allrfiles = f.read().splitlines()
+        print(allrfiles)
         for rfile in allrfiles:
             fullname = os.path.basename(rfile)
             filedatestr = fullname[config['rdstart']:config['rdend']].replace('_','').replace(':','').replace('-','')
