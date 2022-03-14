@@ -59,7 +59,7 @@ class RadarConfig(object):
 
 
         self.species = np.array(['DZ','RN','CR','AG','WS','VI','LDG','HDG','HA','BD'])
-        self.species_long = np.array(['Drizzle','Rain','Ice\nCrystals','Snow\nAggre-\ngates','Wet Snow','Vertical\nIce','Low-\nDensity\nGraupel','High-\nDensity\nGraupel','Hail','Big Drops'])
+        self.species_long = np.array(['Drizzle','Rain','Ice\nCrystals','Snow\nAggre-\ngates','Wet\nSnow','Vertical\nIce','Low-\nDensity\nGraupel','High-\nDensity\nGraupel','Hail','Big\nDrops'])
         #self.hid_colors = ['White','LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
         #    'Lime','Yellow','Red','Fuchsia']
         self.hid_colors = ['LightBlue','MediumBlue','Darkorange','Purple','Cyan','DarkGray',\
