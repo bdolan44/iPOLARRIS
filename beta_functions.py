@@ -77,7 +77,7 @@ import os
 #Beta function parameters stored in individual CSVs in separate directory
 CSV_DIR = os.sep.join([os.path.dirname(__file__),
                       'beta_function_parameters'])+'/'
-print('CSV_DIR',CSV_DIR)
+#print('CSV_DIR',CSV_DIR)
 ################################
 #Helper Functions Below
 ################################

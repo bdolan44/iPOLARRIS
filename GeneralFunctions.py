@@ -35,7 +35,8 @@ import xarray as xr
 
 #import analysis_tools as AT
 #import lightning_tools as LT
-from CSU_RadarTools.csu_radartools import csu_fhc
+#from CSU_RadarTools.csu_radartools import csu_fhc
+import csu_fhc
 import general_tools as gentools
 import RadarConfig
 from matplotlib.colors import from_levels_and_colors
@@ -118,7 +119,7 @@ def cfad(data = None,cfad =None,hts=None,value_bins=None, above=2.0, below=15.0,
 #############################################################################################################
 
 def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.0, above=2.0, below=15.0, bins=None, 
-        log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
+        log=False, pick=None, ylim=None, xlim=None, xlab=None, cbyes=0, z_resolution=1.0,levels=None,tspan =None,cont = False, rconf = None,mask = None,**kwargs):
 
     if hts is None:
         print ('please provide nominal heights to cfad_plot')
@@ -156,10 +157,10 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
 
     # plot the CFAD
     cfad_ma = np.ma.masked_where(cfad==0, cfad)
-    print(np.shape(cfad_ma),'cfad shape')
+    #print(np.shape(cfad_ma),'cfad shape')
+    levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
+    cols = ['lightgrey','silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet','thistle']
     if cont is True:
-        levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
-        cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
         try:
             pc = ax.contourf(bins[:-1],reshts,cfad_ma,levs,colors=cols,extend = 'both')
         except TypeError as e:
@@ -168,17 +169,33 @@ def cfad_plot(var,data = None,cfad=None, hts=None, nbins=20, ax=None, maxval=10.
     else:
 
         if levels is not None:
-            cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
+            cmap, norm = from_levels_and_colors(levs,cols) # mention levels and colors here
             #print cmap
             pc = ax.pcolormesh(bins, reshts, cfad_ma, norm=norm, cmap=cmap)
         else:
             
             pc = ax.pcolormesh(bins, reshts, cfad_ma, vmin=0, vmax=maxval, norm=norm, **kwargs)
 
-    cb = fig.colorbar(pc, ax=ax)
-    cb.set_label('Frequency (%)')
-    ax.set_ylabel('Height (km MSL)')
-#        try:
+    ax.set_xlabel(xlab,fontsize=16)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    if cbyes == 1:
+        lur,bur,wur,hur = ax.get_position().bounds
+        cbar_ax_dims = [lur+wur+0.02,bur,0.02,hur]
+        cbar_ax = fig.add_axes(cbar_ax_dims)
+        cbt = plt.colorbar(pc,cax=cbar_ax)
+        cbt.set_ticks(levs)
+        cbt.ax.tick_params(labelsize=16)
+        cbt.set_label('Frequency (%)', fontsize=16, rotation=270, labelpad=15)
+
+    #    cb = fig.colorbar(pc, ax=ax)
+    #    cb.set_label('Frequency (%)',fontsize=16,rotation=270,labelpad=20)
+    #    cb.ax.tick_params(labelsize=16)
+        ax.set_yticks([])
+        ax.set_yticklabels([])
+        ax.tick_params(axis='y', which='major', labelsize=0)
+    
     if rconf is not None:
         if var == 'DRC' or var == 'DRS':
             varn = rconf.zdr_name
