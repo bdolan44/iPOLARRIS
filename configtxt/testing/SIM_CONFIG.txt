@@ -3,7 +3,7 @@
 ####################################################
 
 type	    == wrf      == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
-mphys	    == wsm6	    == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
+mphys	    == wdm6	    == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
 
 
 #==============
@@ -15,9 +15,9 @@ mphys	    == wsm6	    == # Type of microphysics used in model: 'obs' OR '<scheme
 #-----------------------------------------------
 
 # Args
-sdatetime		        == '20151203-0300'	== # Start time of analysis of interest
+sdatetime		        == '20151203-2100'	== # Start time of analysis of interest
 sdatetime_format	    == %Y%m%d-%H%M		== # Start time format
-edatetime		        == '20151203-0400'	== # End time of analysis of interest
+edatetime		        == '20151203-2200'	== # End time of analysis of interest
 edatetime_format	    == %Y%m%d-%H%M		== # End time format
 
 date		    == '20151203'			                        == # Date of the case
@@ -38,13 +38,13 @@ vdop_name   == vdop01       == # Name of Doppler velocity
 uname		== u       	    == # Name of the zonal wind field
 vname		== v    	    == # Name of the meridional wind field
 wname		== w        	== # Name of the vertical wind field
-xname		== longitude    == # Name of the zonal directional variable
-yname		== latitude     == # Name of the meridional directional variables
+xname		== longitude     == # Name of the zonal directional variable
+yname		== latitude    == # Name of the meridional directional variables
 zname		== hgt	        == # Name of the vertical level field
-latname     == latitude	    ==
-lonname     == longitude    ==
+latname     == latitude	        ==
+lonname     == longitude            ==
 band		== S		    == # Radar band: X, C OR S. Note: needs to be capital letter.
-exper		== KLGX         == # Radar location
+exper		== WDM6         == # Radar location
 lat		    == 47.116806	== # Latitude of the radar station
 lon		    == -124.10625	== # Longitude of the radar station
 radarname	== S-band	    == # 
@@ -71,7 +71,7 @@ convname	== None			        == # Name of
 #------ Sounding File Reading (Optional) ------
 #----------------------------------------------
 
-snd_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+snd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 ad		        == config['date']+'_'		                == # Extra characters
@@ -81,6 +81,18 @@ sdstart		    == 4				                        == # Offset for date timestamp in r
 sdend		    == 19				                        == # Number of characters in timestamp on radar file
 sstat		    == UIL				                        == # Sounding station identification
 
+#-------------------------------------------
+#------ POL-f File Reading (Optional) ------
+#-------------------------------------------
+
+wrft_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+# Args
+ad		        == config['date']+'_'		                == # Extra characters
+wdate_format	== %Y-%m-%d_%H:%M:%S		                    == # Sounding file date format
+wfiles		    == ./inputtxt/testing/test_modpolfiles.txt	== # Sounding file directory
+wdstart		    == 14				                        == # Offset for date timestamp in radar filename 
+wdend		    == 33				                        == # Number of characters in timestamp on radar file
 
 #===============
 #### OUTPUT ####
@@ -92,9 +104,9 @@ sstat		    == UIL				                        == # Sounding station identificatio
 
 # SET 1) Plots created in run_ipolarris_new.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
-rr_timeseries	    == False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
+rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
 vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflectivity with height
 refcfad		    == False	    == # 6) Set to True to plot CFAD of reflectivity with height
@@ -115,7 +127,7 @@ hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grou
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
 cappi_multi		    == False	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
 cappi_individ	    == False	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
-rhi_multi		    == False	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
+rhi_multi		    == True	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 rhi_individ		    == False	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 
 # Model Only
@@ -141,12 +153,12 @@ cb_friendly	== True			== # Use color-blindness palette for output (i.e. reflecti
 # Constant-Altitude Plan-Position Indicator (CAPPI) 
 xlim	== [-200,200]		==#lat / lon zoom for CAPPIS
 ylim	== [-200,200]		==# lat / lon zoom for CAPPIS
-y	== 100			==#Lat of the y cross-section for RHI
+y	== 0			==#Lat of the y cross-section for RHI
 #xlim	== [-127.0,-121.0]	==#lat / lon zoom for CAPPIS
 #ylim	== [45.0,49.0]		==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
-z   == 2.5			==#Height of the CAPPIs
-zlim    == [0,12]    ==
+z   == 3.0			==#Height of the CAPPIs
+zlim    == [0,10]    ==
 
 # Histogram Bins for Radar Observables
 wbins	== np.arange(-25,26,0.5)	== # Histogram bins for vertical velocity
