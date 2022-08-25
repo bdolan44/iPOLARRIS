@@ -212,7 +212,7 @@ def polarris_driver(configfile):
             if not line.startswith("#"):
                 #print('line',line)
                 key, val, comment = line.split('==')
-                print(key)
+                #print(key)
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
                 if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'drop_vars' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
@@ -256,7 +256,7 @@ def polarris_driver(configfile):
     rfiles = []
     with open(config['rfiles'], 'r') as f:
         allrfiles = f.read().splitlines()
-        print(allrfiles)
+        #print(allrfiles)
         for rfile in allrfiles:
             fullname = os.path.basename(rfile)
             filedatestr = fullname[config['rdstart']:config['rdend']].replace('_','').replace(':','').replace('-','')
@@ -438,7 +438,7 @@ def polarris_driver(configfile):
         time.sleep(3)
         wmatch = find_wrfpol_match(config)
         if len(wmatch) > 0:
-            print ('Found POLARRIS-f files! ',list(wmatch.values()),'\n')
+            print ('Found POLARRIS-f files!') #,list(wmatch.values()),'\n')
             try:
                 tvar = xr.open_mfdataset(list(wmatch.values()),concat_dim='d')
             except ValueError as ve:
