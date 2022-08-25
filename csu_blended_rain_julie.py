@@ -149,8 +149,8 @@ def calc_blended_rain(dz, zdr, kdp, r_z_a, r_z_b, r_kdp_a, r_kdp_b,
         zdp = calc_zdp(zhor, zvert)
 
         # calculate contribution to Zh from pure rain
-        #if fit_a is None:
-        #    fit_a, fit_b = get_linear_fits(method=method)
+        if fit_a is None:
+            fit_a, fit_b = get_linear_fits(method=method)
         zrain = 10.0**((fit_a * zdp + fit_b)/10.0)
         dzrain = 10.0 * np.log10(zrain)
         fi = 1.0 - (zrain / zhor)
