@@ -46,13 +46,13 @@ else
 
     st=$(echo $case | cut -d ',' -f1 | sed 's/[^0-9]*//g')
 	stdate=${st:0:8}
-	sttime=${st:8:2}
+	sttime=${st:8:4}
     en=$(echo $case | cut -d ',' -f2 | sed 's/[^0-9]*//g')
 	endate=${en:0:8}
-	entime=${en:8:2}
+	entime=${en:8:4}
 
-	stt=${stdate}_${sttime}00
-	edt=${endate}_${entime}00
+	stt=${stdate}_${sttime}
+	edt=${endate}_${entime}
 
     configdir=$ipoldir/configtxt/${stt}_${edt}
 
@@ -78,11 +78,11 @@ fi
 for filepath in $(ls $raddir/*); do
     file=$(basename $filepath)
     filedt=$(echo $file | cut -d '_' -f2)$(echo $file | cut -d '_' -f3)
-    if [ "$filedt" -ge "$(echo $stt | tr -d '_')00" ] && [ "$filedt" -le "$(echo $edt | tr -d '_')00" ]; then 
+    if [ "$filedt" -ge "$(echo $stt | tr -d '_')00" ] && [ "$filedt" -lt "$(echo $edt | tr -d '_')00" ]; then 
         echo $filepath >> $configdir/$tfile
         echo $(basename $filepath)
     fi
-    if [ "$filedt" -gt "$(echo $edt | tr -d '_')00" ]; then
+    if [ "$filedt" -ge "$(echo $edt | tr -d '_')00" ]; then
         break
     fi
 done
