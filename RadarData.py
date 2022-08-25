@@ -874,8 +874,8 @@ class RadarData(RadarConfig.RadarConfig):
             print ('Sorry, your wavelength has not been run yet! Return to first principles!')
             return
 
-        rr_arr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff,
-                                                      czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band=band,fhc=self.hid)
+        rr_arr,rm = csu_blended_rain_julie.csu_hidro_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,azdrk_coeff,bzdrk_coeff, czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band=band,fhc=self.hid)
+        #rr_arr,rm = csu_blended_rain_julie.calc_blended_rain(self.data[self.dz_name].values,self.data[self.zdr_name].values,self.data[self.kdp_name].values,z_c,z_m,k_c,k_m,None,None,azdrk_coeff,bzdrk_coeff, czdrk_coeff,azzdr_coeff,bzzdr_coeff,czzdr_coeff,band=band)
 #         mask=np.where(np.isnan(self.data[self.dz_name].values))
 #         rr[mask]=np.nan
 #         rm[mask]=-1
@@ -960,7 +960,7 @@ class RadarData(RadarConfig.RadarConfig):
 ########### STARTING WITH CROSS SECTIONS ################
 
     def xsec(self, var, y=None, xlim=None, zlim=None, cbar=1, ts = None,varlist=None, ax=None, title_flag=False, 
-                vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, **kwargs):
+                vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, lblsz=20, lblpad=15, **kwargs):
         "Just one axis cross-section plot of a variable"
         # first, get the appropriate y index from the y that's wanted
         if ts is None:
@@ -977,6 +977,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         if var in self.data.variables.keys():
 #            print('952',y,self.y_name,self.data[self.y_name].dims)
+            '''
             if y is None:
                 y_ind = int(len(self.data[self.y_name].values)/2.0)
             else:
@@ -986,21 +987,24 @@ class RadarData(RadarConfig.RadarConfig):
                     #print('yind',y_ind,y,self.data[self.y_name].sel(x=0,d=0).values)
                 else:
                     y_ind = y
-
+            '''
             if y is None:
                 y_ind = int(((self.data[self.y_name].min().values)-self.data[self.y_name].max())/2.0)
                 y = self.data[self.y_name][y_ind]
             
             else:
                 if 'd' in self.data[self.y_name].dims:
-                    y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind).values)
+                    #y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind).values)
                     if 'x' in self.data[self.y_name].dims:
-                        y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind,x=0).values)
+                        lons = self.data[self.y_name].sel(d=tmind,x=0).values
+                        gps = np.arange(-0.5*len(lons)+0.5,0.5*len(lons))
+                        y_ind = self.get_ind(y,gps)
+                        #y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind,x=0).values)
                     else:
                         y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind).values)
                 else:
                     y_ind = self.get_ind(y,self.data[self.y_name].values)
-
+            
             if xlim is None:
                 xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
             else:
@@ -1038,6 +1042,7 @@ class RadarData(RadarConfig.RadarConfig):
                 zmaxi = zlim[1]
             xmin, xmax = xlim
             zmin, zmax = zlim
+
             # now actually doing the plotting
             ##Adding this here because if the x and y are in reverse order, the indices do not work with the slice.
 #             ylimtest = [ymin,ymax]
@@ -1060,7 +1065,7 @@ class RadarData(RadarConfig.RadarConfig):
             if self.y_name == 'latitude':
                 #print(y_ind,xmini,xmaxi,'lats and lons')
 #                print('yind is ',y_ind,tmind,zmini,zmaxi,xmini,xmaxi)
-                data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y_ind,x=slice(xmini,xmaxi)))
+                data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=slice(y_ind,y_ind+1),x=slice(xmini,xmaxi)))
             else:
                 #data = (self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=y,x=slice(xlim[0],xlim[1])).values)
                 data = np.squeeze(self.data[var].sel(d=tmind,z=slice(zmini,zmaxi),y=slice(y,y+1),x=slice(xmini,xmaxi)).values)
@@ -1071,17 +1076,16 @@ class RadarData(RadarConfig.RadarConfig):
             
             if 'y' in self.data[self.x_name].dims:
                 if 'd' in self.data[self.x_name].dims:
-                    xdat = np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
+                    lons = np.squeeze(self.data[self.x_name].sel(d=tmind,y=slice(y_ind,y_ind+1),x=slice(xmini,xmaxi)))
+                    xdat = np.arange(-0.5*len(lons)+0.5,0.5*len(lons))
                 else:
-                    xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=slice(y_ind,y_ind+1)))
-                    
+                    xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi),y=y_ind)) 
             else:
                 if 'd' in self.data[self.x_name].dims:
                     xdat = np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmini,xmaxi)))
                 else:
                     xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmini,xmaxi)))
 #            print ('zmini,zmaxi',zmini,zmaxi)
-            
             if 'd' in self.data[self.z_name].dims:
                 zdat = np.squeeze(self.data[self.z_name].sel(d=tmind,z=slice(zmini,zmaxi)))
             else:
@@ -1092,6 +1096,7 @@ class RadarData(RadarConfig.RadarConfig):
             #print (np.shape(data),np.shape(xdat),np.shape(zdat),'ln 1053')
             #print np.shape(xdat),np.shape(zdat)
     #        print 'data',np.shape(data),'zdat',np.shape(zdat),'xdat',np.shape(xdat)
+            
             if var.startswith('HID'):
                 data = np.ma.masked_where(data < 1,data)
             if var in self.lims.keys():
@@ -1133,37 +1138,48 @@ class RadarData(RadarConfig.RadarConfig):
                 ax.set_xlim([xmin,xmax])
                 ax.set_ylim([zmin,zmax])
                 if labels:
-                    ax.set_xlabel('Longitude')
-                    ax.set_ylabel('Altitude (km MSL)')
+                    #ax.set_xlabel('Longitude')
+                    ax.set_xlabel('Distance E of Radar (km)', fontsize=lblsz)
+                    ax.set_ylabel('Altitude (km MSL)', fontsize=lblsz)
                     ax.set_xlim([xmin,xmax])
-                    ax.tick_params(axis='both', which='major', labelsize=20)
-                else:
-                    if xlab:
-                        ax.set_xlabel('Longitude')
-                        ax.tick_params(axis='x', which='major', labelsize=20)
-                    if ylab:
-                        ax.set_ylabel('Latitude')
-                        ax.tick_params(axis='y', which='major', labelsize=20)
-            else:
-                #ax.axis([xmini, xmaxi, ymini, ymaxi])
-                ax.set_xlim([xmin,xmax])
-                ax.set_ylim([zmin,zmax])
-                if labels:
-                    ax.set_xlabel('Distance E of radar (km)',fontsize=20)
-                    ax.set_ylabel('Altitude (km MSL)',fontsize=20)
-                    ax.tick_params(axis='both', which='major', labelsize=20)
+                    ax.tick_params(axis='both', which='major', labelsize=lblsz)
                     cbthickness = 0.03
                 else:
                     if xlab:
-                        ax.set_xlabel('Distance E of radar (km)',fontsize=20)
-                        ax.tick_params(axis='x', which='major', labelsize=20)
+                        ax.set_xlabel('Distance E of Radar (km)', fontsize=lblsz)
+                        ax.tick_params(axis='x', which='major', labelsize=lblsz)
                     else:
                         ax.set_xticks([])
                         ax.set_xticklabels([])
                         ax.tick_params(axis='x', which='major', labelsize=0)
                     if ylab:
-                        ax.set_ylabel('Altitude (km MSL)',fontsize=20)
-                        ax.tick_params(axis='y', which='major', labelsize=20)
+                        ax.set_ylabel('Altitude (km MSL)', fontsize=lblsz)
+                        ax.tick_params(axis='y', which='major', labelsize=lblsz)
+                    else:
+                        ax.set_yticks([])
+                        ax.set_yticklabels([])
+                        ax.tick_params(axis='y', which='major', labelsize=0)
+                    cbthickness = 0.02
+            else:
+                #ax.axis([xmini, xmaxi, ymini, ymaxi])
+                ax.set_xlim([xmin,xmax])
+                ax.set_ylim([zmin,zmax])
+                if labels:
+                    ax.set_xlabel('Distance E of radar (km)',fontsize=lblsz)
+                    ax.set_ylabel('Altitude (km MSL)',fontsize=lblsz)
+                    ax.tick_params(axis='both', which='major', labelsize=lblsz)
+                    cbthickness = 0.03
+                else:
+                    if xlab:
+                        ax.set_xlabel('Distance E of radar (km)',fontsize=lblsz)
+                        ax.tick_params(axis='x', which='major', labelsize=lblsz)
+                    else:
+                        ax.set_xticks([])
+                        ax.set_xticklabels([])
+                        ax.tick_params(axis='x', which='major', labelsize=0)
+                    if ylab:
+                        ax.set_ylabel('Altitude (km MSL)',fontsize=lblsz)
+                        ax.tick_params(axis='y', which='major', labelsize=lblsz)
                     else:
                         ax.set_yticks([])
                         ax.set_yticklabels([])
@@ -1183,14 +1199,14 @@ class RadarData(RadarConfig.RadarConfig):
             # now have to do a custom colorbar?
             if cbar == 1:  # call separate HID colorbar function for bar plots
                 lur,bur,wur,hur = ax.get_position().bounds
-                cbar_ax_dims = [lur+wur+0.015,bur,0.03,hur]
+                cbar_ax_dims = [lur+wur+0.015,bur,cbthickness,hur]
                 if var.startswith('HID'): 
                     cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
                 else:
                     cbar_ax = fig.add_axes(cbar_ax_dims)
                     cbt = fig.colorbar(dummy,cax=cbar_ax)
-                cbt.ax.tick_params(labelsize=16)
-                cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=20, rotation=270, labelpad=15)
+                cbt.ax.tick_params(labelsize=lblsz-4)
+                cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=lblsz, rotation=270, labelpad=lblpad)
 
             if cbar == 2 and var.startswith('HID'):
                 lur,bur,wur,hur = ax.get_position().bounds
@@ -1251,7 +1267,7 @@ class RadarData(RadarConfig.RadarConfig):
                     y_ind = self.get_ind(y,self.data[self.y_name].sel(d=tmind).values)
             else:
                 y_ind = self.get_ind(y,self.data[self.y_name].values)
-        yvalplot = self.data[self.y_name].values[y_ind]
+        yvalplot = y_ind
 #        print(yvalplot, y_ind, 'ln 1211 RadarData')
         if xlim is None:
             xmini, xmaxi = self.data[self.x_name].data.min(), self.data[self.x_name].data.max()
@@ -1321,7 +1337,7 @@ class RadarData(RadarConfig.RadarConfig):
             figy = 18
 
         #fig, ax = plt.subplots(nrows, ncols, figsize = (figx, figy), sharex = True, sharey = True)
-        fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.2, 'hspace': 0.07, \
+        fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.27, 'hspace': 0.07, \
             'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): ax = np.array([ax])
         axf = ax.flatten()
@@ -1342,12 +1358,12 @@ class RadarData(RadarConfig.RadarConfig):
                 xlabbool = True if i in botpanels else False
                 lspanels = [ncols*n for n in range(0,nrows)]
                 ylabbool = True if i in lspanels else False
-                dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,**kwargs)
+                dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,lblsz=28,lblpad=28,**kwargs)
             # now do the HID plot, call previously defined functions
 
-        axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.radar_name), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
-        axf[ncols-1].text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes) # (a) Top-left
-        axf[ncols-1].text(0.99, 0.99, 'y = {a} km'.format(a=yvalplot), horizontalalignment='right',verticalalignment='top', size=20, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes)
+        axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.radar_name), horizontalalignment='left', verticalalignment='bottom', size=32, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        axf[ncols-1].text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=32, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes) # (a) Top-left
+        axf[ncols-1].text(0.99, 0.99, 'y = {a} km'.format(a=yvalplot), horizontalalignment='right',verticalalignment='top', size=32, color='k', zorder=10, weight='bold', transform=axf[ncols-1].transAxes)
  
 #        fig.tight_layout()
         #fig.tight_layout()
