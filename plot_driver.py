@@ -1680,6 +1680,14 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False,statpt=False):
     # (4) Initiate a new figure with Mercator projection.
     fig = plt.figure(figsize=(10,8))
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
+    
+    lnspc = 2
+    ltspc = 1
+    
+    minlon = lnspc*np.floor(lons[(0,0)]/lnspc)
+    maxlon = lnspc*np.ceil(lons[(0,-1)]/lnspc)
+    minlat = ltspc*np.floor(lats[(0,0)]/ltspc)
+    maxlat = ltspc*np.ceil(lats[(-1,0)]/ltspc) 
 
     # (5) Overlay variable data as a colormesh plot (with colorbar) using PlateCarree projection.
     cb = ax.pcolormesh(lons,lats,dzcomp, vmin =vmin,vmax=vmax,cmap=cmap,transform=ccrs.PlateCarree())
@@ -1702,10 +1710,18 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False,statpt=False):
     lat_formatter = LatitudeFormatter(number_format='.1f')
     ax.xaxis.set_major_formatter(lon_formatter)
     ax.yaxis.set_major_formatter(lat_formatter)
+    
+    glnolabs = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False, linewidth=1.5, linestyle='--')
+    glnolabs.xlocator = ticker.MultipleLocator(base=lnspc)
+    glnolabs.ylocator = ticker.MultipleLocator(base=ltspc)
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
     gl.xlabels_top = False
     gl.ylabels_right = False
+    lonticks = np.linspace(minlon,maxlon,int((maxlon-minlon)/lnspc+1))
+    latticks = np.linspace(minlat,maxlat,int((maxlat-minlat)/ltspc+1))
+    gl.xlocator = ticker.FixedLocator(lonticks)
+    gl.ylocator = ticker.FixedLocator(latticks)
     gl.xlabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
     gl.ylabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
 
