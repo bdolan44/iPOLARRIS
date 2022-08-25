@@ -21,7 +21,7 @@ sfiles ==  == # Sounding file directory
 wfiles ==  == # Sounding file directory
 dfiles ==  == # Location of dual-Doppler files
 image_dir ==  == # Output figure directory
-ptype ==  == # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
+ptype == png == # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
 exper ==  == # Radar location
 lat ==  == # Latitude of the radar station
 lon ==  == # Longitude of the radar station
@@ -63,7 +63,7 @@ radarname	== S-band	            == #
 #------ Doppler Radar File Reading (Optional) ------
 #---------------------------------------------------
 
-dd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+dd_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 ddate_format	== %Y%m%d_%H%M%S		                        == # Format for the dual-Doppler file date
@@ -77,7 +77,7 @@ convname	== None			        == # Name of
 #------ Sounding File Reading (Optional) ------
 #----------------------------------------------
 
-snd_on	== False	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+snd_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 ad		        == config['date']+'_'		                == # Extra characters
@@ -90,13 +90,13 @@ sstat		    == UIL				                        == # Sounding station identificatio
 #------ POL-f File Reading (Optional) ------
 #-------------------------------------------
 
-wrft_on	== True	== # Set this to loop through separate dual-Doppler files (e.g. for obs)
+wrft_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
 
 # Args
 ad		        == config['date']+'_'		                == # Extra characters
 wdate_format	== %Y-%m-%d_%H:%M:%S		                    == # Sounding file date format
-wdstart		    == 14				                        == # Offset for date timestamp in radar filename 
-wdend		    == 33				                        == # Number of characters in timestamp on radar file
+wdstart		    == 16				                        == # Offset for date timestamp in radar filename 
+wdend		    == 35				                        == # Number of characters in timestamp on radar file
 
 #===============
 #### OUTPUT ####
@@ -108,7 +108,7 @@ wdend		    == 33				                        == # Number of characters in timesta
 
 # SET 1) Plots created in run_ipolarris_new.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
@@ -132,7 +132,7 @@ up_width		    == False	    == # 18) Set to True to plot vertical profile of updr
 cappi_multi		    == False	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
 cappi_individ	    == False	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
 rhi_multi		    == False	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
-rhi_individ		    == True	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
+rhi_individ		    == False	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 
 # Model Only
 qr_cappi		    == False	== # FK) Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
