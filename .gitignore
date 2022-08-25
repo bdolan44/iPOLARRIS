@@ -10,5 +10,6 @@
 *pycache*
 olym*
 inputtxt/*.txt
-configtxt/*.txt
+configtxt/*
 logs/*
+samples/*
