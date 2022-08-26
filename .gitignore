@@ -13,3 +13,4 @@ inputtxt/*.txt
 configtxt/*
 logs/*
 samples/*
+outputfig/*
