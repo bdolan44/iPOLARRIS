@@ -21,7 +21,7 @@ sfiles ==  == # Sounding file directory
 wfiles ==  == # Sounding file directory
 dfiles ==  == # Location of dual-Doppler files
 image_dir ==  == # Output figure directory
-ptype == png == # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
+ptype == 'mp4' == # Output figure file extenstion (i.e. .png, .jpg, .mp4, ...)
 exper ==  == # Radar location
 lat ==  == # Latitude of the radar station
 lon ==  == # Longitude of the radar station
@@ -108,8 +108,8 @@ wdend		    == 35				                        == # Number of characters in timesta
 
 # SET 1) Plots created in run_ipolarris_new.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
-cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
+compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+cappi_rr	    == True	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
 vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflectivity with height
@@ -159,7 +159,7 @@ y	== 0			==#Lat of the y cross-section for RHI
 #xlim	== [-127.0,-121.0]	==#lat / lon zoom for CAPPIS
 #ylim	== [45.0,49.0]		==# lat / lon zoom for CAPPIS
 #y==35.7                                 ==#Lat of the y cross-section for RHI
-z   == 2.5			==#Height of the CAPPIs
+z ==  == # Height of the CAPPIs
 zlim    == [0,12]    ==
 
 # Histogram Bins for Radar Observables

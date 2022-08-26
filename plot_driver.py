@@ -1741,9 +1741,9 @@ def plot_composite(rdata,var,time,resolution='10m',cs_over=False,statpt=False):
 # Description: plot_cappi overlays a Cartopy basemap with a CAPPI plot of a given variable at a given height.
 
 def plot_cappi(rdata,var,zvar,hght,time,time_match,resolution='10m',cs_over=False,statpt=False):
-    
+   
     from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-    
+
     # (1) Find the index in the height variable of the altitude where CAPPI will be drawn.
     if 'd' in rdata.data[zvar].dims:
         try:
@@ -1773,13 +1773,13 @@ def plot_cappi(rdata,var,zvar,hght,time,time_match,resolution='10m',cs_over=Fals
         else:
             lats = rdata.data[rdata.lat_name].values
             lons= rdata.data[rdata.lon_name].values
-        
+   
     # (3) Initiate a new figure with Mercator projection.
     fig, ax = plt.subplots(1,1,figsize=(10,8))
     #ax = fig.add_subplot(1, 1, 1, projection=ccrs.Mercator())
 
     # (4) Overlay variable data as a colormesh plot (with colorbar) using PlateCarree projection.
-    rdata.cappi(var,z=whz,ts=time_match,contour=None,ax=ax)
+    rdata.cappi(var,z=hght,ts=time_match,contour=None,ax=ax)
     #if statpt: ax.plot(rdata.lon_0,rdata.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
     if statpt: ax.plot(0,0,markersize=12,marker='^',color='k')
    

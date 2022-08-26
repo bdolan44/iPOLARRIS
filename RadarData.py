@@ -1423,6 +1423,7 @@ class RadarData(RadarConfig.RadarConfig):
 #                 print('got z index for z:',z, z_ind)
 #        print('xlims 1203',xlim,tmind)
  #       print('xlim is',xlim)
+        
         if xlim is None:
             xmint, xmaxt = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
             xlimtest = [xmint,xmaxt]
@@ -1511,9 +1512,14 @@ class RadarData(RadarConfig.RadarConfig):
         
         ###COMMENTING OUT FOR GCE. LET'S SEE WHAT HAPPENS. BD 1/11/2021
         #z_ind=self.get_ind(z,self.data[self.z_name])
-        data = np.squeeze(self.data[var].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+        #data = np.squeeze(self.data[var].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+       
+        data = np.squeeze(self.data[var].sel(d=tmind,z=z,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
         if np.ndim(data) == 3:
             data = np.squeeze(self.data[var].sel(d=tmind,z=slice(z_ind,z_ind),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
+            print(data.shape)
+            print('Hello2')
+            input()
 #            print("changing shape",np.shape(data))
         #print('lims',self.lims[var])
 ##        except:

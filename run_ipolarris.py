@@ -4,7 +4,7 @@
 
 import sys
 import time
-
+'''
 # WARNING TO USERS to activate conda environment #
 print("\n####################################")
 print("### Welcome, user, to iPOLARRIS! ###")
@@ -23,7 +23,7 @@ else:
     print('\niPOLARRIS INITIATING... If Conda env activated, no import errors...')
     import time
     time.sleep(3)
-
+'''
 # Import core Python packages
 from collections import OrderedDict
 import csv
@@ -61,7 +61,7 @@ if len(sys.argv) > 2:
 else:
     print('\n***Entering OBSERVATION MODE: you are about to analyze radar observations recorded by a station!***')
 
-time.sleep(5)
+time.sleep(3)
 
 print('\n#############################################')
 print('########## Starting run_ipolarris.py ########')
@@ -73,6 +73,7 @@ configfile = sys.argv[1:] # Feed config file name as arg
 print('\n##########################################################')
 print('############ Calling polarris_driver.py to read in obs ###')
 print('##########################################################')
+
 time.sleep(3)
 
 rdata, config, config['uname'], config['vname'], config['wname'] = polarris_driver(configfile)
@@ -199,26 +200,28 @@ else:
             
         outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
         os.makedirs(outdir,exist_ok=True)
-       
+      
+        st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
+        en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
+
         for i,rtimematch in enumerate(np.array(rdata.date)):
 
             fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False,statpt=True)
-            #ax.set_title('{e} {r} Composite {d:%Y-%m-%d %H%M} UTC'.format(d=rtimematch,e=rdata.exper,r=rdata.radar_name), fontsize=18)
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            
-            #minlat = config['ylim'][0]
-            #maxlat = config['ylim'][1]
-            #minlon = config['xlim'][0]
-            #maxlon = config['xlim'][1]
-            #ax.set_extent([minlon, maxlon, minlat,maxlat])
+           
+            if not config['ptype'].startswith('mp4'):
+                plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
+            else: 
+                plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
 
-            #plt.tight_layout()
-            #plt.savefig('{i}composite_{v}_{d:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'composite_'+rdata.dz_name+'/',v=rdata.dz_name,d=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400, bbox_inches='tight') 
-            plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
             plt.close()
             print(rtimematch)
         
+        if config['ptype'].startswith('mp4'):
+            
+            os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdata.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_{t1}-{t2}.mp4'.format(p=config['ptype'],e=rdata.exper,i=outdir,v=rdata.dz_name,t1=st,t2=en))
+
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
     
@@ -256,33 +259,41 @@ else:
     if (config['cappi_rr'] | config['all1']):
 
         print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
-        print('Plotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.rr_name+'...')
+        print('Plotting CAPPIs for all heights by time for variable '+rdata.rr_name+'...')
  
         outdir = config['image_dir']+'cappi_'+rdata.rr_name+'/'
         os.makedirs(outdir,exist_ok=True)
+        
+        if not config['z'] == '': zspan = list([config['z']])
+        else: zspan = rdata.data[rdata.z_name].values
 
-        for i,rtimematch in enumerate(np.array(rdata.date)):
+        for z in zspan:
 
-            fig, ax = plot_driver.plot_cappi(rdata,rdata.rr_name,rdata.z_name,config['z'],i,rtimematch,cs_over=False,statpt=True)
-            #fig, ax = plt.subplots(1,1,figsize=(10,8))
-        #    whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-            #rdata.cappi(rdata.rr_name,z=whz,ts=rtimematch,contour='CS',ax=ax)
-            ax.set_xlim(config['xlim'][0],config['xlim'][1])
-            ax.set_ylim(config['ylim'][0],config['ylim'][1])
-            #ax.set_title('CAPPI RR {t:%Y%m%d_%M%D%S} {h} km'.format(t=rtimematch,h=rdata.data['z'].values[2]))
-            
-            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+            print('\nz = '+str(z))
 
-            #plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
-            plt.savefig('{i}{e}_{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,h=config['z'],v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
-            plt.close()
+            for i,rtimematch in enumerate(np.array(rdata.date)):
 
-            print(rtimematch)
+                fig, ax = plot_driver.plot_cappi(rdata,rdata.rr_name,rdata.z_name,z,i,rtimematch,cs_over=False,statpt=True)
+                
+                #fig, ax = plt.subplots(1,1,figsize=(10,8))
+                #whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
+                #rdata.cappi(rdata.rr_name,z=whz,ts=rtimematch,contour='CS',ax=ax)
+                ax.set_xlim(config['xlim'][0],config['xlim'][1])
+                ax.set_ylim(config['ylim'][0],config['ylim'][1])
+                
+                ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-        print('\nDone! Saved to '+outdir)
-        print('Moving on.\n')
+                #plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
+                #plt.savefig('{i}{e}_{v}_cappi_{t:%Y-%m-%d_%H%M%S}_{h}.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
+                plt.savefig('{i}{e}_{v}_cappi_{t:%Y-%m-%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
+                plt.close()
+
+                print(rtimematch)
+
+        #print('\nDone! Saved to '+outdir)
+        #print('Moving on.\n')
 
     # tdate = datetime.datetime(2006,1,23,18,00)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
