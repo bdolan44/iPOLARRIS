@@ -101,7 +101,7 @@ def find_snd_match(config):
 
         base = os.path.basename(sname)
 #            print base
-        radcdate=np.str(base[config['sdstart']:config['sdend']])
+        radcdate=str(base[config['sdstart']:config['sdend']])
         #print('radcdate',radcdate)
         dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['sdate_format'])
         sdates.append(dates)
@@ -112,7 +112,7 @@ def find_snd_match(config):
 #            print cname
         base = os.path.basename(cname)
 #        print('base',base)
-        radcdate=np.str(base[config['rdstart']:config['rdend']])
+        radcdate=str(base[config['rdstart']:config['rdend']])
         #dates=datetime.datetime.strptime(radcdate,config['rdate_format'])
         dates = datetime.datetime.strptime('{r}'.format(r=radcdate),config['rdate_format'])
         sdt = datetime.datetime.strptime(config['sdatetime'],config['sdatetime_format'])
@@ -144,7 +144,7 @@ def find_wrfpol_match(config):
     for v,sname in enumerate(slist):
 
         base = os.path.basename(sname)
-        radcdate=np.str(base[config['wdstart']:config['wdend']])
+        radcdate=str(base[config['wdstart']:config['wdend']])
         dates=datetime.datetime.strptime('{r}'.format(r=radcdate),config['wdate_format'])
         wdates.append(dates)
 
@@ -152,7 +152,7 @@ def find_wrfpol_match(config):
 
     for v,cname in enumerate(rdum):
         base = os.path.basename(cname)
-        radcdate=np.str(base[config['rdstart']:config['rdend']])
+        radcdate=str(base[config['rdstart']:config['rdend']])
         dates = datetime.datetime.strptime('{r}'.format(r=radcdate),config['rdate_format'])
         sdt = datetime.datetime.strptime(config['sdatetime'],config['sdatetime_format'])
         edt = datetime.datetime.strptime(config['edatetime'],config['edatetime_format'])
@@ -324,7 +324,7 @@ def polarris_driver(configfile):
         #print(d)
         dformat = config['rdate_format']
         base = os.path.basename(d)
-        radcdate=np.str(base[config['rdstart']:config['rdend']])
+        radcdate=str(base[config['rdstart']:config['rdend']])
         date=datetime.datetime.strptime(radcdate,dformat)
         tm.append(date)
 
