@@ -6,10 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 import datetime as dt
-
+import pyart
 
 class RadarConfig(object):
-    
+   
     def __init__(self, dz='DZ', zdr='DR', kdp='KD', ldr='LH', rho='RH', hid = 'HID',conv='Con',
             temp='T', x='x', y='y', z='z', u='U', v='V',rr='RR', w='Wvar',vr='VR',mphys='None',exper = 'Case',
             band = 'C',lat_0 = 0,lon_0=90.0,lat_r=None,lon_r=None,lat=None,lon=None,tm = None,radar_name = None,
@@ -74,7 +74,7 @@ class RadarConfig(object):
         self.set_cs_colorbar()
 
         # Now just set some defaults
-        self.lims = {dz: [0,80], zdr: [-1, 3], kdp: [-0.5, 3], ldr: [-35, -20], rho: [0.95, 1.00], hid: [0, len(self.species)+1],w:[-25,25],vr:[-25,25],self.cs_name:[0,4],self.rr_name:[1,30],self.temp_name:[-30,30]}
+        self.lims = {dz: [0,80], zdr: [-1, 3], kdp: [-0.5, 3], ldr: [-35, -20], rho: [0.95, 1.00], hid: [0, len(self.species)+1],w:[-25,25],vr:[-25,25],self.cs_name:[0,4],self.rr_name:[0,30],self.temp_name:[-30,30]}
         self.delta = {dz: 10, zdr: 1, kdp: 1, ldr: 5, rho: 0.005, hid: 1,w:5,vr:5,self.cs_name:1,self.rr_name:10,self.temp_name:5}
         self.units = {dz: '(dBZ)', zdr: '(dB)', kdp: '($^{\circ}$/km)', ldr: '(dB)', rho: '', hid: '',w:'(m s$^{-1}$)',vr:'(m s$^{-1}$)',self.cs_name:'',self.rr_name:'(mm hr$^{-1}$)',self.temp_name:'C'}
         self.names = {dz: 'Z', zdr: 'Z$_{DR}$', kdp: 'K$_{dp}$', ldr: 'LDR', rho: r'$\rho_{hv}$', hid: '',w:'',vr:'V$_r$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
@@ -82,8 +82,8 @@ class RadarConfig(object):
         self.longnames = {dz: 'Reflectivity', zdr: 'Differential Reflectivity', kdp: 'Specific Differential Phase',\
                 ldr: 'Linear Depolarization Ratio', rho: 'Correlation Coefficient', hid: 'Hydrometeor Identification',w:'Vertical Velocity',vr:'Radial Velocity',\
                 self.cs_name: 'Convective/Stratiform',self.rr_name:'Rain Rate',self.temp_name:'Temperature'}
-        self.cmaps = {dz: self.temp_cmap, zdr: plt.cm.Spectral_r, kdp: plt.cm.gist_heat_r, \
-                ldr: plt.cm.gist_rainbow_r, rho: plt.cm.jet, hid: self.hid_cmap,w:plt.cm.seismic,vr:plt.cm.bwr,self.cs_name: self.cs_cmap,self.rr_name:plt.cm.Spectral_r,self.temp_name:'RdYlBu_r'}
+        #self.cmaps = {dz: self.temp_cmap, zdr: plt.cm.Spectral_r, kdp: plt.cm.gist_heat_r, ldr: plt.cm.gist_rainbow_r, rho: plt.cm.jet, hid: self.hid_cmap,w:plt.cm.seismic,vr:plt.cm.bwr,self.cs_name: self.cs_cmap,self.rr_name:plt.cm.Spectral_r,self.temp_name:'RdYlBu_r'}
+        self.cmaps = {dz: self.temp_cmap, zdr: plt.cm.Spectral_r, kdp: plt.cm.gist_heat_r, ldr: plt.cm.gist_rainbow_r, rho: plt.cm.jet, hid: self.hid_cmap,w:plt.cm.seismic,vr:plt.cm.bwr,self.cs_name: self.cs_cmap,self.rr_name:plt.get_cmap('pyart_HomeyerRainbow'),self.temp_name:'RdYlBu_r'}
         self.ticklabels = {dz: np.arange(0, 90, 10), zdr: np.arange(-1, 4, 1), kdp: np.arange(-0.5, 4.5, 1), 
                 ldr: np.arange(-35, -15, 5), rho: np.arange(0.95, 1.01, 0.005), hid: np.append('', self.species),w:np.arange(-25,30.0,5.0),vr:np.arange(-25,30.0,5.0),
                 self.cs_name: self.cs_labels,self.rr_name:[0.1,1,10,30,50,70,100,130,150],self.temp_name:np.arange(-30,35,5)}
