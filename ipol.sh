@@ -165,8 +165,8 @@ sed -i '' "s/.*edatetime ==.*/edatetime == '$(echo $edt | tr '_' '-')' == # End 
 sed -i '' "s%.*rfiles ==.*%rfiles == '$configdir/$inputfile' == # Path to list of radar files to read in%g" $configdir/$configfile
 sed -i '' "s%.*wfiles ==.*%wfiles == '$configdir/$tempfile' == # Path to list of WRF temperature files to read in%g" $configdir/$configfile
 sed -i '' "s/.*exper ==.*/exper == $station == # Radar location/g" $configdir/$configfile
-sed -i '' "s/.*lat ==.*/lat == $latcen == # Latitude of the radar station/g" $configdir/$configfile
-sed -i '' "s/.*lon ==.*/lon == $loncen == # Longitude of the radar station/g" $configdir/$configfile
+sed -i '' "s/lat ==  == #.*/lat == $latcen == # Latitude of the radar station/g" $configdir/$configfile
+sed -i '' "s/lon ==  == #.*/lon == $loncen == # Longitude of the radar station/g" $configdir/$configfile
 sed -i '' "s%.*image_dir ==.*%image_dir == '$outdir/' == # Output figure directory%g" $configdir/$configfile
 sed -i '' "s/.*dd_on ==.*/dd_on == $dd_on == # Doppler gridded velocity on/g" $configdir/$configfile
 sed -i '' "s/.*snd_on ==.*/snd_on == $snd_on == # Sounding temperature on/g" $configdir/$configfile
