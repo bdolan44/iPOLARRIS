@@ -46,7 +46,6 @@ from tqdm import tqdm
 import csu_fhc
 import general_tools as gentools
 import RadarConfig
-
 # Up here are just some general functions
 
 
@@ -394,6 +393,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def calc_deltas(self): # get grid sizes for x, y, z
+        
         if 'd' in self.data[self.x_name].dims:
             print,'calc deltas'
             self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0))))
@@ -912,7 +912,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
         cb = fig.colorbar(dummy, cax = cbar_ax, orientation = 'horizontal')
-        cb.set_label('$\mu$ score')
+        cb.set_label(r'$\mu$'+' score')
 
         if title_flag:
             fig.suptitle('%s %s Cross Section HID scores' %(self.print_date(), self.radar_name), fontsize = 14)
@@ -943,7 +943,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         cbar_ax = fig.add_axes([0.15, 0.06, 0.7, 0.03])
         cb = fig.colorbar(dummy, cax = cbar_ax, orientation = 'horizontal')
-        cb.set_label('$\mu$ score')
+        cb.set_label(r'$\mu$'+' score')
 
         if title_flag:
             fig.suptitle('%s %s CAPPI HID scores' %(self.print_date(), self.radar_name), fontsize = 14)
@@ -1396,11 +1396,9 @@ class RadarData(RadarConfig.RadarConfig):
 
     def cappi(self, var, z=1.0, xlim=None, ylim=None, ax=None,ts = None, title_flag=False, vectors=None, cblabel=None, 
         labels=True, xlab=False, ylab=False, cbar=1, res = 2.0, thresh_dz=False,contour = None,statpt=False,**kwargs):
-        "Just make a Constant Altitude Plan Position Indicator plot of a given variable"
+        
+        from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 
-        # first, get the appropriate z index from the z that's wanted in altitude
-        #z_ind = np.argmin(np.abs(z - self.data[self.z_name].data))
-#        z_ind = self.get_ind(z,self.data[self.z_name].values)
         if ts is not None:
             try:
                 tmind = np.where(np.array(self.date)==ts)[0][0]
@@ -1412,24 +1410,18 @@ class RadarData(RadarConfig.RadarConfig):
             z_ind = 2
             
         else:
-#            z_ind = z
             if 'd' in self.data[self.z_name].dims:
-#                 print('getting z-ind')
                 z_ind = self.get_ind(z,np.squeeze(self.data[self.z_name].sel(d=tmind).values))
             else:
-#                 print('no d, getting z_ind 1266, z ',z)
-                
                 z_ind = self.get_ind(z,self.data[self.z_name].values)
-#                 print('got z index for z:',z, z_ind)
-#        print('xlims 1203',xlim,tmind)
- #       print('xlim is',xlim)
         
         if xlim is None:
             xmint, xmaxt = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
             xlimtest = [xmint,xmaxt]
             #when these are negative latitudes, then the 0th value is > the 1st value
             xlim = [np.min(xlimtest),np.max(xlimtest)]
-        if self.x_name == 'longitude':
+        
+        if self.x_name == 'longitude' or self.x_name == 'lon':
             if 'd' in self.data[self.x_name].dims:
                 if 'y' in self.data[self.x_name].dims:
                     xmini = self.get_ind(xlim[0],self.data[self.x_name].sel(d=tmind,y=0).values)
@@ -1542,6 +1534,7 @@ class RadarData(RadarConfig.RadarConfig):
 #        print xdat[xmax]
 #        data[dzmask] =np.nan
         data = np.ma.masked_where(~np.isfinite(data),data)
+        if var.startswith('RR'): data = np.ma.masked_where(data < 1,data)
         #print(np.max(data))
 #        print 'about to do plotting, ln 1113'
         if var.startswith('HID'):
@@ -1551,8 +1544,8 @@ class RadarData(RadarConfig.RadarConfig):
 #            print 'in var',var
             #print **kwargs
             #print(np.min(xdat),np.min(ydat),np.shape(data),np.max(data))
-            dummy = ax.pcolormesh(xdat,ydat, data,
-                vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
+            dummy = ax.pcolormesh(xdat,ydat, data, vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
+            #dummy = ax.pcolormesh(lons,lats, data, vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var])#, **kwargs)
         else:
 #            print ('unrecognized var',var)
             dat = self.data[var].data
@@ -1632,14 +1625,36 @@ class RadarData(RadarConfig.RadarConfig):
             if cblabel is not None:
                 cb.set_label(cblabel)
         '''
-        
-       
+        if cbar == 1:  # call separate HID colorbar function for bar plots
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur+wur+0.015,bur,0.02,hur]
+            if var.startswith('HID'): 
+                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+            else:
+                cbar_ax = fig.add_axes(cbar_ax_dims)
+                cbt = fig.colorbar(dummy,cax=cbar_ax)
+            cbt.ax.tick_params(labelsize=16)
+            cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=20, rotation=270, labelpad=20)
+
+        if cbar == 2 and var.startswith('HID'):
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur,bur-0.125,wur,0.03]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')  # call separate HID colorbar function for bar plots
+              
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
             #print('setting min and max',xmin,xmax,ymin,ymax)
             #ax.axis([xmin, xmax, ymin, ymax])
-            ax.set_xlim([xmin,xmax])
-            ax.set_ylim([ymin,ymax])
+            lnspc = 2
+            ltspc = 1
+            
+            minlon = lnspc*np.floor(lons[(0,0)]/lnspc)
+            maxlon = lnspc*np.ceil(lons[(0,-1)]/lnspc)
+            minlat = ltspc*np.floor(lats[(0,0)]/ltspc)
+            maxlat = ltspc*np.ceil(lats[(-1,0)]/ltspc)
+
+			#ax.set_xlim([xmin,xmax])
+            #ax.set_ylim([ymin,ymax])
             if labels:
                 ax.set_xlabel('Longitude')
                 ax.set_ylabel('Latitude')
@@ -1651,7 +1666,36 @@ class RadarData(RadarConfig.RadarConfig):
                 if ylab:
                     ax.set_ylabel('Latitude')
                     ax.tick_params(axis='y', which='major', labelsize=20)
+                    
+            ax.coastlines(resolution=resolution)
+            ax.set_extent([minlon, maxlon, minlat, maxlat])
+            lon_formatter = LongitudeFormatter(number_format='.1f')
+            lat_formatter = LatitudeFormatter(number_format='.1f')
+            ax.xaxis.set_major_formatter(lon_formatter)
+            ax.yaxis.set_major_formatter(lat_formatter)
+            
+            glnolabs = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False, linewidth=1.5, linestyle='--')
+            glnolabs.xlocator = ticker.MultipleLocator(base=lnspc)
+            glnolabs.ylocator = ticker.MultipleLocator(base=ltspc)
+            
+            gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
+            gl.xlabels_top = False
+            gl.ylabels_right = False
+            lonticks = np.linspace(minlon,maxlon,int((maxlon-minlon)/lnspc+1))
+            latticks = np.linspace(minlat,maxlat,int((maxlat-minlat)/ltspc+1))
+            gl.xlocator = ticker.FixedLocator(lonticks)
+            gl.ylocator = ticker.FixedLocator(latticks)
+            gl.xlabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15} 
+            gl.ylabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
+            
+            newax = fig.add_axes(ax.get_position(), frameon=False)
+            newax.tick_params(axis='x', labelsize=0, length=0, pad=20)
+            newax.tick_params(axis='y', labelsize=0, length=0, pad=55)
+            newax.set_xlabel('Longitude',fontsize=16)
+            newax.set_ylabel('Latitude',fontsize=16)
+
             if statpt: ax.plot(rdata.lon_0,rdata.lat_0,markersize=16,marker='^',color='k',transform=ccrs.PlateCarree())
+
         else:
             #ax.axis([xmini, xmaxi, ymini, ymaxi])
             ax.set_xlim([xmin,xmax])
@@ -1691,22 +1735,7 @@ class RadarData(RadarConfig.RadarConfig):
         cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=15)
         '''
         # now have to do a custom colorbar?
-        if cbar == 1:  # call separate HID colorbar function for bar plots
-            lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur+wur+0.015,bur,cbthickness,hur]
-            if var.startswith('HID'): 
-                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
-            else:
-                cbar_ax = fig.add_axes(cbar_ax_dims)
-                cbt = fig.colorbar(dummy,cax=cbar_ax)
-            cbt.ax.tick_params(labelsize=16)
-            cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=20, rotation=270, labelpad=15)
-
-        if cbar == 2 and var.startswith('HID'):
-            lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur,bur-0.125,wur,0.03]
-            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')  # call separate HID colorbar function for bar plots
-       
+      
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
 #            try:
@@ -3312,3 +3341,101 @@ class RadarData(RadarConfig.RadarConfig):
         gl.xlabels_top = False
         gl.ylabels_right = False
         # ax.set_title('MC3E CSAPR {d:
+
+    ######################################
+    ##### plot_driver.PLOT_COMPOSITE #####
+    ######################################
+
+    # Description: plot_composite overlays a Cartopy basemap with a colormesh plot of a given variable.
+
+    def plot_composite(self,var,time,resolution='10m',cs_over=False,statpt=False):
+        import cartopy.crs as ccrs 
+        
+        # (1) Create an array that is a copy of the variable of interest. Remove bad data.
+        dat = deepcopy(self.data[var].sel(d=time))
+        # dat = np.ma.masked_below(rdata.data[rdata.zdr_name].sel(d=time).values,-2)
+        whbad = np.where(self.data['CSS'].sel(d=time).values<0)
+        dat.values[whbad] = np.nan
+        dat = np.squeeze(dat.values)
+        dzcomp = np.nanmax(dat,axis=0)
+        cs_arr = np.squeeze(np.nanmax(np.squeeze(self.data['CSS'].sel(d=time).values),axis=0))
+
+        # (2) Find lat/lon array for the basemap. If not found, calculate it using get_latlon_fromxy().
+        if not self.lat_name in self.data.keys():
+            print('No latitude. Calculating....')
+            self.get_latlon_fromxy()
+            lats = self.data['lat']
+            lons = self.data['lon']
+        else:
+            if 'd' in self.data[self.lat_name].dims:
+                lats = self.data[self.lat_name].sel(d=time).values
+                lons = self.data[self.lon_name].sel(d=time).values
+            else:
+                lats = self.data[self.lat_name].values
+                lons = self.data[self.lon_name].values
+            
+        # (3) Extract the range of values in the variable of interest and derive a colourmap.
+        if var in self.lims.keys(): # If the variable exists in the dataset:
+            range_lim = self.lims[var][1] - self.lims[var][0]
+            vmin=self.lims[var][0]
+            vmax=self.lims[var][1]
+            cmap=self.cmaps[var]
+        else:
+            print ('unrecognized var',var)
+            dat = self.data[var].data
+        
+        # (4) Initiate a new figure with Mercator projection.
+        fig = plt.figure(figsize=(10,8))
+        ax = fig.add_subplot(111, projection=ccrs.Mercator())
+        
+        cb = ax.pcolormesh(lons,lats,dzcomp,vmin=vmin,vmax=vmax,cmap=cmap,transform=ccrs.PlateCarree())
+        if cs_over == True: ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
+        if statpt: ax.plot(self.lon_0,self.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
+ 
+        self.cleanup_plot(fig,ax,cb,var,lons,lats)
+
+        return fig, ax
+
+    def cleanup_plot(self,fig,ax,cb,var,lons,lats,lnspc=2,ltspc=1,resolution='10m'):
+        
+        import cartopy.crs as ccrs
+        import matplotlib.ticker as ticker
+        import numpy as np
+
+        # (5) Overlay variable data as a colormesh plot (with colorbar) using PlateCarree projection.
+        
+        lur,bur,wur,hur = ax.get_position().bounds
+        cbar_ax_dims = [lur+wur+0.02,bur,0.03,hur]
+        cbar_ax = fig.add_axes(cbar_ax_dims)
+        cbt = plt.colorbar(cb,cax=cbar_ax)
+        cbt.ax.tick_params(labelsize=16)
+        if var.startswith('REF'): labtxt = 'Composite Reflectivity (dBZ)'
+        else: labtxt = var
+        cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
+
+        # (6) Make the figure look pretty! 
+        ax.coastlines(resolution=resolution)
+       
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
+        gl.xlabels_top = False
+        gl.ylabels_right = False
+        gl.x_inline = False
+        gl.y_inline = False
+        gl.xlabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
+        gl.ylabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
+ 
+        minlon = np.floor(lons[(0,0)])
+        maxlon = np.ceil(lons[(0,-1)])
+        minlat = np.floor(lats[(0,0)])
+        maxlat = np.ceil(lats[(-1,0)])
+        lonticks = np.linspace(minlon,maxlon,int((maxlon-minlon)/lnspc+1))
+        latticks = np.linspace(minlat,maxlat,int((maxlat-minlat)/ltspc+1))
+        gl.xlocator = ticker.FixedLocator(lonticks)
+        gl.ylocator = ticker.FixedLocator(latticks)
+        ax.set_extent([minlon-0.001,maxlon+0.001,minlat-0.001,maxlat+0.001])
+        
+        newax = fig.add_axes(ax.get_position(), frameon=False)
+        newax.tick_params(axis='x', labelsize=0, length=0, pad=15)
+        newax.tick_params(axis='y', labelsize=0, length=0, pad=45)
+        newax.set_xlabel('Longitude',fontsize=16)
+        newax.set_ylabel('Latitude',fontsize=16)
