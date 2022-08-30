@@ -214,12 +214,11 @@ def polarris_driver(configfile):
                 key, val, comment = line.split('==')
                 vval = val.replace(" ","")
                 numck = hasNumbers(vval)
-                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'drop_vars' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys':
+                if key.replace(" ", "") == 'exper' or key.replace(" ", "") == 'dz_name' or key.replace(" ", "") == 'drop_vars' or key.replace(" ", "") == 'radarname' or key.replace(" ", "") == 'dr_name' or key.replace(" ", "") == 'kd_name' or key.replace(" ", "") == 'rh_name' or key.replace(" ", "") == 'vr_name' or key.replace(" ", "") == 'mphys' or key.replace(" ", "") == 'xname' or key.replace(" ", "") == 'yname' or key.replace(" ", "") == 'zname' or key.replace(" ", "") == 'latname' or key.replace(" ", "") == 'lonname':
                     numck = False
                 if key.replace(" ", "") == 'exper': # or key.replace(" ", "") == 'ptype':
                     vval = vval.strip("''")
                 #print numck
-                #print vval,key
                 if key.replace(" ", "") == 'image_dir':
                     numck = True
                 if key.replace(" ", "") == 'rfiles':
@@ -297,13 +296,15 @@ def polarris_driver(configfile):
         rvar = xr.open_mfdataset(rfiles,autoclose=True,combine='nested',concat_dim='d',preprocess=reduce_dim)
         #rvar = xr.open_mfdataset(rfiles,autoclose=True,concat_dim='d',preprocess=reduce_dim)
     try:
-        rvar = rvar.rename({'x0':'x'})
-        rvar = rvar.rename({'y0':'y'})
-        rvar = rvar.rename({'z0':'z'})
+        rvar = rvar.rename({config['xname']:'x'})
+        rvar = rvar.rename({config['yname']:'y'})
+        rvar = rvar.rename({config['zname']:'z'})
+        rvar = rvar.rename({config['latname']:'lat'})
+        rvar = rvar.rename({config['lonname']:'lon'})
     except:
         print('Dims do not need renaming')
     #print('Current dimensions:',rvar.dims)
-
+    #input()
     #print(np.min(rvar.dimensions[config['xname']].values),np.max(rvar.dimensions[config['xname']].values))
     #print(np.min(rvar.dimensions[config['yname']].values),np.max(rvar.dimensions[config['yname']].values))
     #input()
