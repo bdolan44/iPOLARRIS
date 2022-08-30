@@ -201,60 +201,33 @@ else:
         outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
         os.makedirs(outdir,exist_ok=True)
       
-        st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
-        en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
-
         for i,rtimematch in enumerate(np.array(rdata.date)):
 
-            fig, ax = plot_driver.plot_composite(rdata,rdata.dz_name,i,cs_over=False,statpt=True)
+            fig, ax = rdata.plot_composite(rdata.dz_name,i,statpt=True)
             ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
            
             if not config['ptype'].startswith('mp4'):
                 plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
             else: 
-                plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
+                if len(rdata.date) < 6:
+                    plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.png'.format(e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
+                else:
+                    plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
 
             plt.close()
             print(rtimematch)
         
-        if config['ptype'].startswith('mp4'):
+        if config['ptype'].startswith('mp4') and len(rdata.date) >= 6:
             
+            st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
+            en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
+           
             os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdata.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_{t1}-{t2}.mp4'.format(p=config['ptype'],e=rdata.exper,i=outdir,v=rdata.dz_name,t1=st,t2=en))
 
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
     
-    '''
-    if (config['cappi_ref'] | config['all1']):
-        
-        print('\nIN RUN_IPOLARRIS_NEW... creating CAPPI figures.')
-        print('\nPlotting CAPPIs at height z = '+str(config['z'])+'km by time for variable '+rdata.dz_name+'...')
- 
-        outdir = config['image_dir']+'cappi_'+rdata.dz_name+'/'
-        os.makedirs(outdir,exist_ok=True)
-       
-        for i,rtimematch in enumerate(np.array(rdata.date)):
-
-            fig, ax = plot_driver.plot_cappi(rdata,rdata.dz_name,rdata.z_name,config['z'],i,rtimematch,cs_over=False,statpt=True)
-                    
-            ax.set_xlim(config['xlim'][0],config['xlim'][1])
-            ax.set_ylim(config['ylim'][0],config['ylim'][1])           
-            #ax.set_extent([minlon, maxlon, minlat,maxlat])
-            
-            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-            ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-
-            #plt.savefig('{i}dz_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.dz_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
-            plt.savefig('{i}{e}_{v}_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,h=config['z'],v=rdata.dz_name,t=rtimematch),dpi=400,bbox_inches='tight')
-            plt.close()
-
-            print(rtimematch)
-
-        print('\nDone! Saved to '+outdir)
-        print('Moving on.\n')
-    '''
 
     if (config['cappi_rr'] | config['all1']):
 
@@ -273,11 +246,8 @@ else:
 
             for i,rtimematch in enumerate(np.array(rdata.date)):
 
-                fig, ax = plot_driver.plot_cappi(rdata,rdata.rr_name,rdata.z_name,z,i,rtimematch,cs_over=False,statpt=True)
-                
-                #fig, ax = plt.subplots(1,1,figsize=(10,8))
-                #whz = np.where(rdata.data[rdata.z_name].values==config['z'])[0][0]
-                #rdata.cappi(rdata.rr_name,z=whz,ts=rtimematch,contour='CS',ax=ax)
+                dummy, ax = rdata.cappi(rdata.rr_name,z=z,ts=rtimematch,contour=None)
+
                 ax.set_xlim(config['xlim'][0],config['xlim'][1])
                 ax.set_ylim(config['ylim'][0],config['ylim'][1])
                 
@@ -285,24 +255,26 @@ else:
                 ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                 ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
-                #plt.savefig('{i}rr_cappi_{h}_{v}_{t:%Y-%m-%d_%H%M%S}_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir']+'cappi_'+rdata.rr_name+'/',h=config['z'],v=rdata.dz_name,t=rtimematch,e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight') 
-                #plt.savefig('{i}{e}_{v}_cappi_{t:%Y-%m-%d_%H%M%S}_{h}.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
-                plt.savefig('{i}{e}_{v}_cappi_{t:%Y-%m-%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
+                if not config['ptype'].startswith('mp4') or len(rdata.date) < 6:
+                    plt.savefig('{i}{e}_{v}_cappi_{t:%Y-%m-%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
+                else: 
+                    plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
+
                 plt.close()
 
                 print(rtimematch)
 
-        #print('\nDone! Saved to '+outdir)
-        #print('Moving on.\n')
+        if config['ptype'].startswith('mp4') and len(rdata.date) >= 6:
 
-    # tdate = datetime.datetime(2006,1,23,18,00)
-    # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-    # fig, ax = plot_driver.plot_composite(rdata,rdata.cs_name,whdate[0][0])
-    # rtimematch = rdata.date[whdate[0][0]]
-    # ax.set_title('C/S composite {d:%Y%m%d %H%M}'.format(d=rtimematch))
-    # plt.tight_layout()
-    # plt.savefig('{i}Composite_{v}_{t:%Y%m%d%H%M}_{e}_{m}_{x}.{p}'.format(i=config['image_dir'],v=rdata.cs_name,t=rtimematch,e=rdata.exper,m=rdata.mphys,x=),dpi=400)
-    # plt.clf()
+            st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
+            en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
+
+            os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdata.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_{t1}-{t2}.mp4'.format(p=config['ptype'],e=rdata.exper,i=outdir,v=rdata.rr_name,t1=st,t2=en))
+        
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+
+
 
     ################################################################################
     
