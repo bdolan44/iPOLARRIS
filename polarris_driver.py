@@ -301,6 +301,11 @@ def polarris_driver(configfile):
         rvar = rvar.rename({config['zname']:'z'})
         rvar = rvar.rename({config['latname']:'lat'})
         rvar = rvar.rename({config['lonname']:'lon'})
+        config['xname'] = 'x'
+        config['yname'] = 'y'
+        config['zname'] = 'z'
+        config['latname'] = 'lat'
+        config['lonname'] = 'lon'
     except:
         print('Dims do not need renaming')
     #print('Current dimensions:',rvar.dims)
