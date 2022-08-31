@@ -10,10 +10,12 @@ realpath() {
 case=$1
 raddir="$(realpath $2)"
 tempdir="$(realpath $3)"
-outparentdir="$(realpath $4)"
-allfigs=$5
-simdir=$6
-doppdir=$7
+simdir=$4
+doppdir=$5
+
+outfigpdir="outputfig/"
+outdatpdir="/Volumes/OneTouch5TB/olym_rad_obs/"
+ptype=png
 
 ipoldir="$(realpath )"
 
@@ -146,8 +148,9 @@ else
     dd_on='True'
 fi
 
-outdir=$outparentdir/${fold}_temp${temp}_${station}_${stt}_${edt}
-mkdir -p $outdir
+outfigdir=$outfigpdir/${fold}_temp${temp}_${station}_${stt}_${edt}
+outrrdir=$outdatpdir/radar_rainrates/$station
+mkdir -p $outfigdir $outrrdir
 
 echo
 echo Creating config file for iPOLARRIS...
@@ -160,6 +163,7 @@ cp $template $configdir/$configfile
 
 sed -i '' "s/^type ==.*/type == $data == # Type of input data: 'obs' OR 'wrf' (obs + simulated)/g" $configdir/$configfile
 sed -i '' "s/.*mphys ==.*/mphys == $data == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'/g" $configdir/$configfile
+sed -i '' "s/.*ptype ==.*/ptype == $ptype == # Output figure file extenstion (i.e. png, jpg, mp4, ...)/g" $configdir/$configfile
 sed -i '' "s/.*sdatetime ==.*/sdatetime == '$(echo $stt | tr '_' '-')' == # Start time of analysis of interest/g" $configdir/$configfile
 sed -i '' "s/.*edatetime ==.*/edatetime == '$(echo $edt | tr '_' '-')' == # End time of analysis of interest/g" $configdir/$configfile
 sed -i '' "s%.*rfiles ==.*%rfiles == '$configdir/$inputfile' == # Path to list of radar files to read in%g" $configdir/$configfile
@@ -167,7 +171,8 @@ sed -i '' "s%.*wfiles ==.*%wfiles == '$configdir/$tempfile' == # Path to list of
 sed -i '' "s/.*exper ==.*/exper == $station == # Radar location/g" $configdir/$configfile
 sed -i '' "s/lat ==  == #.*/lat == $latcen == # Latitude of the radar station/g" $configdir/$configfile
 sed -i '' "s/lon ==  == #.*/lon == $loncen == # Longitude of the radar station/g" $configdir/$configfile
-sed -i '' "s%.*image_dir ==.*%image_dir == '$outdir/' == # Output figure directory%g" $configdir/$configfile
+sed -i '' "s%.*image_dir ==.*%image_dir == '$outfigdir/' == # Output figure directory%g" $configdir/$configfile
+sed -i '' "s%.*rr_dir ==.*%rr_dir == '$outrrdir/' == # Output rain rate netcdf directory%g" $configdir/$configfile
 sed -i '' "s/.*dd_on ==.*/dd_on == $dd_on == # Doppler gridded velocity on/g" $configdir/$configfile
 sed -i '' "s/.*snd_on ==.*/snd_on == $snd_on == # Sounding temperature on/g" $configdir/$configfile
 sed -i '' "s/.*wrft_on ==.*/wrft_on == $wrft_on == # WRF temperature on/g" $configdir/$configfile

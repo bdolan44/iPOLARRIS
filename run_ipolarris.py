@@ -246,11 +246,8 @@ else:
 
             for i,rtimematch in enumerate(np.array(rdata.date)):
 
-                dummy, ax = rdata.cappi(rdata.rr_name,z=z,ts=rtimematch,contour=None)
+                dummy, ax = rdata.cappi(rdata.rr_name,z=z,xlim=config['xlim'],ylim=config['ylim'],ts=rtimematch,contour=None,latlon=config['latlon'],statpt=True)
 
-                ax.set_xlim(config['xlim'][0],config['xlim'][1])
-                ax.set_ylim(config['ylim'][0],config['ylim'][1])
-                
                 ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                 ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                 ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)

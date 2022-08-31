@@ -6,6 +6,23 @@ type ==  == # Type of input data: 'obs' OR 'wrf' (obs + simulated)
 mphys ==  == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'
 
 
+#===============
+#### OUTPUT ####
+#===============
+
+# Args
+cb_friendly	== True == # Use color-blindness palette for output (i.e. reflectivity)
+latlon == True == # Output plots on Cartopy basemap if True
+
+xlim ==  ==
+ylim ==  ==
+y == 0 == # Lat of the y cross-section for RHI
+zlim == [0,12] ==
+z == 0.5 == # Height of the CAPPIs
+
+#xlim == [-126.0,-123.0] == #lat / lon zoom for CAPPIS
+#ylim == [46.0,48.5] == #lat / lon zoom for CAPPIS
+
 #==============
 #### INPUT ####
 #==============
@@ -21,14 +38,50 @@ sfiles ==  == # Sounding file directory
 wfiles ==  == # Sounding file directory
 dfiles ==  == # Location of dual-Doppler files
 image_dir ==  == # Output figure directory
-ptype == png == # Output figure file extenstion (i.e. png, jpg, mp4, ...)
+rr_dir ==  == # Output rain rate netcdf directory
+ptype ==  == # Output figure file extenstion (i.e. png, jpg, mp4, ...)
 exper ==  == # Radar location
 lat ==  == # Latitude of the radar station
 lon ==  == # Longitude of the radar station
 
-#-----------------------------------------------
-#------ Radar File Reading (NOT OPTIONAL) ------
-#-----------------------------------------------
+#------------------------------------------------------------------
+#------ Sounding File Reading (REQUIRED if wfrt_on == False) ------
+#------------------------------------------------------------------
+
+snd_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+sdate_format == %Y%m%d_%H%M%S == # Sounding file date format
+sdstart == 4 == # Offset for date timestamp in radar filename 
+sdend == 19 == # Number of characters in timestamp on radar file
+sstat == UIL == # Sounding station identification
+
+#--------------------------------------------------------------
+#------ POL-f File Reading (REQUIRED if snd_on == False) ------
+#--------------------------------------------------------------
+
+wrft_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+wdate_format == %Y-%m-%d_%H:%M:%S == # Sounding file date format
+wdstart == 16 == # Offset for date timestamp in radar filename 
+wdend == 35 == # Number of characters in timestamp on radar file
+
+#---------------------------------------------------
+#------ Doppler Radar File Reading (Optional) ------
+#---------------------------------------------------
+
+dd_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
+
+# Args
+ddate_format	== %Y%m%d_%H%M%S		                        == # Format for the dual-Doppler file date
+ddstart	    	== 10				                            == # Offset for dual-Doppler timestamp in filename
+ddend		    == 25				                            == # Offset for dual-Doppler timestamp in filename
+
+# Variables (NOTE: use NCDUMP to locate variable names of Doppler radar fields and info)
+convname	== None			        == # Name of 
+
+#----------------------------------------------------------------------------------------------------------------
+#------ Radar File Reading (DEFAULT - Change only if radar .nc conventions have changed - use ncdump) -----------
+#----------------------------------------------------------------------------------------------------------------
 
 # Args
 sdatetime_format == %Y%m%d-%H%M == # Start time format
@@ -49,58 +102,17 @@ t_name == T == # Name of the temperature field
 uname == eastward_wind == # Name of the zonal wind field
 vname == northward_wind == # Name of the meridional wind field
 wname == upward_air_velocity == # Name of the vertical wind field
-xname == x0 == # Name of the zonal directional variable
-yname == y0 == # Name of the meridional directional variables
-zname == z0 == # Name of the vertical level field
-latname == lat0 == # 
-lonname == lon0 == # 
+xname == x0 == # File naming of the zonal directional variable
+yname == y0 == # File naming of the meridional directional variables
+zname == z0 == # File naming of the vertical level field
+lonname == lon0 == # File naming of the longitude variable 
+latname == lat0 == # File naming of the latitude variable
 band == S == # Radar band: X, C OR S. Note: needs to be capital letter.
-radarname == S-band == # 
 
-# Other (NOTE: use the internet to find these - not ideal)
 
-#---------------------------------------------------
-#------ Doppler Radar File Reading (Optional) ------
-#---------------------------------------------------
-
-dd_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
-
-# Args
-ddate_format	== %Y%m%d_%H%M%S		                        == # Format for the dual-Doppler file date
-ddstart	    	== 10				                            == # Offset for dual-Doppler timestamp in filename
-ddend		    == 25				                            == # Offset for dual-Doppler timestamp in filename
-
-# Variables (NOTE: use NCDUMP to locate variable names of Doppler radar fields and info)
-convname	== None			        == # Name of 
-
-#----------------------------------------------
-#------ Sounding File Reading (Optional) ------
-#----------------------------------------------
-
-snd_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
-
-# Args
-ad		        == config['date']+'_'		                == # Extra characters
-sdate_format	== %Y%m%d_%H%M%S		                    == # Sounding file date format
-sdstart		    == 4				                        == # Offset for date timestamp in radar filename 
-sdend		    == 19				                        == # Number of characters in timestamp on radar file
-sstat		    == UIL				                        == # Sounding station identification
-
-#-------------------------------------------
-#------ POL-f File Reading (Optional) ------
-#-------------------------------------------
-
-wrft_on ==  == # Set this to loop through separate dual-Doppler files (e.g. for obs)
-
-# Args
-ad		        == config['date']+'_'		                == # Extra characters
-wdate_format	== %Y-%m-%d_%H:%M:%S		                    == # Sounding file date format
-wdstart		    == 16				                        == # Offset for date timestamp in radar filename 
-wdend		    == 35				                        == # Number of characters in timestamp on radar file
-
-#===============
-#### OUTPUT ####
-#===============
+#==============
+#### OTHER ####
+#==============
 
 #----------------------------------------------------------
 #------ Output Flags (what to print) if type = 'obs' ------
@@ -108,7 +120,7 @@ wdend		    == 35				                        == # Number of characters in timesta
 
 # SET 1) Plots created in run_ipolarris_new.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_rr	    == True	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
@@ -144,23 +156,6 @@ qr_rhi			    == False	== # FL) Make rhis of the mixing ratios (only valid for mo
 #----------------------------------------------------------
 
 convert_Tk_Tc	== False	== # Convert temperature in K to deg C
-
-#-----------------------------
-#------ Output Settings ------
-#-----------------------------
-
-# Args
-cb_friendly	== True			    == # Use color-blindness palette for output (i.e. reflectivity)
-
-# Constant-Altitude Plan-Position Indicator (CAPPI) 
-xlim	== [-200,200]		==#lat / lon zoom for CAPPIS
-ylim	== [-200,200]		==# lat / lon zoom for CAPPIS
-y	== 0			==#Lat of the y cross-section for RHI
-#xlim	== [-127.0,-121.0]	==#lat / lon zoom for CAPPIS
-#ylim	== [45.0,49.0]		==# lat / lon zoom for CAPPIS
-#y==35.7                                 ==#Lat of the y cross-section for RHI
-z == 0.5 == # Height of the CAPPIs
-zlim    == [0,12]    ==
 
 # Histogram Bins for Radar Observables
 wbins	== np.arange(-25,26,0.5)	== # Histogram bins for vertical velocity
