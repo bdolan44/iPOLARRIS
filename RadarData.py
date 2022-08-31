@@ -881,10 +881,10 @@ class RadarData(RadarConfig.RadarConfig):
         self.data['RRM'].values[whbad]=-1
         
         it = self.data[self.rr_name].shape[0]
-        print('\nSaving RR to files...\n')
-        for ii in range(it):            
+        print('\nSaving RR to files...')
+        for ii in tqdm(range(it)):            
             self.data[self.rr_name].sel(d=ii).to_netcdf(path=config['rr_dir']+'/RR_hidro_'+config['exper']+'_'+str(tm[ii].strftime('%Y%m%d_%H%M%S'))+'.nc', mode='w')  
-
+        print('')
         return
 #############################################################################################################
 
