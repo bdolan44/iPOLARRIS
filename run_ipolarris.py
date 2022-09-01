@@ -253,21 +253,24 @@ else:
                 ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
 
                 if not config['ptype'].startswith('mp4') or len(rdata.date) < 6:
-                    plt.savefig('{i}{e}_{v}_cappi_{t:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
+                    plt.savefig('{i}{e}_{v}_cappi_{d:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,d=rtimematch),dpi=400,bbox_inches='tight')
                 else: 
-                    plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
+                    if len(rdata.date) < 6:
+                        plt.savefig('{i}{e}_{v}_cappi_{d:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,d=rtimematch),dpi=400,bbox_inches='tight')
+                    else:
+                        plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
 
                 plt.close()
 
                 print(rtimematch)
 
-        if config['ptype'].startswith('mp4') and len(rdata.date) >= 6:
+            if config['ptype'].startswith('mp4') and len(rdata.date) >= 6:
 
-            st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
-            en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
+                st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
+                en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
 
-            os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdata.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_{t1}-{t2}.mp4'.format(p=config['ptype'],e=rdata.exper,i=outdir,v=rdata.rr_name,t1=st,t2=en))
-        
+                os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdata.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_{t1}-{t2}_{h}.mp4'.format(p=config['ptype'],e=rdata.exper,i=outdir,v=rdata.rr_name,t1=st,t2=en,h=z))
+            
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
