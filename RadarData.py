@@ -1398,72 +1398,71 @@ class RadarData(RadarConfig.RadarConfig):
        
         import cartopy.crs as ccrs
 
-        if latlon:
-            lons = self.data[self.lon_name].values
-            lats = self.data[self.lat_name].values 
-        
         if ts is not None:
             try:
                 tmind = np.where(np.array(self.date)==ts)[0][0]
             except IndexError as e:
                 tmind = np.where(np.array(self.date)==ts)[0]
      
-        if not xlim:
-            if latlon:
-                xmin, xmax = lons[(0,0)], lons[(0,-1)]
-            else:
-                xmin, xmax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
-        else:
-            xmin = np.min(xlim)
-            xmax = np.max(xlim)
-              
-        if not ylim:
-            if latlon:
-                ymin, ymax = lats[(0,0)], lats[(-1,0)]
-            else:
-                ymin, ymax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
-        else:
-            ymin = np.min(ylim)
-            ymax = np.max(ylim)
-
         if latlon:
+            lons = self.data[self.lon_name].values
+            xmin, xmax = lons[(0,0)], lons[(0,-1)]
             xshift = 0.5*(self.data[self.x_name].shape[0]-1)
-            xmini = np.where(lons[0,:] >= xmin)[0][0]-xshift
-            xmaxi = np.where(lons[0,:] <= xmax)[0][-1]-xshift
-            yshift = 0.5*(self.data[self.y_name].shape[0]-1)
-            ymini = np.where(lats[:,0] >= ymin)[0][0]-yshift
-            ymaxi = np.where(lats[:,0] <= ymax)[0][-1]-yshift
-            if 'd' in self.data[self.lon_name].dims:
-                xdat = np.squeeze(self.data[self.lon_name].sel(d=tmind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values).T
-                ydat = np.squeeze(self.data[self.lat_name].sel(d=tmind,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values).T
-            else:
-                xdat = np.squeeze(self.data[self.lon_name].sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
-                ydat = np.squeeze(self.data[self.lat_name].sel(x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
-            data = np.squeeze(self.data[var].sel(d=tmind,z=z,x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
-        else:
-            if 'd' in self.data[self.x_name].dims:
-                xdat = np.squeeze(self.data[self.x_name].sel(d=tmind,x=slice(xmin,xmax),y=slice(ymin,ymax)).values)
-                ydat = np.squeeze(self.data[self.y_name].sel(d=tmind,x=slice(xmin,xmax),y=slice(ymin,ymax)).values)
-            else:
-                xdat = np.squeeze(self.data[self.x_name].sel(x=slice(xmin,xmax)).values)
-                ydat = np.squeeze(self.data[self.y_name].sel(y=slice(ymin,ymax)).values)
-            data = np.squeeze(self.data[var].sel(d=tmind,z=z,x=slice(xmin,xmax),y=slice(ymin,ymax)).values) 
- 
-        if ax is None:
-            if latlon:
-                fig = plt.figure(figsize=(10,8))
-                ax = fig.add_subplot(111, projection=ccrs.Mercator())
-            else:
-                fig, ax = plt.subplots(figsize=(10,8))
-        else:
-            fig = ax.get_figure()
+            xmin = np.where(lons[0,:] >= xmin)[0][0]-xshift
+            xmax = np.where(lons[0,:] <= xmax)[0][-1]-xshift
 
+            lats = self.data[self.lat_name].values  
+            ymin, ymax = lats[(0,0)], lats[(-1,0)]
+            yshift = 0.5*(self.data[self.y_name].shape[0]-1)
+            ymin = np.where(lats[:,0] >= ymin)[0][0]-yshift
+            ymax = np.where(lats[:,0] <= ymax)[0][-1]-yshift
+
+            xdataset = self.data[self.lon_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+            ydataset = self.data[self.lat_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+        else:
+            if not xlim:
+                xmin, xmax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
+            else:
+                xmin, xmax = xlim[0], xlim[1]
+            if not ylim:
+                ymin, ymax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
+            else:
+                ymin, ymax = ylim[0], ylim[1]
+
+            if 'y' in self.data[self.x_name]:
+                xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+            else:
+                xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax))
+
+            if 'x' in self.data[self.y_name]:
+                ydataset = self.data[self.y_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+            else:
+                ydataset = self.data[self.y_name].sel(y=slice(ymin,ymax))
+                
+        if 'd' in xdataset:
+            xdat = np.squeeze(xdataset.sel(d=tmind).values)
+            ydat = np.squeeze(ydataset.sel(d=tmind).values)
+        else:
+            xdat = np.squeeze(xdataset.values)
+            ydat = np.squeeze(ydataset.values)
+        
+        dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+        data = np.squeeze(dataset.sel(d=tmind).values)
         data = np.ma.masked_where(~np.isfinite(data),data)
         if var.startswith('HID'): 
             data = np.ma.masked_where(data < 1,data)
         elif var.startswith('RR'):
             data = np.ma.masked_where(data < 0.5,data)
-   
+
+        if ax is None:
+            fig = plt.figure(figsize=(10,8))
+            if latlon:
+                ax = fig.add_subplot(111, projection=ccrs.Mercator())
+            else:
+                ax = fig.add_subplot(111)
+        else:
+            fig = ax.get_figure()
+
         if var in self.lims.keys():
             if latlon:
                 dummy = ax.pcolormesh(xdat,ydat, data, vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], transform=ccrs.PlateCarree(), **kwargs)
@@ -1479,30 +1478,42 @@ class RadarData(RadarConfig.RadarConfig):
 
         if contour is not None:
             if contour == 'CS':
-                csvals = np.squeeze(self.data[self.cs_name].sel(d=tmind,z=slice(z_ind,z_ind+1),x=slice(xmini,xmaxi),y=slice(ymini,ymaxi)).values)
-                cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8,zorder=10)
-
-        if cbar == 1:
-            if var.startswith('HID'): 
-                lur,bur,wur,hur = ax.get_position().bounds
-                cbar_ax_dims = [lur+wur+0.015,bur,0.02,hur]
-                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims) 
-                cbt.ax.tick_params(labelsize=16)
-                cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=20, rotation=270, labelpad=20)
-            else:
-                self.mycbar(fig,ax,dummy,var)
-        elif cbar == 2 and var.startswith('HID'):
-            lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur,bur-0.125,wur,0.03]
-            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
-              
+                csvals = np.squeeze(self.data[self.cs_name].sel(d=tmind,z=z,x=slice(xmin,xmax),y=slice(ymin,ymax)).values)
+                if latlon:
+                    cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8, zorder=10, transform=ccrs.PlateCarree())
+                else:
+                    cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8, zorder=10)
+             
         if latlon:
-            self.co_gridlines(fig,ax,np.floor(xmin),np.ceil(xmax),np.floor(ymin),np.ceil(ymax))
+            if not xlim:
+                maxlons = []
+                minlons = []
+                maxlats = []
+                minlats = []
+                for ii in range(dataset.shape[0]):
+                    xdat_masked = np.ma.array(xdataset,mask=dataset[ii].fillna(True)) 
+                    ydat_masked = np.ma.array(ydataset,mask=dataset[ii].fillna(True))
+                    minlons.append(np.min(xdat_masked))
+                    maxlons.append(np.max(xdat_masked))
+                    minlats.append(np.min(ydat_masked))
+                    maxlats.append(np.max(ydat_masked))
+                
+                minlon = np.round(np.min(minlons)-0.1,1)
+                maxlon = np.round(self.lon_0+(self.lon_0-np.min(minlons))+0.1,1)
+                minlat = np.round(np.min(minlats)-0.1,1)
+                maxlat = np.round(np.max(maxlats)+0.1,1)
+            else:
+                minlon = np.round(np.min(xlim),1)
+                maxlon = np.round(np.max(xlim),1)
+                minlat = np.round(np.min(ylim),1)
+                maxlat = np.round(np.max(ylim),1)
+            
+            self.co_gridlines(fig,ax,minlon,maxlon,minlat,maxlat)
             if statpt: ax.plot(self.lon_0,self.lat_0,markersize=16,marker='^',color='k',transform=ccrs.PlateCarree())
 
         else:
-            ax.set_xlim([xmini,xmaxi])
-            ax.set_ylim([ymini,ymaxi])
+            ax.set_xlim([xmin,xmax])
+            ax.set_ylim([ymin,ymax])
             if labels:
                 ax.set_xlabel('Distance E of radar (km)',fontsize=20)
                 ax.set_ylabel('Distance N of radar (km)',fontsize=20)
@@ -1526,6 +1537,20 @@ class RadarData(RadarConfig.RadarConfig):
                 cbthickness = 0.02
             if statpt: ax.plot(0,0,markersize=16,marker='^',color='k')
 
+        if cbar == 1:
+            if var.startswith('HID'): 
+                lur,bur,wur,hur = ax.get_position().bounds
+                cbar_ax_dims = [lur+wur+0.015,bur,0.02,hur]
+                cbt = self.HID_barplot_colorbar(fig,cbar_ax_dims) 
+                cbt.ax.tick_params(labelsize=16)
+                cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=20, rotation=270, labelpad=20)
+            else:
+                self.mycbar(fig,ax,dummy,var,self.longnames[var]+' '+self.units[var])
+        elif cbar == 2 and var.startswith('HID'):
+            lur,bur,wur,hur = ax.get_position().bounds
+            cbar_ax_dims = [lur,bur-0.125,wur,0.03]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
+ 
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
 #            try:
@@ -3170,13 +3195,13 @@ class RadarData(RadarConfig.RadarConfig):
             ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
             
         if statpt: ax.plot(self.lon_0,self.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
-        
-        self.co_gridlines(fig,ax,lons,lats)
-        self.mycbar(fig,ax,cb,var)
+
+        self.co_gridlines(fig,ax,lons[(0,0)],lons[(0,-1)],lats[(0,0)],lats[(-1,0)])
+        self.mycbar(fig,ax,cb,var,'Composite '+self.longnames[var]+' '+self.units[var])
         
         return fig, ax
 
-    def co_gridlines(self,fig,ax,minlon,maxlon,minlat,maxlat,lnspc=2,ltspc=1,resolution='10m'):
+    def co_gridlines(self,fig,ax,minlon=False,maxlon=False,minlat=False,maxlat=False,lnspc=2,ltspc=1,resolution='10m'):
         
         import cartopy.crs as ccrs
         import matplotlib.ticker as ticker
@@ -3194,10 +3219,6 @@ class RadarData(RadarConfig.RadarConfig):
         gl.xlabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
         gl.ylabel_style = {'size': 16, 'color': 'black'}#,'rotation':-15}
  
-        #lonticks = np.linspace(minlon,maxlon,int((maxlon-minlon)/lnspc+1))
-        #latticks = np.linspace(minlat,maxlat,int((maxlat-minlat)/ltspc+1))
-        #gl.xlocator = ticker.FixedLocator(lonticks)
-        #gl.ylocator = ticker.FixedLocator(latticks)
         ax.set_extent([minlon,maxlon,minlat,maxlat])
         
         newax = fig.add_axes(ax.get_position(), frameon=False)
@@ -3206,13 +3227,11 @@ class RadarData(RadarConfig.RadarConfig):
         newax.set_xlabel('Longitude',fontsize=16)
         newax.set_ylabel('Latitude',fontsize=16)
 
-    def mycbar(self,fig,ax,cb,var):        
+    def mycbar(self,fig,ax,cb,var,labtxt):        
         
         lur,bur,wur,hur = ax.get_position().bounds
-        cbar_ax_dims = [lur+wur+0.02,bur,0.03,hur]
+        cbar_ax_dims = [lur+wur+0.015,bur,0.03,hur]
         cbar_ax = fig.add_axes(cbar_ax_dims)
         cbt = plt.colorbar(cb,cax=cbar_ax)
         cbt.ax.tick_params(labelsize=16)
-        if var.startswith('REF'): labtxt = 'Composite Reflectivity (dBZ)'
-        else: labtxt = var
         cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)

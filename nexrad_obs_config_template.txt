@@ -14,14 +14,17 @@ mphys ==  == # Type of microphysics used in model: 'obs' OR '<scheme>' if type =
 cb_friendly	== True == # Use color-blindness palette for output (i.e. reflectivity)
 latlon == True == # Output plots on Cartopy basemap if True
 
-xlim ==  ==
-ylim ==  ==
-y == 0 == # Lat of the y cross-section for RHI
-zlim == [0,12] ==
-z == 0.5 == # Height of the CAPPIs
-
-#xlim == [-126.0,-123.0] == #lat / lon zoom for CAPPIS
+xlim ==  == #lat / lon zoom for CAPPIS
+#xlim == [-200,200] ==
+#xlim == [-126.0,-122.0] == #lat / lon zoom for CAPPIS
+ylim ==  == #lat / lon zoom for CAPPIS
+#ylim == [-200,200] ==
 #ylim == [46.0,48.5] == #lat / lon zoom for CAPPIS
+zlim == [0,12] ==
+
+y == 0 == # Lat of the y cross-section for RHI
+z == 1.0 == # Height of the CAPPIs
+
 
 #==============
 #### INPUT ####
@@ -120,7 +123,7 @@ band == S == # Radar band: X, C OR S. Note: needs to be capital letter.
 
 # SET 1) Plots created in run_ipolarris_new.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
 cappi_rr	    == True	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity

@@ -114,7 +114,7 @@ if sys.argv[2:]:
         print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
             
         fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[np.min(config['dzbins']),np.max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
-        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
         ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
@@ -126,7 +126,7 @@ if sys.argv[2:]:
         print('\nPlotting composites by time for variable '+rdata.zdr_name+'...')
         
         fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,config,bins=config['drbins'],xlab=rdata.longnames[rdata.zdr_name]+' '+rdata.units[rdata.zdr_name],cscfad=False,xlim=[np.min(config['drbins']),np.max(config['drbins'])+1],ylim=config['zlim'],nor=3)
-        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
         ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
@@ -138,7 +138,7 @@ if sys.argv[2:]:
         print('\nPlotting composites by time for variable '+rdata.kdp_name+'...')
 
         fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,config,bins=config['kdbins'],xlab=rdata.longnames[rdata.kdp_name]+' '+rdata.units[rdata.kdp_name],cscfad=False,xlim=[np.min(config['kdbins']),np.max(config['kdbins'])+1],ylim=config['zlim'],nor=3)
-        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
         ax[3].set_title('({e} - {v})'.format(e=rdata.exper,v=rdata2.mphys.upper()),fontsize=16,fontweight='bold')    
@@ -151,7 +151,7 @@ if sys.argv[2:]:
          
         #fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
         fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
-        ax[0].set_title(rdata.exper+' '+rdata.radar_name,fontsize=16,fontweight='bold')
+        ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
         plt.setp(ax, ylim=[0,10])
         plt.savefig('{i}{e}_{m}_{v}_CFAD_diff.{p}'.format(p=config2['ptype'],i=outdir,e=rdata2.exper,m=rdata2.mphys.upper(),v=rdata.hid_name),dpi=400,bbox_inches='tight')
@@ -189,9 +189,9 @@ else:
     # tdate = datetime.datetime(2006,1,23,18,0,0)
     # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
 
-    config['image_dir'] = config['image_dir']+\
-        config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
-        config['mphys']+'/'
+    #config['image_dir'] = config['image_dir']+\
+    #    config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
+    #    config['mphys']+'/'
 
     if (config['compo_ref'] | config['all1']):
     
@@ -204,14 +204,14 @@ else:
         for i,rtimematch in enumerate(np.array(rdata.date)):
 
             fig, ax = rdata.plot_composite(rdata.dz_name,i,statpt=True)
-            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
             ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
            
             if not config['ptype'].startswith('mp4'):
-                plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
+                plt.savefig('{i}{e}_{v}_{d:%Y%m%d_%H%M%S}.{p}'.format(p=config['ptype'],e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
             else: 
                 if len(rdata.date) < 6:
-                    plt.savefig('{i}{e}_{v}_{d:%Y-%m-%d_%H%M%S}.png'.format(e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
+                    plt.savefig('{i}{e}_{v}_{d:%Y%m%d_%H%M%S}.png'.format(e=rdata.exper,i=outdir,d=rtimematch,v=rdata.dz_name),dpi=400,bbox_inches='tight')
                 else:
                     plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
 
@@ -248,12 +248,12 @@ else:
 
                 dummy, ax = rdata.cappi(rdata.rr_name,z=z,xlim=config['xlim'],ylim=config['ylim'],ts=rtimematch,contour=None,latlon=config['latlon'],statpt=True)
 
-                ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                 ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+                ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
 
                 if not config['ptype'].startswith('mp4') or len(rdata.date) < 6:
-                    plt.savefig('{i}{e}_{v}_cappi_{t:%Y-%m-%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
+                    plt.savefig('{i}{e}_{v}_cappi_{t:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,t=rtimematch),dpi=400,bbox_inches='tight')
                 else: 
                     plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
 
@@ -387,7 +387,7 @@ else:
 
         ax.set_ylabel('Rain Rate (mm/hr)',fontsize=16)
         #ax.set_title('Precipitation Timeseries ')
-        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.exper), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         #plt.savefig('{i}precip_timeseries_convstrat_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
         plt.savefig('{i}{e}_{v}_timeseries_convstrat.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,v=rdata.rr_name),dpi=400,bbox_inches='tight')
@@ -416,7 +416,7 @@ else:
             ax = plot_driver.plot_quartiles(rdata.data[rdata.w_name],0.9,0.5,0.99,rdata.data[rdata.z_name],ax,split_updn=False)
             ax.set_xlabel('Vertical Velocity (m/s)',fontsize=16)
             #ax.set_title('Vertical velocity profiles')
-            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.exper), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
  #plt.tight_layout()
             #plt.savefig('{i}quantile_vvel_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
             plt.savefig('{i}{e}_{v}_vertprof.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,v=rdata.w_name),dpi=400,bbox_inches='tight')
@@ -479,7 +479,7 @@ else:
         ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name],ax,split_updn=False,lab='dz',thresh=-50)
         #ax.set_title('Vertical profile of reflectivity')
         ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
-        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.exper), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         #plt.savefig('{i}meanprofile_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
         plt.savefig('{i}{e}_{v}_vertprof.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,v=rdata.dz_name),dpi=400,bbox_inches='tight')
@@ -505,7 +505,7 @@ else:
 
         ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
         #ax.set_title('{c} CFAD'.format(c=rdata.exper))
-        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.radar_name), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.exper), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         #plt.savefig('{i}CFAD_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
         plt.savefig('{i}{e}_{v}_CFAD.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,v=rdata.dz_name),dpi=400,bbox_inches='tight')
