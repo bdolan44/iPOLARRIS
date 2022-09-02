@@ -22,7 +22,7 @@ ylim ==  == #lat / lon zoom for CAPPIS
 #ylim == [46.0,48.5] == #lat / lon zoom for CAPPIS
 zlim == [0,12] ==
 
-y == 0 == # Lat of the y cross-section for RHI
+y == 0.5 == # Lat of the y cross-section for RHI
 z == 1.0 == # Height of the CAPPIs
 
 
@@ -145,8 +145,8 @@ cfad_individ		== False 	    == # 16) Set to True to plot separate images for Z, 
 hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grouped HID species with height
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
 cappi_multi		    == False	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
-cappi_individ	    == True	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
-rhi_multi		    == False	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
+cappi_individ	    == False	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
+rhi_multi		    == True	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 rhi_individ		    == False	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 
 # Model Only
@@ -205,8 +205,8 @@ cvectors == [None,None,None,None,None,True]                          ==#Turn on 
 rvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
 skip == 2                                  ==#Number of vectors to skip for the vector plots.
 mix_vars ==['qc','qr','qg','qi','qh',config['rr_name'],config['vr_name'],'HID']   ==#Mixing ratios from model to plot.
-rhi_vars ==[config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['wname'],'HID'] == #Names of vars for RHI plots
-cappi_vars == [config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['vr_name'],'HID'] == #Names of vars for CAPPI plots
+rhi_vars ==[config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],'HID',config['wname']] == #Names of vars for RHI plots
+cappi_vars == [config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],'HID',config['vr_name']] == #Names of vars for CAPPI plots
 comb_vicr == True                       ==# Combine VI with CR for plotting.
 cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
 cappi_vectres == 5               ==#Defined the vector skip for cappi plots.
