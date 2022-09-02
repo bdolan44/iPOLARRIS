@@ -1394,9 +1394,11 @@ class RadarData(RadarConfig.RadarConfig):
     
 ######################### Here is the 4 stuff ##############################
 
-    def cappi(self, var, z=1.0, xlim=[], ylim=[], latlon=False, ax=None, ts = None, title_flag=False, vectors=None, cblabel=None, labels=True, xlab=False, ylab=False, cbar=1, res = 2.0, thresh_dz=False,contour = None,statpt=False, **kwargs):
-       
+    def cappi(self, var, z=1.0, xlim=[], ylim=[], latlon=False, ax=None, ts = None, title_flag=False, vectors=None, cblabel=None, labels=True, xlab=False, ylab=False, cbar=1, res = 2.0, thresh_dz=False,contours = None,statpt=False, **kwargs):
+
+        from copy import deepcopy
         import cartopy.crs as ccrs
+        import xarray as xr
 
         if ts is not None:
             try:
@@ -1406,13 +1408,18 @@ class RadarData(RadarConfig.RadarConfig):
      
         if latlon:
             lons = self.data[self.lon_name].values
-            xmin, xmax = lons[(0,0)], lons[(0,-1)]
+            lats = self.data[self.lat_name].values
+            if not xlim:
+                xmin, xmax = lons[(0,0)], lons[(0,-1)]
+                ymin, ymax = lats[(0,0)], lats[(-1,0)]
+            else:
+                xmin, xmax = np.min(xlim), np.max(xlim)
+                ymin, ymax = np.min(ylim), np.max(ylim)
+            
             xshift = 0.5*(self.data[self.x_name].shape[0]-1)
             xmin = np.where(lons[0,:] >= xmin)[0][0]-xshift
             xmax = np.where(lons[0,:] <= xmax)[0][-1]-xshift
 
-            lats = self.data[self.lat_name].values  
-            ymin, ymax = lats[(0,0)], lats[(-1,0)]
             yshift = 0.5*(self.data[self.y_name].shape[0]-1)
             ymin = np.where(lats[:,0] >= ymin)[0][0]-yshift
             ymax = np.where(lats[:,0] <= ymax)[0][-1]-yshift
@@ -1445,8 +1452,12 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             xdat = np.squeeze(xdataset.values)
             ydat = np.squeeze(ydataset.values)
-        
-        dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+      
+        if not var.startswith('RR'):
+            alldata = xr.DataArray(self.data[var].to_numpy(),dims=["d","z","y","x"],coords=dict(x=("x",self.data[self.x_name].values), y=("y",self.data[self.y_name].values), z=("z",self.data[self.z_name].values), lat=(["x","y"],self.data[self.lat_name].values), lon=(["x","y"],self.data[self.lon_name].values)),name=var)
+            dataset = alldata.sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+        else:
+            dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
         data = np.squeeze(dataset.sel(d=tmind).values)
         data = np.ma.masked_where(~np.isfinite(data),data)
         if var.startswith('HID'): 
@@ -1476,8 +1487,8 @@ class RadarData(RadarConfig.RadarConfig):
             dummy = ax.pcolormesh(xdat,ydat, data,
                 vmin = np.nanmin(dat), vmax = np.nanmax(dat), cmap = plt.cm.gist_ncar,**kwargs)
 
-        if contour is not None:
-            if contour == 'CS':
+        if contours is not None:
+            if contours == 'CS':
                 csvals = np.squeeze(self.data[self.cs_name].sel(d=tmind,z=z,x=slice(xmin,xmax),y=slice(ymin,ymax)).values)
                 if latlon:
                     cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8, zorder=10, transform=ccrs.PlateCarree())
@@ -1491,13 +1502,20 @@ class RadarData(RadarConfig.RadarConfig):
                 maxlats = []
                 minlats = []
                 for ii in range(dataset.shape[0]):
-                    xdat_masked = np.ma.array(xdataset,mask=dataset[ii].fillna(True)) 
-                    ydat_masked = np.ma.array(ydataset,mask=dataset[ii].fillna(True))
-                    minlons.append(np.min(xdat_masked))
-                    maxlons.append(np.max(xdat_masked))
-                    minlats.append(np.min(ydat_masked))
-                    maxlats.append(np.max(ydat_masked))
-                
+                    if var.startswith('RR'):
+                        xdat_masked = np.ma.array(xdataset,mask=dataset.sel(d=ii).fillna(value=True)) 
+                        ydat_masked = np.ma.array(ydataset,mask=dataset.sel(d=ii).fillna(value=True))
+                    else:
+                        xdat_masked = deepcopy(xdataset.values)
+                        xdat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
+                        ydat_masked = deepcopy(ydataset.values)
+                        ydat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
+
+                    minlons.append(np.nanmin(xdat_masked))
+                    maxlons.append(np.nanmax(xdat_masked))
+                    minlats.append(np.nanmin(ydat_masked))
+                    maxlats.append(np.nanmax(ydat_masked))
+
                 minlon = np.round(np.min(minlons)-0.1,1)
                 maxlon = np.round(self.lon_0+(self.lon_0-np.min(minlons))+0.1,1)
                 minlat = np.round(np.min(minlats)-0.1,1)
@@ -1549,7 +1567,7 @@ class RadarData(RadarConfig.RadarConfig):
         elif cbar == 2 and var.startswith('HID'):
             lur,bur,wur,hur = ax.get_position().bounds
             cbar_ax_dims = [lur,bur-0.125,wur,0.03]
-            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
+            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames', lblsz=12)
  
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
@@ -2612,7 +2630,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def HID_barplot_colorbar(self, figure, location = [0.9, 0.1, 0.03, 0.8], orientation='vertical', names='shortnames'):
+    def HID_barplot_colorbar(self, figure, location = [0.9, 0.1, 0.03, 0.8], orientation='vertical', names='shortnames', lblsz=16):
 
         scalarMap = plt.cm.ScalarMappable(norm=self.normhid,cmap=self.hid_cmap)
         axcb = figure.add_axes(location) # x pos, y pos, x width, y width
@@ -2625,7 +2643,7 @@ class RadarData(RadarConfig.RadarConfig):
         else: labs = np.array(self.species)
         #print(labs)
         cb.set_ticklabels(labs)
-        cb.ax.tick_params(labelsize=16)
+        cb.ax.tick_params(labelsize=lblsz)
         return cb
 
     def plot_hid_cdf(self, ylab=1, cbar=1, data=None, z_resolution=1.0, ax=None, pick=None,cscfad = None):

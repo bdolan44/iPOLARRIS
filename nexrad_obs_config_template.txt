@@ -121,16 +121,16 @@ band == S == # Radar band: X, C OR S. Note: needs to be capital letter.
 #------ Output Flags (what to print) if type = 'obs' ------
 #----------------------------------------------------------
 
-# SET 1) Plots created in run_ipolarris_new.py
+# SET 1) Plots created in run_ipolarris.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
-cappi_rr	    == True	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
+compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
 vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflectivity with height
 refcfad		    == False	    == # 6) Set to True to plot CFAD of reflectivity with height
 
-# Text files created in run_ipolarris_new.py
+# Text files created in run_ipolarris.py
 all2			    == False	    == # Set to TRUE to output ALL text files in SET 2 below
 rrstats_txt		    == False	    == # 7)
 rrhist_txt		    == False	    == # 8)
@@ -145,7 +145,7 @@ cfad_individ		== False 	    == # 16) Set to True to plot separate images for Z, 
 hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grouped HID species with height
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
 cappi_multi		    == False	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
-cappi_individ	    == False	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
+cappi_individ	    == True	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
 rhi_multi		    == False	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 rhi_individ		    == False	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 
@@ -205,8 +205,8 @@ cvectors == [None,None,None,None,None,True]                          ==#Turn on 
 rvectors == [None,None,None,None,None,True]                          ==#Turn on vectors in the plots.
 skip == 2                                  ==#Number of vectors to skip for the vector plots.
 mix_vars ==['qc','qr','qg','qi','qh',config['rr_name'],config['vr_name'],'HID']   ==#Mixing ratios from model to plot.
-rhi_vars ==['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['wname']] == #Names of vars for RHI plots
-cappi_vars == ['HID',config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['vr_name']] == #Names of vars for CAPPI plots
+rhi_vars ==[config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['wname'],'HID'] == #Names of vars for RHI plots
+cappi_vars == [config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],config['vr_name'],'HID'] == #Names of vars for CAPPI plots
 comb_vicr == True                       ==# Combine VI with CR for plotting.
 cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
 cappi_vectres == 5               ==#Defined the vector skip for cappi plots.

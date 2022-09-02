@@ -779,10 +779,10 @@ def make_single_pplots(rdat,config,y=None):
     tspan= [rdat.date[0],rdat.date[-1]]
     tms = np.array(rdat.date)
     #print('DATES',np.array(rdat.date))
-    tstart = tspan[0]
+    #tstart = tspan[0]
 #    print ts
 #    print rdat.exper
-    tend = tspan[1]
+    #tend = tspan[1]
 #    print ts, te
     xlim = config['xlim']
     ylim = config['ylim']
@@ -791,7 +791,7 @@ def make_single_pplots(rdat,config,y=None):
     z = config['z']
     outpath = config['image_dir']
 
-    title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
+    #title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
 
     if (config['cfad_multi'] | config['all3']):
      
@@ -833,7 +833,7 @@ def make_single_pplots(rdat,config,y=None):
         cbt.set_ticks(dum[-1])
         cbt.set_ticklabels(dum[-1])
 
-        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         
         plt.savefig('{d}{p}_CFAD_4panel.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
@@ -892,7 +892,7 @@ def make_single_pplots(rdat,config,y=None):
         extrax ='strat'
         #plt.tight_layout()
 #        print "{s:%Y%m%d%H%M%S}".format(s=ts[0])
-        #plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=outdir,p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.radar_name,t=config['ptype'],x=extrax),dpi=300) 
+        #plt.savefig('{d}{p}_CFAD_4panel_{s:%Y%m%d%H%M%S}_{r}_{m}_{x}.{t}'.format(d=outdir,p=rdat.exper,s=tstart,m=rdat.mphys,r=rdat.band+'-band',t=config['ptype'],x=extrax),dpi=300) 
         plt.savefig('{d}{p}_CFAD_4panel_{x}.{t}'.format(d=outdir,p=rdat.exper,x=extrax,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
@@ -911,7 +911,7 @@ def make_single_pplots(rdat,config,y=None):
             fig, ax = plt.subplots(1,1,figsize=(14,12))
             rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
             #plt.tight_layout()
-            ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+            ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
             plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.w_name,t=config['ptype']),dpi=400,bbox_inches='tight')
             plt.clf()
             print(rdat.w_name)
@@ -919,7 +919,7 @@ def make_single_pplots(rdat,config,y=None):
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.dz_name,ax = ax,bins=config['dzbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
         #plt.tight_layout()
-        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.dz_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
         print(rdat.dz_name)
@@ -927,14 +927,14 @@ def make_single_pplots(rdat,config,y=None):
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
         #plt.tight_layout()
-        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)       
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)       
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.zdr_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
         print(rdat.zdr_name)
         
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
-        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.kdp_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         #plt.tight_layout()
         plt.clf()
@@ -943,13 +943,13 @@ def make_single_pplots(rdat,config,y=None):
         fig, ax = plt.subplots(1,1,figsize=(14,12))
         rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
         #plt.tight_layout()
-        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
         plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.rho_name,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
         print(rdat.rho_name)
 
         fig, ax = rdat.plot_hid_cdf(ylab=1,cbar=1)
-        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         
         if config['wrft_on']: ext = '_wrft'
         elif config['snd_on']: ext = '_snd'
@@ -985,7 +985,7 @@ def make_single_pplots(rdat,config,y=None):
         axf[0].set_xlabel(rdat.zdr_name+' '+rdat.units[rdat.zdr_name],fontsize=26)
         axf[0].set_ylabel(rdat.dz_name+' '+rdat.units[rdat.dz_name],fontsize=26,labelpad=0)
         #axf[0].set_title(title_string)
-        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         print('Panel 1: '+rdat.zdr_name+' vs. '+rdat.dz_name)
 
         zkdp_wrf,edk = rdat.hist2d(varx=rdat.dz_name,vary=rdat.kdp_name,binsx=config['dzbins'],binsy=config['kdbins'])
@@ -1042,7 +1042,7 @@ def make_single_pplots(rdat,config,y=None):
         #plt.title(title_string)
         plt.legend(loc='best',fontsize=22)
 
-        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         plt.savefig('{d}{p}_HID_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype']),dpi=400,bbox_inches='tight')
         plt.clf()
 
@@ -1068,7 +1068,7 @@ def make_single_pplots(rdat,config,y=None):
             ax.tick_params(axis='both',labelsize=22)
             #plt.title(title_string)
 
-            ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=26, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+            ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=26, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
 
             plt.savefig('{d}{p}_updraft_width_{y}_vertprof.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],y=config['y']),dpi=400,bbox_inches='tight')
             plt.clf()
@@ -1108,7 +1108,7 @@ def make_single_pplots(rdat,config,y=None):
             #label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars)
             label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars,horizontalalignment='left',verticalalignment='top',color='k',bbox=dict(facecolor='w', edgecolor='w', pad=2.0),weight='bold')
             #plt.tight_layout()
-            #plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+            #plt.savefig('{d}{p}_polcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.band+'-band',t=config['ptype'],z=config['z']),dpi=300)
             plt.savefig('{i}{e}_multi_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
             print(ts)
@@ -1122,33 +1122,55 @@ def make_single_pplots(rdat,config,y=None):
         print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating individual CAPPIs for various polarimetric vars.')
         print('Plotting CAPPIs at height z = '+str(config['z'])+'km by time.\n')
  
-        for ts in tms:
+        if not config['z'] == '': zspan = list([config['z']])
+        else: zspan = rdata.data[rdata.z_name].values
 
-            for i,v in enumerate(eval(config['cappi_vars'])):
- 
-                if v is None:
-                    continue
-                else:
-                    outdir = outpath+'cappi_individ/'+v+'/'
-                    os.makedirs(outdir,exist_ok=True)
-                #print config['cappi_vectres'],eval(config['cvectors'])[i],eval(config['cappi_contours'])[i],config['ylim'],config['xlim'],config['z'],rdat.date,v
-                #print str(v)
-    #                print config['xlim'],config['ylim'],config['z'],config['cappi_vectres'],eval(config['cvectors'])[i],config['cappi_contours']
-                    if v.startswith('HID'): cbar = 2
-                    else: cbar = 1
-                    fig, ax = rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],cbar=cbar,z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],contours = eval(config['cappi_contours'])[i],statpt=True)
-                    #plt.tight_layout()
-                    #label_subplots(fig,yoff=0.01,xoff=0.01,size=16,nlabels=1)
-                    #plt.savefig('{d}{p}_polcappi_{v}_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
-                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                    ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                    ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-     
+        for i,v in enumerate(eval(config['cappi_vars'])):
+           
+            print(v)
+
+            if v is None:
+                continue
+            else:
+        
+                for z in zspan: 
                     
-                    plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
-                    plt.clf()
-                    print(v)
-            print(ts)
+                    print('z = '+str(z)+'\n')
+            
+                    for ts in tms:
+                        print(ts)
+
+                        outdir = outpath+'cappi_individ/'+v+'/'
+                        os.makedirs(outdir,exist_ok=True)
+                        
+                        if v.startswith('HID'): cbar = 2
+                        else: cbar = 1
+                        
+                        #fig, ax = rdat.cappi(str(v),ts=ts,xlim=config['xlim'],ylim=config['ylim'],cbar=cbar,z=config['z'],res =config['cappi_vectres'],vectors = eval(config['cvectors'])[i],statpt=True)
+                        fig, ax = rdat.cappi(v,ts=ts,xlim=config['xlim'],ylim=config['ylim'],cbar=cbar,z=config['z'],latlon=config['latlon'],statpt=True)
+                        
+                        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                        ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                        ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
+                        
+                        if not config['ptype'].startswith('mp4') or len(rdata.date) < 6:
+                            plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                        else: 
+                            if len(rdata.date) < 6:
+                                plt.savefig('{i}{e}_{v}_individ_cappi_{h}_{t:%Y-%m-%d_%H%M%S}.png'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                            else:
+                                plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
+                        
+                        plt.close()
+
+                    if config['ptype'].startswith('mp4') and len(rdata.date) >= 6:
+
+                        st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
+                        en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
+
+                        os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdata.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_{t1}-{t2}_{h}.mp4'.format(p=config['ptype'],e=rdata.exper,i=outdir,v=v,t1=st,t2=en,h=z))
+                    
+            print('')
 
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
@@ -1180,7 +1202,7 @@ def make_single_pplots(rdat,config,y=None):
             
             #label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars)
             label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars,horizontalalignment='left',verticalalignment='top',color='k',bbox=dict(facecolor='w', edgecolor='w', pad=2.0),weight='bold')
-            #plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,v=nvars,t=config['ptype'],y=config['y']),dpi=300)
+            #plt.savefig('{d}{p}_polrhi_{v}panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.band+'-band',v=nvars,t=config['ptype'],y=config['y']),dpi=300)
             plt.savefig('{i}{e}_multi_rhi_{h}_{t:%Y-%m-%d_%H%M%S}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['y'],t=ts),dpi=400,bbox_inches='tight')
             plt.clf()
             print(ts)
@@ -1209,9 +1231,9 @@ def make_single_pplots(rdat,config,y=None):
                     else: cbar = 1
                     fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],cbar=cbar,zlim=config['zlim'])
                     #plt.tight_layout()
-                    #plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+                    #plt.savefig('{d}{p}_polrhi_{v}_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,v=v,p=rdat.exper,s=ts,r=rdat.band+'-band',t=config['ptype'],y=config['y']),dpi=300)
                     
-                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.radar_name), horizontalalignment='left', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                     ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                     ax.text(0.99, 0.99, 'y = {a} km'.format(a=config['y']), horizontalalignment='right',verticalalignment='top', size=22, color='k', zorder=10, weight='bold', transform=ax.transAxes)
 
@@ -1230,7 +1252,7 @@ def make_single_pplots(rdat,config,y=None):
         
             print ("qr_cappi")
             fig = rdat.cappi_multiplot(z=config['z'],ts=ts,xlim=config['xlim'],ylim=config['ylim'],varlist=eval(config['mix_vars']))
-            plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],z=config['z']),dpi=300)
+            plt.savefig('{d}{p}_qcappi_6panel_{s:%Y%m%d%H%M%S}_{r}_{z}km.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.band+'-band',t=config['ptype'],z=config['z']),dpi=300)
             plt.clf()
     
 
@@ -1240,7 +1262,7 @@ def make_single_pplots(rdat,config,y=None):
         
             print ("qr_rhi")
             fig = rdat.xsec_multiplot(ts=ts,y=config['y'],xlim=config['xlim'],varlist=eval(config['mix_vars']))
-            plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.radar_name,t=config['ptype'],y=config['y']),dpi=300)
+            plt.savefig('{d}{p}_qrhi_6panel_{s:%Y%m%d%H%M%S}_{r}_{y}.{t}'.format(d=outdir,p=rdat.exper,s=ts,r=rdat.band+'-band',t=config['ptype'],y=config['y']),dpi=300)
             plt.clf()
     
 
@@ -1608,7 +1630,7 @@ def plot_cfad(fig,cfad,hts,vbins, ax, maxval=10.0, above=2.0, below=15.0, bins=N
             ax.set_xlabel('{n} {u}'.format(n=rconf.names[varn], u=rconf.units[varn]))
             #print rconf.print_title(tm=tspan)
 #            ax.set_title("{d}".format(d=rconf.print_title(tm=tspan)))
-    #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.radar_name, self.longnames[var]))
+    #            ax.set_title('%s %s %s CFAD' % (self.print_date(), self.band+'-band', self.longnames[var]))
         else:
             ax.set_xlabel('{n}'.format(n=var))
             #print rconf.print_title(tm=tspan)
