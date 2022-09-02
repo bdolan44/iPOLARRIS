@@ -182,17 +182,9 @@ if sys.argv[2:]:
 #rdata.data.keys()
 
 else:
-    ################################################################################
-    ##Plot a composite reflectivity at a given time.
-
-    # tdate = datetime.datetime(2011,5,23,22,00)
-    # tdate = datetime.datetime(2006,1,23,18,0,0)
-    # whdate = np.where(np.abs(tdate-np.array(rdata.date)) == np.min(np.abs(tdate-np.array(rdata.date))))
-
-    #config['image_dir'] = config['image_dir']+\
-    #    config['exper']+'_'+config['sdatetime']+'_'+config['edatetime']+'/'+\
-    #    config['mphys']+'/'
-
+    
+    #############################################################################
+   
     if (config['compo_ref'] | config['all1']):
     
         print('\nIN RUN_IPOLARRIS_NEW... creating COMPOSITE figures.')
@@ -228,6 +220,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
     
+    #############################################################################
 
     if (config['cappi_rr'] | config['all1']):
 
@@ -246,7 +239,7 @@ else:
 
             for i,rtimematch in enumerate(np.array(rdata.date)):
 
-                dummy, ax = rdata.cappi(rdata.rr_name,z=z,xlim=config['xlim'],ylim=config['ylim'],ts=rtimematch,contour=None,latlon=config['latlon'],statpt=True)
+                dummy, ax = rdata.cappi(rdata.rr_name,z=z,xlim=config['xlim'],ylim=config['ylim'],ts=rtimematch,latlon=config['latlon'],statpt=True)
 
                 ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                 ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
@@ -274,9 +267,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
 
-
-
-    ################################################################################
+    #############################################################################
     
     if (config['rrstats_txt'] | config['all2']):
         
@@ -380,8 +371,7 @@ else:
 
         print('\nIN RUN_IPOLARRIS_NEW... creating timeseries.')
         print('Plotting timeseries for variable '+rdata.rr_name+'...')
- 
-        ################################################################################
+        
         ##First make a timeseries of rain rate, unconditional and conditional. This puts strat, conv, and total on the same plot but you can split the out by putting cs==False.
         ## The conditional rain rate is achieved by sending threshold = 0.
         fig,ax = plt.subplots(1,1,figsize=(12,8))
@@ -402,7 +392,6 @@ else:
 
     ############################################################################
 
-    ################################################################################
     ##Next let's make quantile (50,90,99) plots of the vertical velocity. This splits it by up and down, but you can turn split_updn == False
     if rdata.w_name is not None:
 
@@ -465,10 +454,8 @@ else:
         print("\nNo vertical velocity data.")
         print('Moving on.\n')
     
-    ################################################################################
-
-    ################################################################################
-    
+    #############################################################################
+ 
     if (config['vert_ref'] | config['all1']):
  
         print('\nIN RUN_IPOLARRIS_NEW... creating vertical profile figure.')
@@ -482,7 +469,7 @@ else:
         ax = plot_driver.plot_verprof(rdata.data[rdata.dz_name],rdata.data[rdata.z_name],ax,split_updn=False,lab='dz',thresh=-50)
         #ax.set_title('Vertical profile of reflectivity')
         ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
-        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.exper), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
         #plt.tight_layout()
         #plt.savefig('{i}meanprofile_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
         plt.savefig('{i}{e}_{v}_vertprof.{p}'.format(p=config['ptype'],i=outdir,e=rdata.exper,v=rdata.dz_name),dpi=400,bbox_inches='tight')
@@ -491,34 +478,7 @@ else:
         print('\nDone! Saved to '+outdir)
         print('Moving on.\n')
   
-    '''
-    if config['refcfad']:
-
-        print('\nIN RUN_IPOLARRIS_NEW... creating CFAD figure.')
-        print('Plotting CFAD for variable '+rdata.dz_name+'...')
- 
-    ################################################################################
-    ##Next let's make a reflectivity CFAD
-
-#    cfaddat,vbins = plot_driver.cfad(rdata.data[rdata.dz_name],rdata,rdata.data[rdata.z_name],var=rdata.dz_name,nbins=40)
-        cfaddat,vbins,r1ht = rdata.cfad(rdata.dz_name,ret_z=1,z_resolution=1.0,value_bins=np.arange(0,82,2),cscfad=False)
-
-        fig,ax = plt.subplots(1,1,figsize=(12,8))
-        ax = plot_driver.plot_cfad(fig,cfaddat, hts = r1ht,  vbins = vbins,ax=ax,cfad_on = 0,tspan = config['date'],maxval=20,cont=True,levels = True)
-
-        ax.set_xlabel('Reflectivity (dBZ)',fontsize=16)
-        #ax.set_title('{c} CFAD'.format(c=rdata.exper))
-        ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.exper), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-        #plt.tight_layout()
-        #plt.savefig('{i}CFAD_refl_{e}_{m}.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,m=rdata.mphys),dpi=400,bbox_inches='tight')
-        plt.savefig('{i}{e}_{v}_CFAD.{p}'.format(p=config['ptype'],i=config['image_dir'],e=rdata.exper,v=rdata.dz_name),dpi=400,bbox_inches='tight')
-        plt.close()
-
-        print('\nDone! Saved to '+config['image_dir'])
-        print('Moving on.\n')
-    '''
-
-    #################################################################################
+    #############################################################################
 
     print('\n########################################')
     print('############ Calling plot_driver.py ####')
