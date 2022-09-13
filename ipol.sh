@@ -3,72 +3,45 @@
 echo
 
 realpath() {
-  # $1 : relative filename
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
-case=$1
-raddir="$(realpath $2)"
-tempdir="$(realpath $3)"
-simdir=$4
-doppdir=$5
-
-outfigpdir="outputfig/"
-outdatpdir="/Volumes/OneTouch5TB/olym_rad_obs/"
-ptype=png
-
 ipoldir="$(realpath )"
 
-if [[ ! $case == 2* ]]; then
+ptype=$1
+starg=$2
+enarg=$3
+raddir="$(realpath $4)"
+tempdir="$(realpath $5)"
+simdir=$6
+doppdir=$7
 
-    configdir=$ipoldir/configtxt/$case
-
-    case $case in
-        olym1)
-            stt='20151031_0300'
-            edt='20151101_0600' ;;
-        olym2)
-            stt='20151112_1500'
-            edt='20151114_0000' ;;
-        olym3)
-            stt='20151116_1500'
-            edt='20151118_0000' ;;
-        olym4)
-            stt='20151203_0300'
-            edt='20151204_0300' ;;
-        olym5)
-            stt='20151208_0300'
-            edt='20151209_1200' ;;
-        swbc1)
-            stt='20211113_2100'
-            edt='20211115_2100' ;;
-    esac
-
-else
-
-    st=$(echo $case | cut -d ',' -f1 | sed 's/[^0-9]*//g')
-	stdate=${st:0:8}
-	sttime=${st:8:4}
-    en=$(echo $case | cut -d ',' -f2 | sed 's/[^0-9]*//g')
-	endate=${en:0:8}
-	entime=${en:8:4}
-
-	stt=${stdate}_${sttime}
-	edt=${endate}_${entime}
-
-    configdir=$ipoldir/configtxt/${stt}_${edt}
-
+mkdir -p $raddir $tempdir
+if [ ! -z $simdir ]; then
+    mkdir -p $simdir
+fi
+if [ ! -z $doppdir ]; then
+    mkdir -p $doppdir
 fi
 
+
+st=$(echo $starg | sed 's/[^0-9]*//g')
+stdate=${st:0:8}
+sttime=${st:8:4}
+en=$(echo $enarg | sed 's/[^0-9]*//g')
+endate=${en:0:8}
+entime=${en:8:4}
+stt=${stdate}_${sttime}
+edt=${endate}_${entime}
+
+configdir=$ipoldir/configtxt/${stt}_${edt}
 mkdir -p $configdir
 
-echo Selecting radar files for analysis in range $stt to $edt...
+echo Determining data agency and type...
 echo
 sleep 3
 
 station=$(basename $raddir)
-tfile=input_${stt}_${edt}.txt
-
 if [[ "$station" == "CASAG" ]]; then
     agency='cwr'
 elif [[ "$station" == "NPOL" ]]; then
@@ -76,10 +49,34 @@ elif [[ "$station" == "NPOL" ]]; then
 else
     agency='nexrad'
 fi
+echo $agency
 
-for filepath in $(ls $raddir/*); do
+if [[ "$(ls $raddir/* | head -n 1 | xargs basename)" == "wrfout"* ]]; then
+	data='wrf'
+    mp=$(ls $raddir/* | head -n 1 | xargs basename | cut -d '_' -f2)
+    inputfile=input_${data}_${mp}_${stt}_${edt}.txt
+    configfile=config_${data}_${mp}_${stt}_${edt}.txt
+else
+	data='obs'
+    inputfile=input_${data}_${stt}_${edt}.txt
+    configfile=config_${data}_${stt}_${edt}.txt
+fi
+echo $data
+
+echo
+echo Selecting radar files for analysis in range $stt to $edt...
+echo
+sleep 3
+
+tfile=input_${stt}_${edt}.txt
+
+for filepath in $(ls $raddir/* | sort); do
     file=$(basename $filepath)
-    filedt=$(echo $file | cut -d '_' -f2)$(echo $file | cut -d '_' -f3)
+    if [[ $data == 'obs' ]]; then
+        filedt=$(echo $file | cut -d '_' -f2)$(echo $file | cut -d '_' -f3)
+    else
+        filedt=$(echo $file | cut -d '_' -f4 | tr -d '-')$(echo $file | cut -d '_' -f5 | cut -d '.' -f1 | tr -d ':')
+    fi
     if [ "$filedt" -ge "$(echo $stt | tr -d '_')00" ] && [ "$filedt" -lt "$(echo $edt | tr -d '_')00" ]; then 
         echo $filepath >> $configdir/$tfile
         echo $(basename $filepath)
@@ -89,12 +86,6 @@ for filepath in $(ls $raddir/*); do
     fi
 done
 
-if [[ "$(head -n 1 $configdir/$tfile | xargs basename)" == "wrfout"* ]]; then
-	data='wrf'
-else
-	data='obs'
-fi
-inputfile=input_${data}_${stt}_${edt}.txt
 mv $configdir/$tfile $configdir/$inputfile
 
 #latcen=$(ncdump $indir/$headfile | grep "latitude =" | cut -d '=' -f2 | cut -d ';' -f1 | xargs)
@@ -109,9 +100,9 @@ echo Selecting temperature files for analysis in range $stt to $edt...
 echo
 sleep 3
 
-tfile=temp_${stt}_${edt}.txt
+tfile=tmp_${stt}_${edt}.txt
 
-for filepath in $(ls $tempdir/*); do
+for filepath in $(ls $tempdir/* | sort); do
     file=$(basename $filepath)
     filedt=$(echo $file | cut -d '_' -f4 | tr -d '-')$(echo $file | cut -d '_' -f5 | cut -d '.' -f1 | tr -d ':')
     if [ "$filedt" -ge "$(echo $stt | tr -d '_')00" ] && [ "$filedt" -le "$(echo $edt | tr -d '_')00" ]; then 
@@ -125,7 +116,8 @@ done
 
 if [[ "$(head -n 1 $configdir/$tfile | xargs basename)" == "wrfout"* ]]; then
 	temp='wrf'
-    tempfile=temp_${temp}_mp$(basename $tempdir)_${stt}_${edt}.txt
+    mp=$(head -n 1 $configdir/$tfile | xargs basename | cut -d '_' -f2)
+    tempfile=temp_${temp}_${mp}_${stt}_${edt}.txt
     snd_on='False'
     wrft_on='True'
 else
@@ -148,8 +140,8 @@ else
     dd_on='True'
 fi
 
-outfigdir=$outfigpdir/${fold}_temp${temp}_${station}_${stt}_${edt}
-outrrdir=$outdatpdir/radar_rainrates/$station
+outfigdir=outputfig/${fold}_temp${temp}_${station}_${stt}_${edt}
+outrrdir=$(cd $raddir/../../ && pwd)/radar_rainrates/$station
 mkdir -p $outfigdir $outrrdir
 
 echo
@@ -158,12 +150,11 @@ echo
 sleep 3
 
 template=$ipoldir/${agency}_${data}_config_template.txt
-configfile=config_${data}_${stt}_${edt}.txt
 cp $template $configdir/$configfile
 
 sed -i '' "s/^type ==.*/type == $data == # Type of input data: 'obs' OR 'wrf' (obs + simulated)/g" $configdir/$configfile
 sed -i '' "s/.*mphys ==.*/mphys == $data == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'/g" $configdir/$configfile
-sed -i '' "s/.*ptype ==.*/ptype == $ptype == # Output figure file extenstion (i.e. png, jpg, mp4, ...)/g" $configdir/$configfile
+sed -i '' "s/.*ptype ==.*/ptype == '$ptype' == # Output figure file extenstion (i.e. png, jpg, mp4, ...)/g" $configdir/$configfile
 sed -i '' "s/.*sdatetime ==.*/sdatetime == '$(echo $stt | tr '_' '-')' == # Start time of analysis of interest/g" $configdir/$configfile
 sed -i '' "s/.*edatetime ==.*/edatetime == '$(echo $edt | tr '_' '-')' == # End time of analysis of interest/g" $configdir/$configfile
 sed -i '' "s%.*rfiles ==.*%rfiles == '$configdir/$inputfile' == # Path to list of radar files to read in%g" $configdir/$configfile
@@ -180,4 +171,8 @@ sed -i '' "s/.*wrft_on ==.*/wrft_on == $wrft_on == # WRF temperature on/g" $conf
 echo Running iPOLARRIS...
 sleep 3
 
-python run_ipolarris.py $configdir/$configfile
+if [ ! -z $simdir]; then
+    python run_ipolarris.py $configdir/$configfile $configdir/$configfile2
+else
+    python run_ipolarris.py $configdir/$configfile
+fi
