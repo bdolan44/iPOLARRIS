@@ -101,9 +101,9 @@ if sys.argv[2:]:
     print('########## Returning to run_ipolarris.py ########')
     print('#################################################')
 
-    config2['image_dir'] = config2['image_dir']+\
-        config2['exper']+'_'+config2['sdatetime']+'_'+config2['edatetime']+'/'+\
-        config2['mphys']+'/'
+    #config2['image_dir'] = config2['image_dir']+\
+    #    config2['exper']+'_'+config2['sdatetime']+'_'+config2['edatetime']+'/'+\
+    #    config2['mphys']+'/'
 
     if (config2['cfad_individ'] | config2['all3']):
         
@@ -229,8 +229,8 @@ else:
  
         outdir = config['image_dir']+'cappi_'+rdata.rr_name+'/'
         os.makedirs(outdir,exist_ok=True)
-        
-        if not config['z'] == '': zspan = list([config['z']])
+
+        if not config['z'] == '': zspan = list(eval(str([config['z']])))
         else: zspan = rdata.data[rdata.z_name].values
 
         for z in zspan:
@@ -238,14 +238,16 @@ else:
             print('\nz = '+str(z))
 
             for i,rtimematch in enumerate(np.array(rdata.date)):
+                
+                print(rtimematch)
 
-                dummy, ax = rdata.cappi(rdata.rr_name,z=z,xlim=config['xlim'],ylim=config['ylim'],ts=rtimematch,latlon=config['latlon'],statpt=True)
+                dummy, ax = rdata.cappi(rdata.rr_name,z=z,xlim=config['xlim'],ylim=config['ylim'],ts=rtimematch,latlon=config['latlon'],statpt=True,xlab=True,ylab=True,dattype=config['type'])
 
                 ax.text(0, 1, '{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                 ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=rtimematch), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
-                ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
+                ax.text(0.99, 0.99, 'z = {a} km'.format(a=z), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
 
-                if not config['ptype'].startswith('mp4') or len(rdata.date) < 6:
+                if not config['ptype'].startswith('mp4'):
                     plt.savefig('{i}{e}_{v}_cappi_{d:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdata.exper,h=z,v=rdata.rr_name,d=rtimematch),dpi=400,bbox_inches='tight')
                 else: 
                     if len(rdata.date) < 6:
@@ -254,8 +256,6 @@ else:
                         plt.savefig(outdir+'/fig'+str(i).zfill(3)+'.png',dpi=400,bbox_inches='tight')
 
                 plt.close()
-
-                print(rtimematch)
 
             if config['ptype'].startswith('mp4') and len(rdata.date) >= 6:
 
