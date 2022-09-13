@@ -597,10 +597,10 @@ class RadarData(RadarConfig.RadarConfig):
     def calc_pol_analysis(self,tm,config,**kwargs):
         self.set_hid(use_temp = 'True',band=self.band,zthresh = self.z_thresh,return_scores=self.return_scores)
         print("running pol rain")
-        if self.mphys == 'obs':
+        #if self.mphys == 'obs':
         
-            self.calc_qr_pol()
-            self.calc_rr_pol(tm,config,**kwargs)
+        self.calc_qr_pol()
+        self.calc_rr_pol(tm,config,**kwargs)
 
 
 #############################################################################################################
@@ -952,7 +952,7 @@ class RadarData(RadarConfig.RadarConfig):
         return fig, ax
 
 
-    def xsec(self, var, y=None, xlim=None, zlim=None, cbar=1, ts = None,varlist=None, ax=None, title_flag=False, vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, lblsz=16, lblpad=15, **kwargs):
+    def xsec(self, var, y=None, xlim=None, zlim=None, cbar=1, ts = None,varlist=None, ax=None, title_flag=False, vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, latlon=False, lblsz=16, lblpad=15, **kwargs):
         
         if ts is not None: 
             try:
@@ -1087,7 +1087,7 @@ class RadarData(RadarConfig.RadarConfig):
         return dummy, ax
 
     
-    def xsec_multiplot(self, y=0.5, xlim=[], zlim=[], ts=None, res = 2.0, varlist=None, vectors=None, **kwargs):
+    def xsec_multiplot(self, y=0.5, xlim=[], zlim=[], ts=None, res = 2.0, varlist=None, vectors=None, latlon=False, **kwargs):
     
         if ts is not None:
             try:
@@ -1139,7 +1139,7 @@ class RadarData(RadarConfig.RadarConfig):
                 lspanels = [ncols*n for n in range(0,nrows)]
                 ylabbool = True if i in lspanels else False
                 #dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,lblsz=28,lblpad=28,**kwargs)
-                dummy = self.xsec(var, ts=ts, y=y, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,**kwargs)
+                dummy = self.xsec(var, ts=ts, y=y, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,latlon=latlon,**kwargs)
 
         axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
 
@@ -1170,7 +1170,7 @@ class RadarData(RadarConfig.RadarConfig):
     
 ######################### Here is the 4 stuff ##############################
 
-    def cappi(self, var, z=1.0, xlim=[], ylim=[], latlon=False, ax=None, ts = None, title_flag=False, vectors=None, cblabel=None, labels=True, xlab=False, ylab=False, cbar=1, res = 2.0, thresh_dz=False,contours = None,statpt=False, **kwargs):
+    def cappi(self, var, z=1.0, xlim=[], ylim=[], latlon=False, ax=None, ts = None, title_flag=False, vectors=None, cblabel=None, labels=True, xlab=False, ylab=False, cbar=1, res = 2.0, thresh_dz=False,contours = None,statpt=False, dattype='obs', **kwargs):
 
         from copy import deepcopy
         import cartopy.crs as ccrs
@@ -1183,22 +1183,33 @@ class RadarData(RadarConfig.RadarConfig):
                 tmind = np.where(np.array(self.date)==ts)[0]
      
         if latlon:
-            lons = self.data[self.lon_name].values
-            lats = self.data[self.lat_name].values
+            if 'd' in self.data[self.lon_name].dims:
+                lons = self.data[self.lon_name].sel(d=tmind).values
+                lats = self.data[self.lat_name].sel(d=tmind).values
+            else:
+                lons = self.data[self.lon_name].values
+                lats = self.data[self.lat_name].values
+            
             if not xlim:
                 xmin, xmax = lons[(0,0)], lons[(0,-1)]
                 ymin, ymax = lats[(0,0)], lats[(-1,0)]
             else:
                 xmin, xmax = np.min(xlim), np.max(xlim)
                 ymin, ymax = np.min(ylim), np.max(ylim)
-            
-            xshift = 0.5*(self.data[self.x_name].shape[0]-1)
-            xmin = np.where(lons[0,:] >= xmin)[0][0]-xshift
-            xmax = np.where(lons[0,:] <= xmax)[0][-1]-xshift
+           
+            if dattype.startswith('obs'):
+                xshift = 0.5*(self.data[self.x_name].shape[0]-1)
+                xmin = np.where(lons[0,:] >= xmin)[0][0]-xshift
+                xmax = np.where(lons[0,:] <= xmax)[0][-1]-xshift
 
-            yshift = 0.5*(self.data[self.y_name].shape[0]-1)
-            ymin = np.where(lats[:,0] >= ymin)[0][0]-yshift
-            ymax = np.where(lats[:,0] <= ymax)[0][-1]-yshift
+                yshift = 0.5*(self.data[self.y_name].shape[0]-1)
+                ymin = np.where(lats[:,0] >= ymin)[0][0]-yshift
+                ymax = np.where(lats[:,0] <= ymax)[0][-1]-yshift
+            else:
+                xmin = np.where(lons[0,:] >= xmin)[0][0]
+                xmax = np.where(lons[0,:] <= xmax)[0][-1]
+                ymin = np.where(lats[:,0] >= ymin)[0][0]
+                ymax = np.where(lats[:,0] <= ymax)[0][-1]
 
             xdataset = self.data[self.lon_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
             ydataset = self.data[self.lat_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
@@ -1212,28 +1223,31 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 ymin, ymax = ylim[0], ylim[1]
 
-            if 'y' in self.data[self.x_name]:
+            if 'y' in self.data[self.x_name].dims:
                 xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
             else:
                 xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax))
 
-            if 'x' in self.data[self.y_name]:
+            if 'x' in self.data[self.y_name].dims:
                 ydataset = self.data[self.y_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
             else:
                 ydataset = self.data[self.y_name].sel(y=slice(ymin,ymax))
                 
-        if 'd' in xdataset:
+        if 'd' in xdataset.dims:
             xdat = np.squeeze(xdataset.sel(d=tmind).values)
             ydat = np.squeeze(ydataset.sel(d=tmind).values)
         else:
             xdat = np.squeeze(xdataset.values)
             ydat = np.squeeze(ydataset.values)
-      
-        if not var.startswith('RR'):
-            alldata = xr.DataArray(self.data[var].to_numpy(),dims=["d","z","y","x"],coords=dict(x=("x",self.data[self.x_name].values), y=("y",self.data[self.y_name].values), z=("z",self.data[self.z_name].values), lat=(["x","y"],self.data[self.lat_name].values), lon=(["x","y"],self.data[self.lon_name].values)),name=var)
-            dataset = alldata.sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
-        else:
-            dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+    
+        #if not var.startswith('RR'):
+        #    alldata = xr.DataArray(self.data[var].to_numpy(),dims=["d","z","y","x"],coords=dict(x=("x",self.data[self.x_name].values), y=("y",self.data[self.y_name].values), z=("z",self.data[self.z_name].values), lat=(["x","y"],self.data[self.lat_name].values), lon=(["x","y"],self.data[self.lon_name].values)),name=var)
+        #    dataset = alldata.sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+        #else:
+        #    dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+        
+        dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
+        
         data = np.squeeze(dataset.sel(d=tmind).values)
         data = np.ma.masked_where(~np.isfinite(data),data)
         if var.startswith('HID'): 
@@ -1278,14 +1292,19 @@ class RadarData(RadarConfig.RadarConfig):
                 maxlats = []
                 minlats = []
                 for ii in range(dataset.shape[0]):
-                    if var.startswith('RR'):
-                        xdat_masked = np.ma.array(xdataset,mask=dataset.sel(d=ii).fillna(value=True)) 
-                        ydat_masked = np.ma.array(ydataset,mask=dataset.sel(d=ii).fillna(value=True))
+                    #if var.startswith('RR'):
+                    #    xdat_masked = np.ma.array(xdataset,mask=dataset.sel(d=ii).fillna(value=True)) 
+                    #    ydat_masked = np.ma.array(ydataset,mask=dataset.sel(d=ii).fillna(value=True))
+                    #else:
+                    if 'd' in xdataset.dims:
+                        xdat_masked = deepcopy(xdataset.sel(d=ii).values)
+                        ydat_masked = deepcopy(ydataset.sel(d=ii).values)
                     else:
                         xdat_masked = deepcopy(xdataset.values)
-                        xdat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
                         ydat_masked = deepcopy(ydataset.values)
-                        ydat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
+                   
+                    xdat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
+                    ydat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
 
                     minlons.append(np.nanmin(xdat_masked))
                     maxlons.append(np.nanmax(xdat_masked))
@@ -1301,7 +1320,7 @@ class RadarData(RadarConfig.RadarConfig):
                 maxlon = np.round(np.max(xlim),1)
                 minlat = np.round(np.min(ylim),1)
                 maxlat = np.round(np.max(ylim),1)
-            
+           
             self.co_gridlines(fig,ax,minlon=minlon,maxlon=maxlon,minlat=minlat,maxlat=maxlat,xlab=xlab,ylab=ylab)
             if statpt: ax.plot(self.lon_0,self.lat_0,markersize=16,marker='^',color='k',transform=ccrs.PlateCarree())
 
@@ -1365,7 +1384,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def cappi_multiplot(self, z=1.0, xlim=[], ylim=[], ts=None,res = 2, varlist=None, vectors=None, contours = None,thresh_dz = False, latlon=False, statpt=False, **kwargs):
+    def cappi_multiplot(self, z=1.0, xlim=[], ylim=[], ts=None,res = 2, varlist=None, vectors=None, contours = None,thresh_dz = False, latlon=False, statpt=False, dattype='obs', **kwargs):
 
         import cartopy.crs as ccrs
 
@@ -1420,7 +1439,7 @@ class RadarData(RadarConfig.RadarConfig):
                 lspanels = [ncols*n for n in range(0,nrows)]
                 ylabbool = True if i in lspanels else False
                 #dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, vectors=vect,res=res,contour=vcont,thresh_dz =thresh_dz,xlab=xlabbool,ylab=ylabbool,cbar=1,labels=False,statpt=statpt,latlon=False)
-                dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, res=res, thresh_dz=thresh_dz,xlab=xlabbool,ylab=ylabbool,cbar=1,labels=False,statpt=statpt,latlon=latlon)
+                dummy = self.cappi(var, z=z, ax=axf[i], xlim=xlim, ylim=ylim,ts = ts, res=res, thresh_dz=thresh_dz,xlab=xlabbool,ylab=ylabbool,cbar=1,labels=False,statpt=statpt,latlon=latlon,dattype=dattype)
 
         axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
         
@@ -1829,7 +1848,7 @@ class RadarData(RadarConfig.RadarConfig):
                 print('Need even multiple of vertical resolution: %.1f'%self.dz)
                 return
 #        print('ln 1592')
-        multiple = np.int(z_resolution/self.dz)
+        multiple = int(z_resolution/self.dz)
         if 'd' in self.data[self.z_name].dims:
             sz=np.shape(self.data[self.z_name].sel(d=0).values)[0]
             hts = np.squeeze(self.data[self.z_name].sel(d=0).values)
@@ -1926,7 +1945,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             pass
 
-        multiple = np.int(z_resolution/self.dz)
+        multiple = int(z_resolution/self.dz)
 #         print self.dz
 #         print 'multiple: {}'.format(multiple)
 
@@ -1986,7 +2005,7 @@ class RadarData(RadarConfig.RadarConfig):
 #       except:
 #            pass
 
-        return fig, ax, pc, levs
+        return fig, ax #, pc, levs
 
 
 #############################################################################################################
@@ -2221,7 +2240,7 @@ class RadarData(RadarConfig.RadarConfig):
             print ('Need even multiple of vertical resolution: %.1f'%self.dz)
             return
 
-        multiple = np.int(z_resolution/self.dz)
+        multiple = int(z_resolution/self.dz)
         vol = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
         hts = np.zeros(int(self.data[self.z_name].values.shape[0]/multiple))
         #print np.shape(vol)
@@ -2359,7 +2378,7 @@ class RadarData(RadarConfig.RadarConfig):
             fig = ax.get_figure()
 
         #fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
-        multiple = np.int(z_resolution/self.dz)
+        multiple = int(z_resolution/self.dz)
 #         if 'd' in self.data[self.z_name].dims:
 #             hgt = self.data[self.z_name].sel(d=0).values
 #         else:
@@ -2373,7 +2392,7 @@ class RadarData(RadarConfig.RadarConfig):
             ax.barh(hgt[i], data[0, i], left = 0., align = 'center', color = self.hid_colors[0]) 
             for spec in range(1, len(self.species)): # now looping thru the species to make bar plot
                 #print spec, np.max(data[spec,i]) 
-                ax.barh(hgt[i], data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec], edgecolor = 'none')
+                ax.barh(hgt[i], data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec], edgecolor = 'k')
                 #ax.barh(vl, data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec+1], edgecolor = 'none')
 
         ax.set_xlim(0,100)
@@ -2735,11 +2754,13 @@ class RadarData(RadarConfig.RadarConfig):
                 if 'd' in self.data[self.lat_name].dims:
                     lat = self.data[self.lat_name].sel(d=q).values
                     lon = self.data[self.lon_name].sel(d=q).values
-                    zlev = np.where(self.data[self.z_name].sel(d=q).values ==cs_z)[0]
-                    nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
                 else:
                     lat = self.data[self.lat_name].values
                     lon = self.data[self.lon_name].values
+                if 'd' in self.data[self.z_name].dims:
+                    zlev = np.where(self.data[self.z_name].sel(d=q).values ==cs_z)[0]
+                    nlevs = np.shape(self.data[self.z_name].sel(d=q).values)[0]
+                else:
                     zlev = np.where(self.data[self.z_name].values ==cs_z)[0]
                     nlevs = np.shape(self.data[self.z_name].values)[0]
             else:
@@ -2880,6 +2901,7 @@ class RadarData(RadarConfig.RadarConfig):
     # Description: plot_composite overlays a Cartopy basemap with a colormesh plot of a given variable.
 
     def plot_composite(self,var,time,resolution='10m',cs_over=False,statpt=False):
+        
         import cartopy.crs as ccrs 
         
         dat = deepcopy(self.data[var].sel(d=time))
@@ -2900,19 +2922,21 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 lats = self.data[self.lat_name].values
                 lons = self.data[self.lon_name].values
-            
+      
+        minlon,maxlon,minlat,maxlat = lons[(0,0)],lons[(0,-1)],lats[(0,0)],lats[(-1,0)]
+
         fig = plt.figure(figsize=(10,8))
         ax = fig.add_subplot(111, projection=ccrs.Mercator())
         
         cb = ax.pcolormesh(lons,lats,dzcomp,vmin=self.lims[var][0],vmax=self.lims[var][1],cmap=self.cmaps[var],transform=ccrs.PlateCarree())
-        
+       
         if cs_over == True: 
             cs_arr = np.squeeze(np.nanmax(np.squeeze(self.data['CSS'].sel(d=time).values),axis=0))
             ax.contour(lons,lats,cs_arr,levels=[0,1,2,3],linewidths=3,colors=['black','black'],transform=ccrs.PlateCarree())
             
         if statpt: ax.plot(self.lon_0,self.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
 
-        self.co_gridlines(fig,ax,lons[(0,0)],lons[(0,-1)],lats[(0,0)],lats[(-1,0)])
+        self.co_gridlines(fig,ax,minlon,maxlon,minlat,maxlat)
         self.mycbar(fig,ax,cb,var,'Composite '+self.longnames[var]+' '+self.units[var])
         
         return fig, ax
