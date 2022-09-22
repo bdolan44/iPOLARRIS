@@ -113,7 +113,7 @@ if sys.argv[2:]:
         print('\nIN RUN_IPOLARRIS... creating CFAD COMPARISON figures.')
         print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
             
-        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[np.min(config['dzbins']),np.max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[min(config['dzbins']),max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
         ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
@@ -125,7 +125,7 @@ if sys.argv[2:]:
         print('Moving on.')
         print('\nPlotting composites by time for variable '+rdata.zdr_name+'...')
         
-        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,config,bins=config['drbins'],xlab=rdata.longnames[rdata.zdr_name]+' '+rdata.units[rdata.zdr_name],cscfad=False,xlim=[np.min(config['drbins']),np.max(config['drbins'])+1],ylim=config['zlim'],nor=3)
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,config,bins=config['drbins'],xlab=rdata.longnames[rdata.zdr_name]+' '+rdata.units[rdata.zdr_name],cscfad=False,xlim=[min(config['drbins']),max(config['drbins'])+1],ylim=config['zlim'],nor=3)
         ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
@@ -137,7 +137,7 @@ if sys.argv[2:]:
         print('Moving on.')
         print('\nPlotting composites by time for variable '+rdata.kdp_name+'...')
 
-        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,config,bins=config['kdbins'],xlab=rdata.longnames[rdata.kdp_name]+' '+rdata.units[rdata.kdp_name],cscfad=False,xlim=[np.min(config['kdbins']),np.max(config['kdbins'])+1],ylim=config['zlim'],nor=3)
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.kdp_name,rdata2.kdp_name,config,bins=config['kdbins'],xlab=rdata.longnames[rdata.kdp_name]+' '+rdata.units[rdata.kdp_name],cscfad=False,xlim=[min(config['kdbins']),max(config['kdbins'])+1],ylim=config['zlim'],nor=3)
         ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
