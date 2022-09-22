@@ -56,30 +56,31 @@ class RadarConfig(object):
         self.date = tm
         self.radar_name = radar_name
 
-
-
         self.species = np.array(['DZ','RN','CR','AG','WS','VI','LDG','HDG','HA','BD'])
         self.species_long = np.array(['Drizzle','Rain','Ice\nCrystals','Snow\nAggre-\ngates','Wet\nSnow','Vertical\nIce','Low-\nDensity\nGraupel','High-\nDensity\nGraupel','Hail','Big\nDrops'])
         #self.hid_colors = ['White','LightBlue','MediumBlue','Darkorange','LightPink','Cyan','DarkGray',\
         #    'Lime','Yellow','Red','Fuchsia']
         self.hid_colors = ['LightBlue','MediumBlue','Darkorange','Purple','Cyan','DarkGray',\
-            'Lime','Yellow','Red','Fuchsia']       
+            'Lime','Yellow','Red','Fuchsia'] 
         self.pol_vars = np.array([self.dz_name, self.zdr_name, self.kdp_name, self.ldr_name, self.rho_name, self.hid_name])
 
         self.cs_colors = ['#FFFFFF', 'DodgerBlue', 'Red', 'Khaki']
         self.cs_labels = ['', 'Strat', 'Conv', 'Mixed']
+
+        self.cfad_levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
+        self.cfad_cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet'] 
 
         self.set_dbz_colorbar(color_blind=color_blind)
         self.set_hid_colorbar()
         self.set_cs_colorbar()
 
         # Now just set some defaults
-        self.lims = {dz: [0,80], zdr: [-1, 3], kdp: [-0.5, 3], ldr: [-35, -20], rho: [0.95, 1.00], hid: [0, len(self.species)+1],w:[-25,25],vr:[-25,25],self.cs_name:[0,4],self.rr_name:[0,30],self.temp_name:[-30,30]}
-        self.bins = {dz: np.arange(-10,60,1), zdr: np.arange(-2,6,0.05), kdp: np.arange(-2,2,0.05), rho: '', hid: '' , w: np.arange(-25,26,0.5), self.temp_name: np.arange(20,-60,-5)} 
+        self.lims = {dz: [0,80], zdr: [-1, 3], kdp: [-0.5, 3], ldr: [-35, -20], rho: [0.95, 1.00], hid: [0,len(self.species)+1],w:[-25,25],vr:[-25,25],self.cs_name:[0,4],self.rr_name:[0,30],self.temp_name:[-30,30]}
+        self.cfbins = {dz: np.arange(-10,60.1,1), zdr: np.arange(-2,6.01,0.05), kdp: np.arange(-2,2.01,0.05), rho: np.arange(0.5,1.01,0.02), hid: '' , w: np.arange(-25,25.1,0.5), self.temp_name: np.arange(20,-60.1,-5)} 
         self.delta = {dz: 10, zdr: 1, kdp: 1, ldr: 5, rho: 0.005, hid: 1,w:5,vr:5,self.cs_name:1,self.rr_name:10,self.temp_name:5}
-        self.units = {dz: '(dBZ)', zdr: '(dB)', kdp: '($^{\circ}$/km)', ldr: '(dB)', rho: '', hid: '',w:'(m s$^{-1}$)',vr:'(m s$^{-1}$)',self.cs_name:'',self.rr_name:'(mm hr$^{-1}$)',self.temp_name:'C'}
+        self.units = {dz: '(dBZ)', zdr: '(dB)', kdp: '($^{\circ}$ km$^{-1}$)', ldr: '(dB)', rho: '', hid: '',w:'(m s$^{-1}$)',vr:'(m s$^{-1}$)',self.cs_name:'',self.rr_name:'(mm hr$^{-1}$)',self.temp_name:'C'}
         self.names = {dz: 'Z', zdr: 'Z$_{DR}$', kdp: 'K$_{dp}$', ldr: 'LDR', rho: r'$\rho_{hv}$', hid: '',w:'',vr:'V$_r$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
-        self.names_uc = {dz: 'Z', zdr: 'ZDR', kdp: 'KDP', ldr: 'LDR', rho: 'RHO', hid: 'HID',w:'W',vr:'V$_{RAD}$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
+        self.names_uc = {dz: 'REF', zdr: 'ZDR', kdp: 'KDP', ldr: 'LDR', rho: 'RHO', hid: 'HID',w:'W',vr:'V$_{RAD}$',self.cs_name:'',self.rr_name:'RR',self.temp_name:'T'}
         self.longnames = {dz: 'Reflectivity', zdr: 'Differential Reflectivity', kdp: 'Specific Differential Phase',\
                 ldr: 'Linear Depolarization Ratio', rho: 'Correlation Coefficient', hid: 'Hydrometeor Identification',w:'Vertical Velocity',vr:'Radial Velocity',\
                 self.cs_name: 'Convective/Stratiform',self.rr_name:'Rain Rate',self.temp_name:'Temperature'}
