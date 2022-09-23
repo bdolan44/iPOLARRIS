@@ -24,6 +24,8 @@ if [ ! -z $doppdir ]; then
     mkdir -p $doppdir
 fi
 
+declare -a mpopts=( "mp06" "mp08" "mp10" "mp16" "mp51" )
+declare -a mpnames=( "WSM6" "THOM" "MORR" "WDM6" "P3" )
 
 st=$(echo $starg | sed 's/[^0-9]*//g')
 stdate=${st:0:8}
@@ -120,6 +122,10 @@ if [[ "$(head -n 1 $configdir/$tfile | xargs basename)" == "wrfout"* ]]; then
     tempfile=temp_${temp}_${mp}_${stt}_${edt}.txt
     snd_on='False'
     wrft_on='True'
+    for ((ii=0;ii<${#mpopts[@]};ii++)); do
+       [[ "${mpopts[ii]}" = "$mp" ]] && break
+    done
+    mpname=${mpnames[ii]}
 else
 	temp='snd'
     tempfile=temp_${temp}_${stt}_${edt}.txt
@@ -129,7 +135,11 @@ fi
 mv $configdir/$tfile $configdir/$tempfile
 
 if [ -z $simdir ]; then
-    fold=$data
+    if [[ "$data" == "obs" ]]; then
+        fold="obs"
+    else
+        fold=$(echo "$mpname" | tr '[:upper:]' '[:lower:]')
+    fi
 else
     fold='obswrf'
 fi
@@ -153,13 +163,21 @@ template=$ipoldir/${agency}_${data}_config_template.txt
 cp $template $configdir/$configfile
 
 sed -i '' "s/^type ==.*/type == $data == # Type of input data: 'obs' OR 'wrf' (obs + simulated)/g" $configdir/$configfile
-sed -i '' "s/.*mphys ==.*/mphys == $data == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'/g" $configdir/$configfile
+if [[ "$data" == "obs" ]]; then
+    sed -i '' "s/.*mphys ==.*/mphys == $data == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'/g" $configdir/$configfile
+else
+    sed -i '' "s/.*mphys ==.*/mphys == $mpname == # Type of microphysics used in model: 'obs' OR '<scheme>' if type = 'wrf'/g" $configdir/$configfile
+fi
 sed -i '' "s/.*ptype ==.*/ptype == '$ptype' == # Output figure file extenstion (i.e. png, jpg, mp4, ...)/g" $configdir/$configfile
 sed -i '' "s/.*sdatetime ==.*/sdatetime == '$(echo $stt | tr '_' '-')' == # Start time of analysis of interest/g" $configdir/$configfile
 sed -i '' "s/.*edatetime ==.*/edatetime == '$(echo $edt | tr '_' '-')' == # End time of analysis of interest/g" $configdir/$configfile
 sed -i '' "s%.*rfiles ==.*%rfiles == '$configdir/$inputfile' == # Path to list of radar files to read in%g" $configdir/$configfile
 sed -i '' "s%.*wfiles ==.*%wfiles == '$configdir/$tempfile' == # Path to list of WRF temperature files to read in%g" $configdir/$configfile
-sed -i '' "s/.*exper ==.*/exper == $station == # Radar location/g" $configdir/$configfile
+if [[ "$data" == "obs" ]]; then
+    sed -i '' "s/.*exper ==.*/exper == $station == # Radar location/g" $configdir/$configfile
+else
+    sed -i '' "s/.*exper ==.*/exper == $station-$mpname == # Radar location/g" $configdir/$configfile
+fi
 sed -i '' "s/lat ==  == #.*/lat == $latcen == # Latitude of the radar station/g" $configdir/$configfile
 sed -i '' "s/lon ==  == #.*/lon == $loncen == # Longitude of the radar station/g" $configdir/$configfile
 sed -i '' "s%.*image_dir ==.*%image_dir == '$outfigdir/' == # Output figure directory%g" $configdir/$configfile
