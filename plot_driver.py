@@ -896,12 +896,16 @@ def make_single_pplots(rdat,config,y=None):
  
         st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
         en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
+        if st == en:
+            label = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' UTC'
+        else:
+            label = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' - '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
         zmax = config['zmax']
 
         if not zmax == '':
-            fig = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'],zmax=zmax)
+            fig, ax = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'],zmax=zmax)
         else:
-            fig = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'])
+            fig, ax = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'])
         
         nvars=0
         for var in eval(config['cfad_vars']):
@@ -917,6 +921,10 @@ def make_single_pplots(rdat,config,y=None):
         
         label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars,horizontalalignment='left',verticalalignment='top',color='k',bbox=dict(facecolor='w', edgecolor='w', pad=2.0),weight='bold')
 
+        axf = ax.flatten()
+        axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        axf[2].text(1, 1, label, horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[2].transAxes) # (a) Top-left
+ 
         if config['ptype'].startswith('mp4'):
             plt.savefig('{d}{p}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,t1=st,t2=en),dpi=400,bbox_inches='tight')
         else: 

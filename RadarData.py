@@ -1989,10 +1989,8 @@ class RadarData(RadarConfig.RadarConfig):
                     dummy = self.cfad_plot(var,ax=axf[i],xlab=1,ylab=ylabbool,cbar=cbbool,bins=self.cfbins[var],levels=1,zmax=zmax,z_resolution=z_resolution)
                 else:
                     dummy = self.plot_hid_cdf(ax=axf[i],xlab=1,ylab=ylabbool,zmax=zmax,z_resolution=z_resolution)
-
-        axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
-        
-        return fig
+       
+        return fig, ax
 
 #############################################################################################################
 
