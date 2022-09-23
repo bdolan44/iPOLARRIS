@@ -20,12 +20,12 @@ xlim ==  == #lat / lon zoom for CAPPIS
 ylim ==  == #lat / lon zoom for CAPPIS
 #ylim == [-200,200] ==
 #ylim == [46.0,48.5] == #lat / lon zoom for CAPPIS
-zlim == [0,12] ==
+zmax == 10 ==
 
 y ==  == # Lat of the y cross-section for RHI
 #y == 0.5 == # Lat of the y cross-section for RHI
 #z == 0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0 == # Height of the CAPPIs
-z == 0.5 == # Height of the CAPPIs
+z == 2.0 == # Height of the CAPPIs
 z_resolution == 0.5 == # Vertical resolution for CFADs.
 
 
@@ -126,8 +126,8 @@ band == S == # Radar band: X, C OR S. Note: needs to be capital letter.
 
 # SET 1) Plots created in run_ipolarris.py
 all1		    == False	    == # Set to True to output ALL figures in SET 1 below
-compo_ref	    == True	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
-cappi_rr	    == True	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
+compo_ref	    == False	    == # 1) Set to True to plot for spatial composite reflectivity plotting (1 figure per timestep)
+cappi_rr	    == False	    == # 3) Set to True to plot rain rate CAPPI at some altitude z (set z below) 
 rr_timeseries	== False	    == # 4) Set to True to plot a time series of convective and stratiform rain rate
 vv_profiles	    == False	    == # 5) Set to True to plot vertical profiles of the 50th, 90th and 99th percentile of updraft, downdrafts and overall vertical velocity
 vert_ref	    == False	    == # 5) Set to True to plot vertical profile of reflectivity with height
@@ -142,15 +142,16 @@ percentiles_txt		== False	    == # 10)
 
 # Plots created in plot_driver.py
 all3			    == False	    == Set to TRUE to output ALL figures in SET 3 below
-cfad_multi		    == False	    == # 13) Set to True to plot 4-panel of CFADs of Z, ZDR, KDP and W
+pol_compare		    == False	    == # 13) Set to True to plot 4-panel of CFADs of Z, ZDR, KDP and W
 hist_multi		    == False	    == # 15) Set to True to plot 4-panel of comparison figures between various polarimetric vars
-cfad_individ		== True 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W, RHO and HID
+cfad_multi		    == True	    == # 13) Set to True to plot x-panel of CFADs for x polarimetric variables
+cfad_individ		== False 	    == # 16) Set to True to plot separate images for Z, ZDR, KDP, W, RHO and HID
 hid_prof		    == False	    == # 17) Set to True to plot vertical profile of grouped HID species with height
 up_width		    == False	    == # 18) Set to True to plot vertical profile of updraft width with temperature.
 cappi_multi		    == True	    == # 19) Set to True to plot x-panel of CAPPIs for x polarimetric variables at some altitude z (set z below; 1 figure per timestep)
-cappi_individ	    == True	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
+cappi_individ	    == False	    == # 20) Set to True to plot a CAPPI for x individual polarimetric variables at some altitude z (set z below; 1 figure per timestep)
 rhi_multi		    == True	    == # 21) Set to True to plot x-panel of RHIs for x polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
-rhi_individ		    == True	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
+rhi_individ		    == False	    == # 22) Set to True to plot an RHI for x individual polarimetric variables at some latitude/N-S distance from the radar y (set y below; 1 figure per timestep)
 
 # Model Only
 qr_cappi		    == False	== # FK) Make cappi cross section of mixing ratios. change parameters in plot_driver.py (only valid for model)
@@ -199,8 +200,8 @@ rvectors == [None,None,None,None,None,True]                          ==#Turn on 
 skip == 2                                  ==#Number of vectors to skip for the vector plots.
 mix_vars ==['qc','qr','qg','qi','qh',config['rr_name'],config['vr_name'],'HID']   ==#Mixing ratios from model to plot.
 rhi_vars ==[config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],'HID',config['wname']] == #Names of vars for RHI plots
-cfad_vars == [config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],'HID',config['wname']] == #Names of vars for CAPPI plots
-cfad_bins == {config['dz_name']: np.arange(-10,60,1),config['dr_name']: np.arange(-2,6,0.05),config['kd_name']: np.arange(-2,2,0.05),config['rh_name']: ,'HID': ,config['wname']: np.arange(-25,26,0.5)} == #
+cfad_vars == [config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],'HID',config['wname']] == #Names of vars for CFAD plots
+#cfad_vars == ['HID'] == #Names of vars for CAPPI plots
 cappi_vars == [config['dz_name'],config['dr_name'],config['kd_name'],config['rh_name'],'HID',config['vr_name']] == #Names of vars for CAPPI plots
 comb_vicr == True                       ==# Combine VI with CR for plotting.
 cappi_contours == ['CS',None,None,None,None,None]   ==#What contours to apply to the CAPPI images.
