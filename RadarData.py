@@ -48,6 +48,7 @@ import general_tools as gentools
 import RadarConfig
 # Up here are just some general functions
 
+np.set_printoptions(threshold=sys.maxsize)
 
 class RadarData(RadarConfig.RadarConfig): 
 
@@ -127,13 +128,13 @@ class RadarData(RadarConfig.RadarConfig):
         # down here goes some zdr checking
         self.zdr_offset = 0 # initialize as 0
         try:
-            self.top_index = np.where(self.data[self.z_name]== np.max(self.data[self.z_name]))[self.zind]
+            self.top_index = np.where(self.data[self.z_name]== max(self.data[self.z_name]))[self.zind]
         except:
-            self.top_index = np.where(self.data[self.z_name]== np.max(self.data[self.z_name]))[0]
+            self.top_index = np.where(self.data[self.z_name]== max(self.data[self.z_name]))[0]
         try:
-            self.bot_index = np.where(self.data[self.z_name]== np.min(self.data[self.z_name]))[self.zind]
+            self.bot_index = np.where(self.data[self.z_name]== min(self.data[self.z_name]))[self.zind]
         except:
-            self.bot_index = np.where(self.data[self.z_name]== np.min(self.data[self.z_name]))[0]
+            self.bot_index = np.where(self.data[self.z_name]== min(self.data[self.z_name]))[0]
 
 #         if hasattr(self.nc,'Latitude_deg') == True:
 #             print 'Getting attribute!'
@@ -952,7 +953,7 @@ class RadarData(RadarConfig.RadarConfig):
         return fig, ax
 
 
-    def xsec(self, var, y=None, xlim=None, zlim=None, cbar=1, ts = None,varlist=None, ax=None, title_flag=False, vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, latlon=False, lblsz=16, lblpad=15, **kwargs):
+    def xsec(self, var, y=None, xlim=None, zmax=None, cbar=1, ts = None,varlist=None, ax=None, title_flag=False, vectors=None, cblabel=None, res=2.0,cbpad=0.03, labels=True, xlab=False, ylab=False, latlon=False, lblsz=16, lblpad=15, **kwargs):
         
         if ts is not None: 
             try:
@@ -964,17 +965,15 @@ class RadarData(RadarConfig.RadarConfig):
             xmin, xmax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
         else:
             xmin, xmax = xlim[0], xlim[1]
-        if not zlim:
-            zmin, zmax = self.data[self.z_name].values.min(), self.data[self.z_name].values.max()
-        else:
-            zmin, zmax = zlim[0], zlim[1]
+        if not zmax:
+            zmax = self.data[self.z_name].values.max()
 
         if 'y' in self.data[self.x_name]:
             xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
         else:
             xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax))
 
-        zdataset = self.data[self.z_name].sel(z=slice(zmin,zmax))
+        zdataset = self.data[self.z_name].sel(z=slice(0,zmax))
 
         if 'd' in xdataset:
             xdat = np.squeeze(xdataset.sel(d=tmind).values)
@@ -983,7 +982,7 @@ class RadarData(RadarConfig.RadarConfig):
             xdat = np.squeeze(xdataset.values)
             zdat = np.squeeze(zdataset.values)
 
-        dataset = self.data[var].sel(z=slice(zmin,zmax),y=y,x=slice(xmin,xmax))
+        dataset = self.data[var].sel(z=slice(0,zmax),y=y,x=slice(xmin,xmax))
         data = np.squeeze(dataset.sel(d=tmind).values)
         data = np.ma.masked_where(~np.isfinite(data),data)
            
@@ -1008,7 +1007,7 @@ class RadarData(RadarConfig.RadarConfig):
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
             ax.set_xlim([xmin,xmax])
-            ax.set_ylim([zmin,zmax])
+            ax.set_ylim([0,zmax])
             if labels:
                 ax.set_xlabel('Distance E of Radar (km)', fontsize=lblsz)
                 ax.set_ylabel('Altitude (km MSL)', fontsize=lblsz)
@@ -1033,7 +1032,7 @@ class RadarData(RadarConfig.RadarConfig):
                 cbthickness = 0.02
         else:
             ax.set_xlim([xmin,xmax])
-            ax.set_ylim([zmin,zmax])
+            ax.set_ylim([0,zmax])
             if labels:
                 ax.set_xlabel('Distance E of radar (km)',fontsize=lblsz)
                 ax.set_ylabel('Altitude (km MSL)',fontsize=lblsz)
@@ -1073,8 +1072,8 @@ class RadarData(RadarConfig.RadarConfig):
  
         if vectors:
 #                 try:
-#                     print( zlim,xlim,ts,res)
-                self.xsec_vector(ax=ax, y=y,zlim=zlim,xlim=xlim,ts=ts,res=res)
+#                     print( zmax,xlim,ts,res)
+                self.xsec_vector(ax=ax, y=y,zmax=zmax,xlim=xlim,ts=ts,res=res)
 #                 except Exception as e:
 #                     print ('Error trying to plot xsec vectors: {}'.format(e))
 
@@ -1087,7 +1086,7 @@ class RadarData(RadarConfig.RadarConfig):
         return dummy, ax
 
     
-    def xsec_multiplot(self, y=0.5, xlim=[], zlim=[], ts=None, res = 2.0, varlist=None, vectors=None, latlon=False, **kwargs):
+    def xsec_multiplot(self, y=0.5, xlim=[], zmax=[], ts=None, res = 2.0, varlist=None, vectors=None, latlon=False, **kwargs):
     
         if ts is not None:
             try:
@@ -1138,8 +1137,8 @@ class RadarData(RadarConfig.RadarConfig):
                 xlabbool = True if i in botpanels else False
                 lspanels = [ncols*n for n in range(0,nrows)]
                 ylabbool = True if i in lspanels else False
-                #dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,lblsz=28,lblpad=28,**kwargs)
-                dummy = self.xsec(var, ts=ts, y=y, xlim=xlim, zlim=zlim, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,latlon=latlon,**kwargs)
+                #dummy = self.xsec(var, ts=ts, y=y, vectors=vect, xlim=xlim, zmax=zmax, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,lblsz=28,lblpad=28,**kwargs)
+                dummy = self.xsec(var, ts=ts, y=y, xlim=xlim, zmax=zmax, ax=axf[i],res=res,xlab=xlabbool,ylab=ylabbool,labels=False,latlon=latlon,**kwargs)
 
         axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
 
@@ -1151,7 +1150,7 @@ class RadarData(RadarConfig.RadarConfig):
 
     def get_ind(self,val,dat):
         dum = np.abs(val - dat)
-        wh_t = np.squeeze(np.where(dum == np.min(dum)))
+        wh_t = np.squeeze(np.where(dum == min(dum)))
         try:
             t = (len(wh_t))
             if t==1:
@@ -1170,7 +1169,7 @@ class RadarData(RadarConfig.RadarConfig):
     
 ######################### Here is the 4 stuff ##############################
 
-    def cappi(self, var, z=1.0, xlim=[], ylim=[], latlon=False, ax=None, ts = None, title_flag=False, vectors=None, cblabel=None, labels=True, xlab=False, ylab=False, cbar=1, res = 2.0, thresh_dz=False,contours = None,statpt=False, dattype='obs', **kwargs):
+    def cappi(self, var, z=1.0, xlim=[], ylim=[], latlon=False, ax=None, ts = None, title_flag=False, vectors=None, cblabel=None, labels=True, xlab=1, ylab=1, cbar=1, res = 2.0, thresh_dz=False,contours = None,statpt=False, dattype='obs', **kwargs):
 
         from copy import deepcopy
         import cartopy.crs as ccrs
@@ -1194,8 +1193,8 @@ class RadarData(RadarConfig.RadarConfig):
                 xmin, xmax = lons[(0,0)], lons[(0,-1)]
                 ymin, ymax = lats[(0,0)], lats[(-1,0)]
             else:
-                xmin, xmax = np.min(xlim), np.max(xlim)
-                ymin, ymax = np.min(ylim), np.max(ylim)
+                xmin, xmax = min(xlim), max(xlim)
+                ymin, ymax = min(ylim), max(ylim)
            
             if dattype.startswith('obs'):
                 xshift = 0.5*(self.data[self.x_name].shape[0]-1)
@@ -1311,15 +1310,15 @@ class RadarData(RadarConfig.RadarConfig):
                     minlats.append(np.nanmin(ydat_masked))
                     maxlats.append(np.nanmax(ydat_masked))
 
-                minlon = np.round(np.min(minlons)-0.1,1)
-                maxlon = np.round(self.lon_0+(self.lon_0-np.min(minlons))+0.1,1)
-                minlat = np.round(np.min(minlats)-0.1,1)
-                maxlat = np.round(np.max(maxlats)+0.1,1)
+                minlon = np.round(min(minlons)-0.1,1)
+                maxlon = np.round(self.lon_0+(self.lon_0-min(minlons))+0.1,1)
+                minlat = np.round(min(minlats)-0.1,1)
+                maxlat = np.round(max(maxlats)+0.1,1)
             else:
-                minlon = np.round(np.min(xlim),1)
-                maxlon = np.round(np.max(xlim),1)
-                minlat = np.round(np.min(ylim),1)
-                maxlat = np.round(np.max(ylim),1)
+                minlon = np.round(min(xlim),1)
+                maxlon = np.round(max(xlim),1)
+                minlat = np.round(min(ylim),1)
+                maxlat = np.round(max(ylim),1)
            
             self.co_gridlines(fig,ax,minlon=minlon,maxlon=maxlon,minlat=minlat,maxlat=maxlat,xlab=xlab,ylab=ylab)
             if statpt: ax.plot(self.lon_0,self.lat_0,markersize=16,marker='^',color='k',transform=ccrs.PlateCarree())
@@ -1453,7 +1452,7 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
     # Down here is dual doppler plotting stuff
 
-    def xsec_vector(self, y=None, xlim=None,zlim=None,ts=None,ax=None, res=2.0, ht_offset=0.2, **kwargs):
+    def xsec_vector(self, y=None, xlim=None,zmax=None,ts=None,ax=None, res=2.0, ht_offset=0.2, **kwargs):
         if ts is None:
             print('xsec_vector got no time')
             ts=self.date[0]
@@ -1466,24 +1465,18 @@ class RadarData(RadarConfig.RadarConfig):
 #             print 'Check your dates!', ts
 #        print 'ts:',ts
 
-        if zlim is None:
-            zmin=0
+        if zmax is None:
             if 'd' in self.data[self.z_name].dims:
                 zmax=len(self.data[self.z_name].sel(d=0))
             else:
                 zmax=len(self.data[self.z_name])
-            zlim=[zmin,zmax]
-            
-        else:
-        
-            zmin, zmax = zlim
             
         if 'd' in self.data[self.z_name].dims:
 #                print('getting z-ind')
-            zmini = self.get_ind(zmin,np.squeeze(self.data[self.z_name].sel(d=tmind).values))
+            zmini = self.get_ind(0,np.squeeze(self.data[self.z_name].sel(d=tmind).values))
             zmaxi = self.get_ind(zmax,np.squeeze(self.data[self.z_name].sel(d=tmind).values))
         else:
-            zmini = self.get_ind(zmin,np.squeeze(self.data[self.z_name].values))
+            zmini = self.get_ind(0,np.squeeze(self.data[self.z_name].values))
             zmaxi = self.get_ind(zmax,np.squeeze(self.data[self.z_name].values))
 
 #        print('xlims 1203',xlim,tmind)
@@ -1786,8 +1779,8 @@ class RadarData(RadarConfig.RadarConfig):
                 udat[msk2] = np.nan
 #                ydat= np.ma.masked_where(msk,ydat)
                 #print type(vdat)
-            #print np.max(vdat)
-            #print 'vect shp',np.shape(udat),np.shape(vdat),np.shape(xdat),np.min(ydat),np.max(ydat)
+            #print max(vdat)
+            #print 'vect shp',np.shape(udat),np.shape(vdat),np.shape(xdat),min(ydat),max(ydat)
 #            print type(xdat),type(ydat),type(udat)
 #            print('yskip','xskip',yskip,xskip)
             if xdat.ndim > 1:
@@ -1845,8 +1838,8 @@ class RadarData(RadarConfig.RadarConfig):
 #         print np.shape(data),type(data)
 
         if np.mod(z_resolution, self.dz) != 0:
-                print('Need even multiple of vertical resolution: %.1f'%self.dz)
-                return
+            print('Need even multiple of vertical resolution: %.1f'%self.dz)
+            return
 #        print('ln 1592')
         multiple = int(z_resolution/self.dz)
         if 'd' in self.data[self.z_name].dims:
@@ -1878,7 +1871,7 @@ class RadarData(RadarConfig.RadarConfig):
            mask= np.where(self.raintype != 2)
            holddat = deepcopy(self.data[var].values)
            self.data[var].values[mask] = np.nan
-#           print ('in conv')
+#           print ('in conv'
         elif cscfad == 'stratiform':
            mask = np.where(self.raintype != 1)
            holddat = deepcopy(self.data[var].values)
@@ -1894,6 +1887,8 @@ class RadarData(RadarConfig.RadarConfig):
            self.data[var].values = holddat2
         #print('ready to go in loop!')
         # if left blank, check the whole thing
+        
+        
         for ivl, vl in (enumerate(tqdm(looped[:-1]))):
             #print ivl, vl
 #             try:
@@ -1909,20 +1904,38 @@ class RadarData(RadarConfig.RadarConfig):
 #                v2 = self.get_ind(vl+multiple,self.data[self.z_name].data])
 #                print v,v2
                 dum = self.data[var].sel(z=slice(vl,vl+multiple)).where(np.isfinite)
-            #print np.max(dum)
+            #print max(dum)
 #            dum2 = np.ma.masked_less(dum,-900.0)
 #             dum2 = np.where(np.isfinite(dum))
 #             print(type(dum[dum2]))
             #print dum[dum2]
             lev_hist, edges = np.histogram(dum, bins=value_bins, density=True) 
-#             except:
+            '''
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.hist(dum.values.flatten(), bins=value_bins, density=True)
+            if self.mphys.startswith('obs'):
+                plt.savefig('hist1x_'+var+'_'+str(ivl).zfill(2)+'.png')
+            else:
+                plt.savefig('hist2x_'+var+'_'+str(ivl).zfill(2)+'.png')
+            plt.close()
+            '''
+#           except:
 #            lev_hist, edges = np.histogram(data[vl:vl+multiple].ravel(), bins=value_bins, density=True) 
             #print lev_hist, edges
                     # this keeps it general, can make more elaborate calls in other functions
             #print(np.shape(lev_hist))
+            
             lev_hist = 100.0*lev_hist/np.sum(lev_hist)
-            if np.max(lev_hist) > 0:
+            if max(lev_hist) > 0:
+                #print(looped[ivl])
+                #print('Hello')
+                #print(max(lev_hist))
                 cfad_out[ivl, :] = lev_hist
+            #else:
+            #    print('Negative!')
+            #    print(looped[ivl])
+            #    print(max(lev_hist))
         #print np.shape(cfad_out)
 #        if cscfad == 'convective' or cscfad == 'stratiform':
 #            print 'setting data back'
@@ -1936,79 +1949,112 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, 
-            log=False, pick=None, z_resolution=1.0,levels=None,tspan =None,cont = False,cscfad = False, cbar=None, ylab=False, **kwargs):
+    def cfad_multiplot(self, varlist=None, z_resolution=1.0, zmax=None, **kwargs):
+
+        if varlist is not None:
+            good_vars = varlist
+        else:
+            good_vars = self.valid_vars()
+            
+        nvars = len(good_vars)
+        if 'scores' in good_vars:
+            if hasattr(self, 'scores'):
+                nvars += 1
+        if nvars <= 3:
+            ncols = 1
+            nrows = deepcopy(nvars)
+            figx = 5
+            figy = 3*nrows
+        else:
+            nrows = 2
+            ncols = int(np.ceil(nvars/2))
+
+        fig, ax = plt.subplots(nrows,ncols,figsize=(14,8),gridspec_kw={'wspace': 0.1, 'hspace': 0.2, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
+        
+        if not isinstance(ax, np.ndarray) or not isinstance(ax, list): 
+            ax = np.array([ax], **kwargs)
+        axf = ax.flatten()
+        
+        for i, var in enumerate((good_vars)):
+            if var is None:
+                fig.delaxes(axf[i])
+                continue
+            else:
+                print(var)
+                lspanels = [ncols*n for n in range(0,nrows)]
+                ylabbool = True if i in lspanels else False
+                cbpanels = [ncols*n+2 for n in range(0,nrows)]
+                cbbool = True if i in cbpanels else False
+                if not var.startswith('HID'):
+                    dummy = self.cfad_plot(var,ax=axf[i],xlab=1,ylab=ylabbool,cbar=cbbool,bins=self.cfbins[var],levels=1,zmax=zmax,z_resolution=z_resolution)
+                else:
+                    dummy = self.plot_hid_cdf(ax=axf[i],xlab=1,ylab=ylabbool,zmax=zmax,z_resolution=z_resolution)
+
+        axf[0].text(0, 1, '{e} {r}'.format(e=self.exper,r=self.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
+        
+        return fig
+
+#############################################################################################################
+
+    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, log=False, pick=None, z_resolution=1.0, levels=None, tspan=None, cont=False, cscfad=False, cbar=1, xlab=1, ylab=1, zmax=None,**kwargs):
 
         from matplotlib.colors import from_levels_and_colors
+
         if bins is None:
             bins = np.linspace(self.lims[var][0], self.lims[var][1], nbins)
         else:
             pass
 
         multiple = int(z_resolution/self.dz)
-#         print self.dz
-#         print 'multiple: {}'.format(multiple)
 
+        if np.nanstd(self.data[var].values) < np.abs(bins[0]-bins[-1]):
+            if self.names_uc[var].startswith('RHO'):
+                bins = np.arange(0.95,bins[-1],0.001)
+            
         cfad,value_bins,hts = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,tspan=tspan,cscfad=cscfad,ret_z=1)
-    #print cfad.sum(axis=1)
         if above is not None:
             bot_index, top_index = self._get_ab_incides(above=above, below=below)
 
         if ax is None:
-            fig, ax = plt.subplots()
+            fig = plt.figure(figsize=(10,8))
+            ax = fig.add_subplot(111)
         else:
-        # ax has been passed in, do nothing to ax, but need to get the parent fig
             fig = ax.get_figure()
 
         if log:
             norm = colors.LogNorm(vmin=1e-5, vmax=1e2)
         else:
             norm = None
-
-        # plot the CFAD
-        cfad_ma = np.ma.masked_where(cfad==0, cfad)
-#        print np.max(cfad_ma),var
-        #print np.shape(cfad_ma)
-#        print multiple, self.data[self.z_name].data[::multiple]
-        levs = [0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.]
-        cols = ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']
-        cmap, norm = from_levels_and_colors(levs,cols) # mention levels and colors here
+        
+        cfad_ma = np.ma.masked_where(cfad==0,cfad)
+        cmap, norm = from_levels_and_colors(self.cfad_levs,self.cfad_cols)
         if cont is True:
-            #cmap, norm = from_levels_and_colors(levs,cols) # mention levels and colors here
-            #pc = ax.contourf(bins[0:-1],self.data[self.z_name].data[::multiple],(cfad_ma/np.sum(cfad_ma))*100.,levs,color=cols)
-            pc = ax.contourf(bins[0:-1],hts,(cfad_ma),levs,color=cols,cmap=cmap,norm=norm,extend='both')
+            pc = ax.contourf(bins[0:-1],hts,(cfad_ma),levels=self.cfad_levs,color=self.cfad_cols,cmap=cmap,norm=norm,extend='both')
         else:
             if levels is not None:
-                #print cmap
                 pc = ax.pcolormesh(bins[0:-1], hts, cfad_ma, norm=norm, cmap=cmap)
             else:
-                #cmap, norm = from_levels_and_colors([0.02,0.05,0.1,0.2,0.5,1.0,2.0,5.0,10.0,15.0,20.,25.], ['silver','darkgray','slategrey','dimgray','blue','mediumaquamarine','yellow','orange','red','fuchsia','violet']) # mention levels and colors here
                 pc = ax.pcolormesh(bins, hts, cfad_ma, vmin=0, vmax=maxval, norm=norm,cmap=cmap, **kwargs)
-
-#        print np.shape(cfad_ma)
-
-        if cbar is not None:
-            cb = fig.colorbar(pc,ax=ax,pad=0.03)
-            cb.set_label('Frequency (%)',fontsize=22,rotation=270,labelpad=20)
-            cb.ax.tick_params(labelsize=20)
-        if ylab is True: 
-            ax.set_ylabel('Height (km MSL)',fontsize=22)
-            ax.tick_params(axis='y',labelsize=20)
-            ax.set_ylim(np.floor(min(hts)),np.ceil(max(hts)))
+      
+        if xlab:
+            ax.set_xlabel('%s %s' %(self.names_uc[var], self.units[var]),fontsize=16)
+            ax.tick_params(axis='x',labelsize=16)
+        else:
+            ax.tick_params(axis='x',labelsize=0,left=False)
+        if cbar:
+            cbar = self.mycbar(fig,ax,pc,var,'Frequency (%)')
+            cbar.set_ticks(self.cfad_levs)
+        if ylab: 
+            ax.set_ylabel('Height (km MSL)',fontsize=16)
+            ax.tick_params(axis='y',labelsize=16)
         else: 
             ax.tick_params(axis='y',labelsize=0,left=False)
-        ax.set_xlabel('%s %s' %(var, self.units[var]),fontsize=22)
-        ax.tick_params(axis='x',labelsize=20)
-        ax.set_xlim(np.floor(min(bins)),np.ceil(max(bins)))
-#        ax.set_title("{d} {r} {v}".format(d=self.date,r=self.band+'-band',v=self.longnames[var]))
-#        ax.set_title('%s %s %s CFAD' % (self.print_date(), self.band+'-band', self.longnames[var]))
-#       except:
-#            pass
+        
+        ax.set_xlim(min(bins),max(bins))
+        ax.set_ylim(0,zmax)
+        ax.grid(color='grey', linestyle='-', linewidth=1)
 
-        return fig, ax #, pc, levs
-
-
-#############################################################################################################
+        return fig, ax
 
 #############################################################################################################
 
@@ -2049,7 +2095,7 @@ class RadarData(RadarConfig.RadarConfig):
         # ax has been passed in, do nothing to ax, but need to get the parent fig
             fig = ax.get_figure()
     
-        cb = ax.contourf(edge[0][:-1],edge[1][:-1],hist.T,norm=colors.Normalize(vmin=0, vmax=np.max(hist)),levels=np.arange(0.01,np.max(hist),0.01))
+        cb = ax.contourf(edge[0][:-1],edge[1][:-1],hist.T,norm=colors.Normalize(vmin=0, vmax=max(hist)),levels=np.arange(0.01,max(hist),0.01))
         if cbon == True:
             #print ' making colorbar'
             col = plt.colorbar(cb,ax=ax)
@@ -2272,7 +2318,7 @@ class RadarData(RadarConfig.RadarConfig):
         if cscfad == 'convective' or cscfad == 'stratiform':
             self.data[self.hid_name].values = holddat
 
-        #print np.shape(vol), np.max(vol)
+        #print np.shape(vol), max(vol)
         #print hts
 #         print self.data[self.z_name].data[0]
 #         print self.data[self.z_name].data[0][::looped]
@@ -2350,56 +2396,53 @@ class RadarData(RadarConfig.RadarConfig):
     def HID_barplot_colorbar(self, figure, location = [0.9, 0.1, 0.03, 0.8], orientation='vertical', names='shortnames', lblsz=16):
 
         scalarMap = plt.cm.ScalarMappable(norm=self.normhid,cmap=self.hid_cmap)
-        axcb = figure.add_axes(location) # x pos, y pos, x width, y width
+        axcb = figure.add_axes(location)
         cb = mpl.colorbar.ColorbarBase(axcb, cmap=self.hid_cmap, norm=self.normhid, boundaries=self.boundshid, orientation = orientation)
-        #cb.set_ticks(np.arange(0,10))
         cb.set_ticks(np.arange(len(self.species))+0.5)
-            # need to add a blank at the beginning of species to align labels correctly
-        #labs = np.concatenate((np.array(['']), np.array(self.species)))
-        if names.startswith('long'): labs = np.array(self.species_long)
-        else: labs = np.array(self.species)
-        #print(labs)
-        cb.set_ticklabels(labs)
-        cb.ax.tick_params(labelsize=lblsz)
+        
+        if names.startswith('long'): 
+            labs = np.array(self.species_long)
+            cb.set_ticklabels(labs)
+            cb.ax.tick_params(labelsize=lblsz-2)
+        else: 
+            labs = np.array(self.species)
+            cb.set_ticklabels(labs)
+            cb.ax.tick_params(labelsize=lblsz)
+         
         return cb
 
-    def plot_hid_cdf(self, ylab=1, cbar=1, data=None, z_resolution=1.0, ax=None, pick=None,cscfad = None):
-        # this will just plot it
+    def plot_hid_cdf(self, xlab=1, ylab=1, zmax=None, cbar=1, data=None, z_resolution=1.0, ax=None, pick=None,cscfad = None):
+        
         ts=np.array(self.date)[0]
         if data is not None:
             pass
         else:
-            pass # will call the hid_cdf function here
+            pass
             data,hgt = self.hid_cdf(z_resolution=z_resolution, pick=pick,cscfad = cscfad)
-        #print np.shape(data)
         if ax is None:
-            fig, ax = plt.subplots(1,1)
+            fig = plt.figure(figsize=(10,8))
+            ax = fig.add_subplot(111)
         else:
             fig = ax.get_figure()
 
-        #fig.subplots_adjust(left = 0.07, top = 0.93, right = 0.87, bottom = 0.1)
         multiple = int(z_resolution/self.dz)
-#         if 'd' in self.data[self.z_name].dims:
-#             hgt = self.data[self.z_name].sel(d=0).values
-#         else:
-#             hgt = self.data[self.z_name].valeus
-        print(len(hgt),'heights!')
-        for i, vl in enumerate(np.arange(0, len(hgt), multiple)):
-            #print(vl,i)
-#            print self.data[self.z_name].data[vl]
-            #print data[0,:]
-#            print('in plotting cfad',i, vl,np.shape(data),hgt[i])#,np.shape(data[0,:]))
-            ax.barh(hgt[i], data[0, i], left = 0., align = 'center', color = self.hid_colors[0]) 
-            for spec in range(1, len(self.species)): # now looping thru the species to make bar plot
-                #print spec, np.max(data[spec,i]) 
-                ax.barh(hgt[i], data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec], edgecolor = 'k')
-                #ax.barh(vl, data[spec, i], left = data[spec-1, i], color = self.hid_colors[spec+1], edgecolor = 'none')
-
-        ax.set_xlim(0,100)
-        ax.set_xlabel('Cumulative Frequency (%)',fontsize=16)
-        ax.tick_params(axis='x',which='major',labelsize=16)
         
+        for i in tqdm(np.arange(0,len(hgt),multiple)):
+            ax.barh(hgt[i],data[0,i],left=0.,align='center',height=z_resolution,color=self.hid_colors[0],edgecolor='k')
+            for spec in range(1, len(self.species)):
+                ax.barh(hgt[i],data[spec,i],left=data[spec-1,i],align='center',height=z_resolution,color=self.hid_colors[spec],edgecolor='k')
+
+        if xlab == 1:
+            ax.set_xlim(0,100)
+            ax.set_xlabel('Cumulative Frequency (%)',fontsize=16)
+            ax.tick_params(axis='x',which='major',labelsize=16)
+        else:
+            ax.tick_params(axis='x',which='major',labelsize=0)
+            ax.set_xticks([])
+            ax.set_xticklabels([])
+            
         if ylab == 1:
+            ax.set_ylim(0,zmax+0.5)
             ax.set_ylabel('Height (km MSL)',fontsize=16)
             ax.tick_params(axis='y',which='major',labelsize=16)
         else:
@@ -2407,26 +2450,18 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_yticks([])
             ax.set_yticklabels([])
         
-        # now have to do a custom colorbar?
-        if cbar == 1:  # call separate HID colorbar function for bar plots
+        if cbar == 1:
             lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur+wur+0.02,bur-0.001,0.03,hur]
-            self.HID_barplot_colorbar(fig,cbar_ax_dims)  # call separate HID colorbar function for bar plots
+            cbar_ax_dims = [lur+wur++0.015,bur,0.03,hur]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims)
         
         if cbar == 2:
             lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur,bur-0.13,2*wur+0.04,0.03]
-            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')  # call separate HID colorbar function for bar plots
-
-            #fig.suptitle('%04d/%02d/%02d - %02d:%02d:%02d %s, cell %d, HID CDF' \
-            #                %(self.year,self.month,self.date,self.hour,self.minute,self.second, \
-            #                self.radar, self.cell_num), fontsize = 14)
-        #ax.set_title('%s %s HID CDF' % (self.print_date(), self.band+'-band'))
+            cbar_ax_dims = [lur,bur-0.13,wur,0.03]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
 
         return fig, ax 
 
-
-#############################################################################################################
 #############################################################################################################
 
     def vertical_profile(self, var, rep_func=np.average, above=None, below=None, pick=None):
@@ -2612,7 +2647,7 @@ class RadarData(RadarConfig.RadarConfig):
             if self.data[self.x_name].units == "[deg]":
 #                print 'changing units'
                 uw[iz]=uw[iz]*110.*110.
-        #print np.shape(uw),np.max(uw),self.data[self.x_name].units
+        #print np.shape(uw),max(uw),self.data[self.x_name].units
         #print np.shape(uw)
         #print np.shape(self.T[0,:,0,0])
         # now inerpolate this to the temps listed
@@ -2876,7 +2911,7 @@ class RadarData(RadarConfig.RadarConfig):
             vmax=np.nanmax(dat)
             cmap = plt.cm.gist_ncar
         
-        ax.set_extent([np.min(self.lons), np.max(lons), np.min(lats), np.max(lats)])
+        ax.set_extent([min(self.lons), max(lons), min(lats), max(lats)])
         lon_formatter = LongitudeFormatter(number_format='.1f')
         lat_formatter = LatitudeFormatter(number_format='.1f')
         ax.xaxis.set_major_formatter(lon_formatter)
@@ -2982,3 +3017,5 @@ class RadarData(RadarConfig.RadarConfig):
         cbt = plt.colorbar(cb,cax=cbar_ax)
         cbt.ax.tick_params(labelsize=16)
         cbt.set_label(labtxt, fontsize=16, rotation=270, labelpad=20)
+
+        return cbt
