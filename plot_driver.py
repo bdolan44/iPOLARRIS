@@ -156,7 +156,7 @@ def plot_joint_int(dat1,config,typ='zzdr',n1= None,n2=None):
         plt.clf()
 
 def plot_upwidth_int(dat1,config,n1= None):
-        #print np.max(m_warea_wrf)
+        #print max(m_warea_wrf)
         plt.plot(np.nanmean(dat1['warea'],axis=0),dat1['wareat'][0],color='k',lw=5)
         plt.ylim(20,-60)
         plt.xlabel('Updraft Width (km$^2$)')
@@ -498,7 +498,7 @@ def plot_cfad_compare(dat1,dat2,ht1,ht2,bin1,bin2,config,typ='dz',xlab = None, n
         vals = np.array([cfad1_all, cfad2_all])
 
         lens = [len(ht1),len(ht2)]
-        sz = np.max(lens)
+        sz = max(lens)
         arg = np.argmax(lens)
         cfad_new1=np.zeros_like(vals[arg])
         cfad_new2=np.zeros_like(vals[arg])
@@ -679,7 +679,7 @@ def plot_hid_profile(dat1,dat2,config,typ='hid',n1 = None,n2 = None):
         svals = np.array([tw_snow_vert1,tw_snow_vert2])
 
         lens = [len(dat1['hts'][0]),len(dat2['hts'][0])]
-        sz = np.max(lens)
+        sz = max(lens)
         arg = np.argmax(lens)
         wvals_new1=np.zeros_like(wvals[arg])
         wvals_new2=np.zeros_like(wvals[arg])
@@ -778,26 +778,13 @@ def make_single_pplots(rdat,config,y=None):
     
     tspan= [rdat.date[0],rdat.date[-1]]
     tms = np.array(rdat.date)
-    #print('DATES',np.array(rdat.date))
-    #tstart = tspan[0]
-#    print ts
-#    print rdat.exper
-    #tend = tspan[1]
-#    print ts, te
-    xlim = config['xlim']
-    ylim = config['ylim']
-    zlim = config['zlim']
-    y = config['y']
-    z = config['z']
     outpath = config['image_dir']
 
-    #title_string = '{e} {t} {d1:%Y%m%d-%H%M%S}'.format(e=rdat.exper,t=rdat.mphys,d1=tstart)
-
-    if (config['cfad_multi'] | config['all3']):
+    if (config['pol_compare'] | config['all3']):
      
         print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel CFADs for various polarimetric vars.\n')
     
-        outdir = outpath+'cfad_multi/'
+        outdir = outpath+'pol_compare/'
         os.makedirs(outdir,exist_ok=True)
 
         if config['wname'] in rdat.data.variables.keys():
@@ -900,6 +887,47 @@ def make_single_pplots(rdat,config,y=None):
         print('Moving on.\n')
  
 
+    if (config['cfad_multi'] | config['all3']):
+ 
+        print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating multi-panel CFADs for various polarimetric vars.\n')
+        
+        outdir = outpath+'cfad_multi/'
+        os.makedirs(outdir,exist_ok=True)
+ 
+        st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
+        en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
+        zmax = config['zmax']
+
+        if not zmax == '':
+            fig = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'],zmax=zmax)
+        else:
+            fig = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'])
+        
+        nvars=0
+        for var in eval(config['cfad_vars']):
+            if var in rdat.data.variables.keys():
+                nvars+=1
+        
+        if nvars <=6:
+            yof = 0.01
+        else:
+            yof = -0.02
+        yof = -0.01
+        xof = 0.01
+        
+        label_subplots(fig,yoff=yof,xoff=xof,size=16,nlabels=nvars,horizontalalignment='left',verticalalignment='top',color='k',bbox=dict(facecolor='w', edgecolor='w', pad=2.0),weight='bold')
+
+        if config['ptype'].startswith('mp4'):
+            plt.savefig('{d}{p}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,t1=st,t2=en),dpi=400,bbox_inches='tight')
+        else: 
+            plt.savefig('{d}{p}_CFAD_{t1}-{t2}.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],t1=st,t2=en),dpi=400,bbox_inches='tight')
+
+        plt.close()
+
+        print('\nDone! Saved to '+outdir)
+        print('Moving on.\n')
+
+
     if (config['cfad_individ'] | config['all3']):
 
         print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating individual CFADs for various polarimetric vars.\n')
@@ -914,83 +942,52 @@ def make_single_pplots(rdat,config,y=None):
                 continue 
             else:
                 
-                outdir = outpath+'cfad_individ/'+v+'/'
-                os.makedirs(outdir,exist_ok=True)
-
-                '''
-                if config['wname'] in rdat.data.variables.keys():
-
-                    fig, ax = plt.subplots(1,1,figsize=(14,12))
-                    rdat.cfad_plot(rdat.w_name,ax = ax,bins=config['wbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
-                    #plt.tight_layout()
-                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-                    plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.w_name,t=config['ptype']),dpi=400,bbox_inches='tight')
-                    plt.clf()
-                    print(rdat.w_name)
-                '''
                 st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
                 en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
+                zmax = config['zmax']
 
                 if v.startswith('HID'):
-                    
+ 
                     print(v)
-                    
-                    fig, ax = rdat.plot_hid_cdf(ylab=1,cbar=1,z_resolution=config['z_resolution'])
-                    
-                    ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=12, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
+
+                    if not zmax == '':
+                        fig, ax = rdat.plot_hid_cdf(cbar=2,z_resolution=config['z_resolution'],zmax=zmax)
+                    else:
+                        fig, ax = rdat.plot_hid_cdf(cbar=2,z_resolution=config['z_resolution'])
+
+                    ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=16,color='k',zorder=10,weight='bold',transform=ax.transAxes)
                    
                     if config['ptype'].startswith('mp4'):
                         plt.savefig('{d}{p}_HID_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,t1=st,t2=en),dpi=400,bbox_inches='tight')
                     else: 
                         plt.savefig('{d}{p}_HID_CFAD_{t1}-{t2}.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],t1=st,t2=en),dpi=400,bbox_inches='tight')
 
+                    plt.close()
+                
                 else:
 
-                    if not rdat.bins[v] is '':
+                    if not rdat.cfbins[v] is '': # and v in rdat.data.variables.keys():
                         
                         print(v)
 
-                        fig, ax = rdat.cfad_plot(v,bins=rdat.bins[v],z_resolution=config['z_resolution'],levels='levs',tspan=tspan,cbar=True,ylab=True)
-                        
-                        ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
+                        if not zmax == '':
+                            fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1,tspan=tspan,zmax=zmax)
+                        else:
+                            fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1,tspan=tspan)
+                            
+                        ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=16,color='k',zorder=10,weight='bold',transform=ax.transAxes)
                       
                         if config['ptype'].startswith('mp4'):
-                            plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,v=v,t1=st,t2=en),dpi=400,bbox_inches='tight')
+                            plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,v=rdat.names_uc[v],t1=st,t2=en),dpi=400,bbox_inches='tight')
                         else:
-                            plt.savefig('{d}{p}_HID_CFAD_{t1}-{t2}.{t}'.format(d=outdir,p=rdat.exper,t=config['ptype'],t1=st,t2=en),dpi=400,bbox_inches='tight')
+                            plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.{t}'.format(d=outdir,p=rdat.exper,v=rdat.names_uc[v],t=config['ptype'],t1=st,t2=en),dpi=400,bbox_inches='tight')
 
                         plt.close()
 
                     else:
+                        
                         continue
-                '''
-                fig, ax = plt.subplots(1,1,figsize=(14,12))
-                rdat.cfad_plot(rdat.zdr_name,ax= ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan= tspan,cbar=True,ylab=True)
-                #plt.tight_layout()
-                ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)       
-                plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.zdr_name,t=config['ptype']),dpi=400,bbox_inches='tight')
-                plt.clf()
-                print(rdat.zdr_name)
-                
-                fig, ax = plt.subplots(1,1,figsize=(14,12))
-                rdat.cfad_plot(rdat.kdp_name,ax = ax,bins=config['drbins'],z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
-                ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-                plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.kdp_name,t=config['ptype']),dpi=400,bbox_inches='tight')
-                #plt.tight_layout()
-                plt.clf()
-                print(rdat.kdp_name)
-                
-                fig, ax = plt.subplots(1,1,figsize=(14,12))
-                rdat.cfad_plot(rdat.rho_name,ax = ax,z_resolution=config['z_resolution'],levels='levs',tspan = tspan,cbar=True,ylab=True)
-                #plt.tight_layout()
-                ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=24, color='k', zorder=10, weight='bold', transform=ax.transAxes)
-                plt.savefig('{d}{p}_{v}_CFAD.{t}'.format(d=outdir,p=rdat.exper,v=rdat.rho_name,t=config['ptype']),dpi=400,bbox_inches='tight')
-                plt.clf()
-                print(rdat.rho_name)
 
-                plt.clf()
-                print('HID')
-                '''
                 print('\nDone! Saved to '+outdir)
                 print('Moving on.\n')
          
@@ -1090,7 +1087,7 @@ def make_single_pplots(rdat,config,y=None):
             print('IN PLOT_DRIVER.MAKE_SINGLE_PLOTS... creating vertical profile of updraft width as a function of temperature.\n')
             
             tmp, m_warea_wrf = rdat.updraft_width_profile(thresh_dz=True)
-            #print np.max(m_warea_wrf)
+            #print max(m_warea_wrf)
 
             fig, ax = plt.subplots(1,1,figsize=(18,12))
 
@@ -1204,10 +1201,10 @@ def make_single_pplots(rdat,config,y=None):
                         ax.text(0.99, 0.99, 'z = {a} km'.format(a=config['z']), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
                         
                         if not config['ptype'].startswith('mp4'):
-                            plt.savefig('{i}{e}_{v}_individ_cappi_{t:%Y%m%d_%H%M%S}_{h}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                            plt.savefig('{i}{e}_{v}_individ_cappi_{t:%Y%m%d_%H%M%S}_{h}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=rdat.names_uc[v]),dpi=400,bbox_inches='tight')
                         else: 
                             if len(rdat.date) < 6:
-                                plt.savefig('{i}{e}_{v}_individ_cappi_{t:%Y%m%d_%H%M%S}_{h}.png'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=v),dpi=400,bbox_inches='tight')
+                                plt.savefig('{i}{e}_{v}_individ_cappi_{t:%Y%m%d_%H%M%S}_{h}.png'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=config['z'],t=ts,v=rdat.names_uc[v]),dpi=400,bbox_inches='tight')
                             else:
                                 plt.savefig(outdir+'/fig'+str(ii).zfill(3)+'.png',dpi=400,bbox_inches='tight')
                         
@@ -1246,9 +1243,9 @@ def make_single_pplots(rdat,config,y=None):
                 print(ts)
 
                 if rdat.w_name is not None:
-                    fig = rdat.xsec_multiplot(ts=ts,y=y,vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],zlim=config['zlim'],varlist=eval(config['rhi_vars']),latlon=config['latlon'])
+                    fig = rdat.xsec_multiplot(ts=ts,y=y,vectors=eval(config['rvectors']),res = config['rhi_vectres'],xlim=config['xlim'],zmax=config['zmax'],varlist=eval(config['rhi_vars']),latlon=config['latlon'])
                 else:
-                    fig = rdat.xsec_multiplot(ts=ts,y=y,xlim=config['xlim'],zlim=config['zlim'],varlist=eval(config['rhi_vars']),latlon=config['latlon'])
+                    fig = rdat.xsec_multiplot(ts=ts,y=y,xlim=config['xlim'],zmax=config['zmax'],varlist=eval(config['rhi_vars']),latlon=config['latlon'])
                 
                 nvars = len(eval(config['rhi_vars']))-1*(rdat.w_name is None)
                 if nvars <= 6:
@@ -1287,7 +1284,7 @@ def make_single_pplots(rdat,config,y=None):
         print('Plotting RHIs at y = '+str(config['y'])+'km north of the radar by time.\n')
 
         if not config['y'] == '': yspan = list(eval(str([config['y']])))
-        else: yspan = rdat.data[rdat.y_name].values[25::50]
+        else: yspan = rdat.data[rdat.y_name].values[0::50]
      
         for i,v in enumerate(eval(config['rhi_vars'])):
 
@@ -1311,8 +1308,8 @@ def make_single_pplots(rdat,config,y=None):
                         if v.startswith('HID'): cbar = 2
                         else: cbar = 1
                         
-                        fig, ax = rdat.xsec(v,ts=ts,y=y,res = config['rhi_vectres'],xlim=config['xlim'],cbar=cbar,zlim=config['zlim'],latlon=config['latlon'])
-                        #fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],cbar=cbar,zlim=config['zlim'])
+                        fig, ax = rdat.xsec(v,ts=ts,y=y,res = config['rhi_vectres'],xlim=config['xlim'],cbar=cbar,zmax=config['zmax'],latlon=config['latlon'])
+                        #fig, ax = rdat.xsec(v,ts=ts,y=config['y'],vectors=eval(config['rvectors'])[i],res = config['rhi_vectres'],xlim=config['xlim'],cbar=cbar,zmax=config['zmax'])
                         
                         ax.text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                         ax.text(1, 1, '{d:%Y-%m-%d %H:%M:%S} UTC'.format(d=ts), horizontalalignment='right', verticalalignment='bottom', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
@@ -1522,11 +1519,11 @@ def hid_cdf(data,rdat,hts,species,z_resolution=1.0, ret_z=0,pick=None,z_ind =0, 
     all_vols = np.array(all_vols)
     all_cdf = np.zeros_like(all_vols)
 #9        print np.shape(all_vols)
-#3    print np.min(all_vols)
+#3    print min(all_vols)
     # shape is 10,16, which is nspecies x nheights
     # need to do cdf on each level
     all_vols[all_vols == np.nan] = 0.0
-#    print np.max(all_vols)
+#    print max(all_vols)
     for iz in range(all_vols.shape[1]):
         # loop thru the vertical
 #        print all_vols[:,iz]
@@ -1538,7 +1535,7 @@ def hid_cdf(data,rdat,hts,species,z_resolution=1.0, ret_z=0,pick=None,z_ind =0, 
 #            all_cdf[:, iz] = 100.0*level_cum_vol/1.
 
 #    all_cdf[np.isnan(all_cdf)] = 0.0
-#    print np.max(all_cdf)
+#    print max(all_cdf)
     if ret_z == 1:
     
         return htsn,all_cdf,all_vols
@@ -1645,7 +1642,7 @@ def cfad(data,rdat,zvals, var='zhh01',nbins=30,value_bins=None, multiple=1,ret_z
         dum2 = np.where(np.isfinite(dum))
         lev_hist, edges = np.histogram(np.ravel(dum[dum2]), bins=value_bins, density=True) 
         lev_hist = 100.0*lev_hist/np.sum(lev_hist)
-        if np.max(lev_hist) > 0:
+        if max(lev_hist) > 0:
             cfad_out[ivl, :] = lev_hist
 
     if ret_z == 1:
@@ -1769,7 +1766,7 @@ def plot_composite(rdat,var,time,resolution='10m',cs_over=False,statpt=False):
         
     # Specifies the detail level of the map.
     # Options are '110m' (default), '50m', and '10m'
-    # print(np.min(lons),np.max(lons))
+    # print(min(lons),max(lons))
     
     # (3) Extract the range of values in the variable of interest and derive a colourmap.
     if var in rdat.lims.keys(): # If the variable exists in the dataset:
