@@ -101,19 +101,95 @@ if sys.argv[2:]:
     print('########## Returning to run_ipolarris.py ########')
     print('#################################################')
 
-    #config2['image_dir'] = config2['image_dir']+\
-    #    config2['exper']+'_'+config2['sdatetime']+'_'+config2['edatetime']+'/'+\
-    #    config2['mphys']+'/'
-
-    if (config2['cfad_individ'] | config2['all3']):
-        
-        outdir = config2['image_dir']+'cfad_diff_individ/'
-        os.makedirs(outdir,exist_ok=True)
-        
+    if (config2['cfad_compare'] | config2['all3']):
+ 
         print('\nIN RUN_IPOLARRIS... creating CFAD COMPARISON figures.')
-        print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
+        outdir = config['image_dir']+'cfad_diff_individ/'
+        os.makedirs(outdir,exist_ok=True)
+ 
+        zmax = config['zmax']
+        st = rdata.date[0].strftime('%Y%m%d_%H%M%S')
+        en = rdata.date[-1].strftime('%Y%m%d_%H%M%S')
+
+        if st.startswith(en): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' UTC'
+        elif st[0:8].startswith(en[0:8]): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+'-'+en[9:11]+':'+en[11:13]+' UTC'
+        else: dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' - '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
+
+        for i,v in enumerate(eval(config['cfad_compare_vars'])):
             
-        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[min(config['dzbins']),max(config['dzbins'])+1],ylim=config['zlim'],nor=10)
+            if v is None:
+                continue 
+            else:
+                
+                if v.startswith('HID'):
+ 
+                    print(v)
+
+                    fig, ax = plt.subplots(1,2,figsize=(14,8),gridspec_kw={'wspace': 0.07, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.}) 
+                    if not isinstance(ax, np.ndarray) or not isinstance(ax, list): 
+                        ax = np.array([ax])
+                    axf = ax.flatten()
+
+                    if not zmax == '':
+                        rdata.plot_hid_cdf(ax=axf[0],cbar=False,z_resolution=config['z_resolution'],zmax=zmax)
+                        rdata2.plot_hid_cdf(ax=axf[1],ylab=False,cbar=False,z_resolution=config['z_resolution'],zmax=zmax)
+                    else:
+                        rdata.plot_hid_cdf(ax=axf[0],cbar=False,z_resolution=config['z_resolution'])
+                        rdata2.plot_hid_cdf(ax=axf[1],ylab=False,cbar=False,z_resolution=config['z_resolution'])
+                    
+                    lur,bur,wur,hur = axf[0].get_position().bounds
+                    cbar_ax_dims = [lur,bur-0.13,2*wur+0.07,0.05]
+                    rdata.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
+
+                    axf[0].text(0,1,'{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[0].transAxes)
+                    axf[1].text(0,1,'{e} {r}'.format(e=rdata2.exper,r=rdata2.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[1].transAxes)
+                    axf[1].text(1,1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=18, color='k', zorder=10, weight='bold', transform=axf[1].transAxes) # (a) Top-left
+                   
+                    if config['ptype'].startswith('mp4'):
+                        plt.savefig('{d}{p}_HID_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdata.exper,t1=st,t2=en),dpi=400,bbox_inches='tight')
+                    else: 
+                        plt.savefig('{d}{p}_HID_CFAD_{t1}-{t2}.{t}'.format(d=outdir,p=rdata.exper,t=config['ptype'],t1=st,t2=en),dpi=400,bbox_inches='tight')
+
+                    plt.close()
+                
+                else:
+
+                    if not rdata.cfbins[config[v]] == '' and config[v] in rdata.data.variables.keys():
+                        
+                        print(v)
+
+                        fig, ax = plt.subplots(1,2,figsize=(14,8),gridspec_kw={'wspace': 0.07, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.}) 
+                        if not isinstance(ax, np.ndarray) or not isinstance(ax, list): 
+                            ax = np.array([ax])
+                        axf = ax.flatten()
+
+                        if not zmax == '':
+                            rdata.cfad_plot(config[v],ax=axf[0],cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
+                            rdata2.cfad_plot(config2[v],ax=axf[1],ylab=False,bins=rdata2.cfbins[config2[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
+                        else:
+                            rdata.cfad_plot(config[v],ax=axf[0],cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1)
+                            rdata2.cfad_plot(config2[v],ax=axf[1],ylab=False,bins=rdata2.cfbins[config2[v]],z_resolution=config['z_resolution'],levels=1)
+ 
+                        axf[0].text(0,1,'{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[0].transAxes)
+                        axf[1].text(0,1,'{e} {r}'.format(e=rdata2.exper,r=rdata2.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[1].transAxes)
+                        axf[1].text(1,1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=18, color='k', zorder=10, weight='bold', transform=axf[1].transAxes) # (a) Top-left
+                      
+                        if config['ptype'].startswith('mp4'):
+                            plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdata.exper,v=rdata.names_uc[config[v]],t1=st,t2=en),dpi=400,bbox_inches='tight')
+                        else: 
+                            plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.{t}'.format(d=outdir,p=rdata.exper,v=rdata.names_uc[config[v]],t=config['ptype'],t1=st,t2=en),dpi=400,bbox_inches='tight')
+        
+                        plt.close()
+
+                    else:
+                        
+                        continue
+
+                print('\nDone! Saved to '+outdir)
+                print('Moving on.\n')
+  
+        '''
+        fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,config,bins=config['dzbins'],xlab=rdata.longnames[rdata.dz_name]+' '+rdata.units[rdata.dz_name],cscfad=False,xlim=[min(rdata.cfbins[rdata.dz_name]),max(rdata.cfbins[rdata.dz_name])],ylim=config['zmax'],nor=10)
         ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
         ax[0].set_ylabel('Height (km MSL)',fontsize=16)
         ax[1].set_title(rdata2.mphys.upper(),fontsize=16,fontweight='bold')
@@ -148,7 +224,6 @@ if sys.argv[2:]:
         print('\nDone! Saved to '+outdir)
         print('Moving on.')
         print('\nPlotting composites by time for variable '+rdata.hid_name+'...')
-         
         #fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.w_name,rdata2.w_name,'Vertical Velocity',config,config2,bins=np.arange(-20,21,1),savefig=True,cscfad=False)
         fig,ax = plot_driver.plot_hid_comparison_cfad(rdata,rdata2,config=config,cscfad=None)
         ax[0].set_title(rdata.exper+' '+rdata.exper,fontsize=16,fontweight='bold')
@@ -160,7 +235,6 @@ if sys.argv[2:]:
         print('\nDone! Saved to '+outdir)
         print('Moving on.')
 
-    '''
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.dz_name,rdata2.dz_name,'Reflectivity',config,config2,bins=np.arange(0,82,2),savefig=True,cscfad='convective')
         
     fig,ax = plot_driver.plot_difference_cfad(rdata,rdata2,rdata.zdr_name,rdata2.zdr_name,'Z$_{dr}$',config,config2,bins=np.arange(-2,8,0.2),savefig=True,cscfad='convective')

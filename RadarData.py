@@ -1819,7 +1819,7 @@ class RadarData(RadarConfig.RadarConfig):
 #############################################################################################################
 
 
-    def cfad(self, var, value_bins=None, above=None, below=15.0,tspan=None, pick=None, ret_z=0,z_resolution=1.0,cscfad = None):
+    def cfad(self, var, value_bins=None, above=None, below=15.0, pick=None, ret_z=0,z_resolution=1.0,cscfad = None):
     # pick a variable and do a CFAD for the cell
 
         if value_bins is None: # set a default if nothing is there
@@ -1994,7 +1994,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 #############################################################################################################
 
-    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, log=False, pick=None, z_resolution=1.0, levels=None, tspan=None, cont=False, cscfad=False, cbar=1, xlab=1, ylab=1, zmax=None,**kwargs):
+    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, log=False, pick=None, z_resolution=1.0, levels=None, cont=False, cscfad=False, cbar=1, xlab=1, ylab=1, zmax=None,**kwargs):
 
         from matplotlib.colors import from_levels_and_colors
 
@@ -2009,7 +2009,7 @@ class RadarData(RadarConfig.RadarConfig):
             if self.names_uc[var].startswith('RHO'):
                 bins = np.arange(0.95,bins[-1],0.001)
             
-        cfad,value_bins,hts = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,tspan=tspan,cscfad=cscfad,ret_z=1)
+        cfad,value_bins,hts = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,cscfad=cscfad,ret_z=1)
         if above is not None:
             bot_index, top_index = self._get_ab_incides(above=above, below=below)
 
@@ -2409,7 +2409,7 @@ class RadarData(RadarConfig.RadarConfig):
          
         return cb
 
-    def plot_hid_cdf(self, xlab=1, ylab=1, zmax=None, cbar=1, data=None, z_resolution=1.0, ax=None, pick=None,cscfad = None):
+    def plot_hid_cdf(self, ax=None, xlab=1, ylab=1, zmax=None, cbar=1, data=None, z_resolution=1.0, pick=None,cscfad = None):
         
         ts=np.array(self.date)[0]
         if data is not None:
@@ -2430,8 +2430,8 @@ class RadarData(RadarConfig.RadarConfig):
             for spec in range(1, len(self.species)):
                 ax.barh(hgt[i],data[spec,i],left=data[spec-1,i],align='center',height=z_resolution,color=self.hid_colors[spec],edgecolor='k')
 
+        ax.set_xlim(0,100)
         if xlab == 1:
-            ax.set_xlim(0,100)
             ax.set_xlabel('Cumulative Frequency (%)',fontsize=16)
             ax.tick_params(axis='x',which='major',labelsize=16)
         else:
@@ -2439,8 +2439,8 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_xticks([])
             ax.set_xticklabels([])
             
+        ax.set_ylim(0,zmax+0.5)
         if ylab == 1:
-            ax.set_ylim(0,zmax+0.5)
             ax.set_ylabel('Height (km MSL)',fontsize=16)
             ax.tick_params(axis='y',which='major',labelsize=16)
         else:
@@ -2450,7 +2450,7 @@ class RadarData(RadarConfig.RadarConfig):
         
         if cbar == 1:
             lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur+wur++0.015,bur,0.03,hur]
+            cbar_ax_dims = [lur+wur+0.015,bur,0.03,hur]
             self.HID_barplot_colorbar(fig,cbar_ax_dims)
         
         if cbar == 2:
