@@ -281,7 +281,6 @@ else
     sed -i '' "s/.*wrft_on ==.*/wrft_on == $wrft_on == # WRF temperature on/g" $configdir/$configfile2
 
     echo Running iPOLARRIS...
-    read
     sleep 3
 
     python run_ipolarris.py $configdir/$configfile $configdir/$configfile2
