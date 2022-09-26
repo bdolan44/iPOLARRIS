@@ -894,13 +894,13 @@ def make_single_pplots(rdat,config,y=None):
         outdir = outpath+'cfad_multi/'
         os.makedirs(outdir,exist_ok=True)
  
+        zmax = config['zmax']
         st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
         en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
-        if st == en:
-            label = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' UTC'
+        if st.startswith(en): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' UTC'
         else:
-            label = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' - '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
-        zmax = config['zmax']
+            if st[0:8].startswith(en[0:8]): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+'-'+en[9:11]+':'+en[11:13]+' UTC'
+            else: dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' - '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
 
         if not zmax == '':
             fig, ax = rdat.cfad_multiplot(varlist = eval(config['cfad_vars']),z_resolution=config['z_resolution'],zmax=zmax)
@@ -923,7 +923,7 @@ def make_single_pplots(rdat,config,y=None):
 
         axf = ax.flatten()
         axf[0].text(0, 1, '{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'), horizontalalignment='left', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[0].transAxes) # (a) Top-left
-        axf[2].text(1, 1, label, horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[2].transAxes) # (a) Top-left
+        axf[2].text(1, 1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=20, color='k', zorder=10, weight='bold', transform=axf[2].transAxes) # (a) Top-left
  
         if config['ptype'].startswith('mp4'):
             plt.savefig('{d}{p}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,t1=st,t2=en),dpi=400,bbox_inches='tight')
@@ -944,16 +944,21 @@ def make_single_pplots(rdat,config,y=None):
 
         allvars = eval(config['cfad_vars'])
 
+        zmax = config['zmax']
+        st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
+        en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
+
+        if st.startswith(en): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' UTC'
+        else:
+            if st[0:8].startswith(en[0:8]): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+'-'+en[9:11]+':'+en[11:13]+' UTC'
+            else: dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' - '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
+
         for i,v in enumerate(eval(config['cfad_vars'])):
             
             if v is None:
                 continue 
             else:
                 
-                st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
-                en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
-                zmax = config['zmax']
-
                 if v.startswith('HID'):
  
                     print(v)
@@ -963,7 +968,8 @@ def make_single_pplots(rdat,config,y=None):
                     else:
                         fig, ax = rdat.plot_hid_cdf(cbar=2,z_resolution=config['z_resolution'])
 
-                    ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=16,color='k',zorder=10,weight='bold',transform=ax.transAxes)
+                    ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=ax.transAxes)
+                    ax.text(1,1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=18, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                    
                     if config['ptype'].startswith('mp4'):
                         plt.savefig('{d}{p}_HID_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,t1=st,t2=en),dpi=400,bbox_inches='tight')
@@ -983,7 +989,8 @@ def make_single_pplots(rdat,config,y=None):
                         else:
                             fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1,tspan=tspan)
                             
-                        ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=16,color='k',zorder=10,weight='bold',transform=ax.transAxes)
+                        ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=ax.transAxes)
+                        ax.text(1,1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=18, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
                       
                         if config['ptype'].startswith('mp4'):
                             plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdat.exper,v=rdat.names_uc[v],t1=st,t2=en),dpi=400,bbox_inches='tight')
