@@ -289,8 +289,10 @@ def polarris_driver(configfile):
         parsers = ['dr_name','kd_name','rh_name','vr_name']
         for v in parsers:
             newvals = deepcopy(rvar[config[v]].values)
-            newvals[newvals == -999.0] = np.nan
-            newvals[np.isnan(refvals)] = np.nan
+            newvals = np.where(newvals == -999.0,np.nan,newvals)
+            #newvals = np.where(np.logical_and(newvals >= 0.0,newvals < 0.1),np.nan,newvals)
+            newvals = np.where(newvals == 0.0,np.nan,newvals)
+            newvals = np.where(np.isnan(refvals),np.nan,newvals)
             newvar = xr.DataArray(newvals, dims=['d','z','y','x'], name=config[v])
             rvar[config[v]] = newvar
     
