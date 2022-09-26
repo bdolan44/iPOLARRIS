@@ -985,9 +985,9 @@ def make_single_pplots(rdat,config,y=None):
                         print(v)
 
                         if not zmax == '':
-                            fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1,tspan=tspan,zmax=zmax)
+                            fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
                         else:
-                            fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1,tspan=tspan)
+                            fig, ax = rdat.cfad_plot(v,bins=rdat.cfbins[v],z_resolution=config['z_resolution'],levels=1)
                             
                         ax.text(0,1,'{e} {r}'.format(e=rdat.exper,r=rdat.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=ax.transAxes)
                         ax.text(1,1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=18, color='k', zorder=10, weight='bold', transform=ax.transAxes) # (a) Top-left
