@@ -25,7 +25,7 @@ if [ ! -z $doppdir ]; then
 fi
 
 declare -a mpopts=( "mp06" "mp08" "mp10" "mp16" "mp51" )
-declare -a mpnames=( "WSM6" "THOM" "MORR" "WDM6" "P3" )
+declare -a mpnames=( "wsm6" "thom" "morr" "wdm6" "p3" )
 
 st=$(echo $starg | sed 's/[^0-9]*//g')
 stdate=${st:0:8}
@@ -56,8 +56,11 @@ echo $agency
 if [[ "$(ls $raddir/* | head -n 1 | xargs basename)" == "wrfout"* ]]; then
 	data='wrf'
     mp=$(ls $raddir/* | head -n 1 | xargs basename | cut -d '_' -f2)
-    inputfile=input_${data}_${mp}_${stt}_${edt}.txt
-    configfile=config_${data}_${mp}_${stt}_${edt}.txt
+    for ((ii=0;ii<${#mpopts[@]};ii++)); do
+       [[ "${mpopts[ii]}" = "$mp" ]] && break
+    done
+    inputfile=input_${mpnames[ii]}_${stt}_${edt}.txt
+    configfile=config_${mpnames[ii]}_${stt}_${edt}.txt
     echo $data
 else
     if [ -z $simdir ]; then
@@ -125,14 +128,14 @@ done
 
 if [[ "$(head -n 1 $configdir/$tfile | xargs basename)" == "wrfout"* ]]; then
     mp=$(head -n 1 $configdir/$tfile | xargs basename | cut -d '_' -f2)
-    mpname=$(echo "${mpnames[ii]}" | tr '[:upper:]' '[:lower:]')
+    for ((ii=0;ii<${#mpopts[@]};ii++)); do
+       [[ "${mpopts[ii]}" = "$mp" ]] && break
+    done
+    mpname=$(echo "${mpnames[ii]}")
     tempsrc=$mpname
     tempfile=temp_${tempsrc}_${stt}_${edt}.txt
     snd_on='False'
     wrft_on='True'
-    for ((ii=0;ii<${#mpopts[@]};ii++)); do
-       [[ "${mpopts[ii]}" = "$mp" ]] && break
-    done
 else
     tempsrc='uwyo'
     tempfile=temp_${tempsrc}_${stt}_${edt}.txt
@@ -160,7 +163,7 @@ else
     for ((ii=0;ii<${#mpopts[@]};ii++)); do
        [[ "${mpopts[ii]}" = "$mp2" ]] && break
     done
-    mpname2=$(echo ${mpnames[ii]} | tr '[:upper:]' '[:lower:]')
+    mpname2=$(echo ${mpnames[ii]})
 
     inputfile2=input_${mpname2}_${stt}_${edt}.txt
     configfile2=config_${mpname2}_${stt}_${edt}.txt
