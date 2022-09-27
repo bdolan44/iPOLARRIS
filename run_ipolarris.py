@@ -113,7 +113,7 @@ if sys.argv[2:]:
 
         if st.startswith(en): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' UTC'
         elif st[0:8].startswith(en[0:8]): dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+'-'+en[9:11]+':'+en[11:13]+' UTC'
-        else: dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+' - '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
+        else: dtlab = st[0:4]+'-'+st[4:6]+'-'+st[6:8]+' '+st[9:11]+':'+st[11:13]+'\n- '+en[0:4]+'-'+en[4:6]+'-'+en[6:8]+' '+en[9:11]+':'+en[11:13]+' UTC'
 
         for i,v in enumerate(eval(config['cfad_compare_vars'])):
             
@@ -125,7 +125,7 @@ if sys.argv[2:]:
  
                     print(v)
 
-                    fig, ax = plt.subplots(1,2,figsize=(14,8),gridspec_kw={'wspace': 0.07, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.}) 
+                    fig, ax = plt.subplots(1,2,figsize=(14,8),gridspec_kw={'wspace': 0.08, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.}) 
                     if not isinstance(ax, np.ndarray) or not isinstance(ax, list): 
                         ax = np.array([ax])
                     axf = ax.flatten()
@@ -138,7 +138,8 @@ if sys.argv[2:]:
                         rdata2.plot_hid_cdf(ax=axf[1],ylab=False,cbar=False,z_resolution=config['z_resolution'])
                     
                     lur,bur,wur,hur = axf[0].get_position().bounds
-                    cbar_ax_dims = [lur,bur-0.13,2*wur+0.07,0.05]
+                    lur2,bur2,wur2,hur2 = axf[1].get_position().bounds
+                    cbar_ax_dims = [lur,bur-0.15,lur2+wur2,0.05]
                     rdata.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
 
                     axf[0].text(0,1,'{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[0].transAxes)
@@ -158,21 +159,41 @@ if sys.argv[2:]:
                         
                         print(v)
 
-                        fig, ax = plt.subplots(1,2,figsize=(14,8),gridspec_kw={'wspace': 0.07, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.}) 
+                        fig, ax = plt.subplots(1,3,figsize=(16,8),gridspec_kw={'wspace': 0.1, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.}) 
                         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): 
                             ax = np.array([ax])
                         axf = ax.flatten()
 
                         if not zmax == '':
-                            rdata.cfad_plot(config[v],ax=axf[0],cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
-                            rdata2.cfad_plot(config2[v],ax=axf[1],ylab=False,bins=rdata2.cfbins[config2[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
+                            ocfad, hts, pc, fig0, ax0 = rdata.cfad_plot(config[v],ax=axf[0],cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
+                            scfad, hts2, pc2, fig1, ax1 = rdata2.cfad_plot(config2[v],ax=axf[1],ylab=False,cbar=False,bins=rdata2.cfbins[config2[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax)
+                            dcfad, hts3, pc3, fig2, ax2 = rdata.cfad_plot(config[v],cfad=ocfad-scfad,hts=hts,ax=axf[2],ylab=False,cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1,zmax=zmax,diff=1)
                         else:
-                            rdata.cfad_plot(config[v],ax=axf[0],cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1)
-                            rdata2.cfad_plot(config2[v],ax=axf[1],ylab=False,bins=rdata2.cfbins[config2[v]],z_resolution=config['z_resolution'],levels=1)
- 
+                            ocfad, hts, pc, fig0, ax0 = rdata.cfad_plot(config[v],ax=axf[0],cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1)
+                            scfad, hts2, pc2, fig1, ax1 = rdata2.cfad_plot(config2[v],ax=axf[1],ylab=False,cbar=False,bins=rdata2.cfbins[config2[v]],z_resolution=config['z_resolution'],levels=1)
+                            dcfad, hts3, pc3, fig2, ax2 = rdata.cfad_plot(config[v],cfad=ocfad-scfad,hts=hts,ax=axf[2],ylab=False,cbar=False,bins=rdata.cfbins[config[v]],z_resolution=config['z_resolution'],levels=1,diff=1)
+
+                        lur,bur,wur,hur = axf[0].get_position().bounds
+                        lur2,bur2,wur2,hur2 = axf[1].get_position().bounds
+                        cbar_ax_dims = [lur,bur-0.13,lur2+wur2,0.03]
+                        cbar_ax = fig.add_axes(cbar_ax_dims)
+                        cbt = plt.colorbar(pc,cax=cbar_ax,orientation='horizontal')
+                        cbt.ax.tick_params(labelsize=16)
+                        cbt.set_ticks(rdata.cfad_levs)
+                        cbt.set_label('Frequency (%)', fontsize=16, labelpad=10)
+
+                        lur3,bur3,wur3,hur3 = axf[2].get_position().bounds
+                        cbar_ax_dims3 = [lur3,bur3-0.13,wur3,0.03]
+                        cbar_ax3 = fig.add_axes(cbar_ax_dims3)
+                        cbt3 = plt.colorbar(pc3,cax=cbar_ax3,orientation='horizontal')
+                        cbt3.ax.tick_params(labelsize=16)
+                        cbt.set_ticks(rdata.cfad_levs)
+                        cbt3.set_label('Frequency Difference (%)', fontsize=16, labelpad=10)
+
                         axf[0].text(0,1,'{e} {r}'.format(e=rdata.exper,r=rdata.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[0].transAxes)
                         axf[1].text(0,1,'{e} {r}'.format(e=rdata2.exper,r=rdata2.band+'-band'),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[1].transAxes)
-                        axf[1].text(1,1, dtlab, horizontalalignment='right', verticalalignment='bottom', size=18, color='k', zorder=10, weight='bold', transform=axf[1].transAxes) # (a) Top-left
+                        axf[2].text(0,1,'({e1} - {e2})'.format(e1=rdata.exper,e2=rdata2.exper),horizontalalignment='left',verticalalignment='bottom',size=18,color='k',zorder=10,weight='bold',transform=axf[2].transAxes)
+                        axf[2].text(0.99,0.99, dtlab, horizontalalignment='right', verticalalignment='top', size=18, color='k', zorder=10, weight='bold', transform=axf[2].transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0)) # (a) Top-left
                       
                         if config['ptype'].startswith('mp4'):
                             plt.savefig('{d}{p}_{v}_CFAD_{t1}-{t2}.png'.format(d=outdir,p=rdata.exper,v=rdata.names_uc[config[v]],t1=st,t2=en),dpi=400,bbox_inches='tight')
