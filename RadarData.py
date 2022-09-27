@@ -1063,7 +1063,7 @@ class RadarData(RadarConfig.RadarConfig):
                 cbt.ax.tick_params(labelsize=16)
                 cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=20)
             else:
-                self.mycbar(fig,ax,dummy,var,self.longnames[var]+' '+self.units[var])
+                self.mycbar(fig,ax,dummy,self.longnames[var]+' '+self.units[var])
 
         if cbar == 2 and var.startswith('HID'):
             lur,bur,wur,hur = ax.get_position().bounds
@@ -1357,7 +1357,7 @@ class RadarData(RadarConfig.RadarConfig):
                 cbt.ax.tick_params(labelsize=16)
                 cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=20)
             else:
-                self.mycbar(fig,ax,dummy,var,self.longnames[var]+' '+self.units[var])
+                self.mycbar(fig,ax,dummy,self.longnames[var]+' '+self.units[var])
         elif cbar == 2 and var.startswith('HID'):
             lur,bur,wur,hur = ax.get_position().bounds
             cbar_ax_dims = [lur,bur-0.125,wur,0.03]
@@ -1986,15 +1986,15 @@ class RadarData(RadarConfig.RadarConfig):
                 cbpanels = [ncols*n+2 for n in range(0,nrows)]
                 cbbool = True if i in cbpanels else False
                 if not var.startswith('HID'):
-                    dummy = self.cfad_plot(var,ax=axf[i],xlab=1,ylab=ylabbool,cbar=cbbool,bins=self.cfbins[var],levels=1,zmax=zmax,z_resolution=z_resolution)
+                    self.cfad_plot(var,ax=axf[i],xlab=1,ylab=ylabbool,cbar=cbbool,bins=self.cfbins[var],levels=1,zmax=zmax,z_resolution=z_resolution)
                 else:
-                    dummy = self.plot_hid_cdf(ax=axf[i],xlab=1,ylab=ylabbool,zmax=zmax,z_resolution=z_resolution)
+                    self.plot_hid_cdf(ax=axf[i],xlab=1,ylab=ylabbool,zmax=zmax,z_resolution=z_resolution)
        
         return fig, ax
 
 #############################################################################################################
 
-    def cfad_plot(self, var, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, log=False, pick=None, z_resolution=1.0, levels=None, cont=False, cscfad=False, cbar=1, xlab=1, ylab=1, zmax=None,**kwargs):
+    def cfad_plot(self, var, cfad=None, hts=None, nbins=20, ax=None, maxval=10.0, above=None, below=15.0, bins=None, log=False, diff=False, pick=None, z_resolution=1.0, levels=None, cont=False, cscfad=False, cbar=1, xlab=1, ylab=1, zmax=8,**kwargs):
 
         from matplotlib.colors import from_levels_and_colors
 
@@ -2008,8 +2008,10 @@ class RadarData(RadarConfig.RadarConfig):
         if np.nanstd(self.data[var].values) < np.abs(bins[0]-bins[-1]):
             if self.names_uc[var].startswith('RHO'):
                 bins = np.arange(0.95,bins[-1],0.001)
-            
-        cfad,value_bins,hts = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,cscfad=cscfad,ret_z=1)
+        
+        if not diff:
+            cfad,value_bins,hts = self.cfad(var, value_bins=bins, above=above, below=below, pick=pick, z_resolution=z_resolution,cscfad=cscfad,ret_z=1)
+
         if above is not None:
             bot_index, top_index = self._get_ab_incides(above=above, below=below)
 
@@ -2019,13 +2021,16 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             fig = ax.get_figure()
 
+        cfad_ma = np.ma.masked_where(cfad==0,cfad)
         if log:
             norm = colors.LogNorm(vmin=1e-5, vmax=1e2)
+        elif diff:
+            cmap = plt.set_cmap('bwr')
+            vmin,vmax = -np.nanmax(cfad_ma),np.nanmax(cfad_ma)
+            norm = colors.Normalize(vmin=vmin,vmax=vmax) 
         else:
-            norm = None
+            cmap, norm = from_levels_and_colors(self.cfad_levs,self.cfad_cols)
         
-        cfad_ma = np.ma.masked_where(cfad==0,cfad)
-        cmap, norm = from_levels_and_colors(self.cfad_levs,self.cfad_cols)
         if cont is True:
             pc = ax.contourf(bins[0:-1],hts,(cfad_ma),levels=self.cfad_levs,color=self.cfad_cols,cmap=cmap,norm=norm,extend='both')
         else:
@@ -2040,7 +2045,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             ax.tick_params(axis='x',labelsize=0,left=False)
         if cbar:
-            cbar = self.mycbar(fig,ax,pc,var,'Frequency (%)')
+            cbar = self.mycbar(fig,ax,pc,'Frequency (%)')
             cbar.set_ticks(self.cfad_levs)
         if ylab: 
             ax.set_ylabel('Height (km MSL)',fontsize=16)
@@ -2052,7 +2057,7 @@ class RadarData(RadarConfig.RadarConfig):
         ax.set_ylim(0,zmax)
         ax.grid(color='grey', linestyle='-', linewidth=1)
 
-        return fig, ax
+        return cfad_ma, hts, pc, fig, ax
 
 #############################################################################################################
 
@@ -2401,7 +2406,7 @@ class RadarData(RadarConfig.RadarConfig):
         if names.startswith('long'): 
             labs = np.array(self.species_long)
             cb.set_ticklabels(labs)
-            cb.ax.tick_params(labelsize=lblsz-2)
+            cb.ax.tick_params(labelsize=lblsz)
         else: 
             labs = np.array(self.species)
             cb.set_ticklabels(labs)
@@ -2970,7 +2975,7 @@ class RadarData(RadarConfig.RadarConfig):
         if statpt: ax.plot(self.lon_0,self.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
 
         self.co_gridlines(fig,ax,minlon,maxlon,minlat,maxlat)
-        self.mycbar(fig,ax,cb,var,'Composite '+self.longnames[var]+' '+self.units[var])
+        self.mycbar(fig,ax,cb,'Composite '+self.longnames[var]+' '+self.units[var])
         
         return fig, ax
 
@@ -3007,7 +3012,7 @@ class RadarData(RadarConfig.RadarConfig):
         if xlab: newax.set_xlabel('Longitude',fontsize=16)
         if ylab: newax.set_ylabel('Latitude',fontsize=16)
 
-    def mycbar(self,fig,ax,cb,var,labtxt):        
+    def mycbar(self,fig,ax,cb,labtxt):        
         
         lur,bur,wur,hur = ax.get_position().bounds
         cbar_ax_dims = [lur+wur+0.015,bur,0.03,hur]
