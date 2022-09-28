@@ -1346,7 +1346,8 @@ class RadarData(RadarConfig.RadarConfig):
         
         elif cbar == 2 and var.startswith('HID'):
             lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur,bur-0.075,wur,0.03]
+            if latlon: cbar_ax_dims = [lur,bur-0.075,wur,0.03]
+            else: cbar_ax_dims = [lur,bur-0.125,wur,0.03]
             self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames', lblsz=14)
  
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
