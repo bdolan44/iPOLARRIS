@@ -392,13 +392,13 @@ class RadarData(RadarConfig.RadarConfig):
         
         if 'd' in self.data[self.x_name].dims:
             print,'calc deltas'
-            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].sel(d=0,y=0))))
-            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].sel(d=0,x=0))))        
-            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].sel(d=0))))
+            self.dx = np.average(abs(np.diff(self.data[self.x_name].sel(d=0,y=0))))
+            self.dy = np.average(abs(np.diff(self.data[self.y_name].sel(d=0,x=0))))        
+            self.dz = np.average(abs(np.diff(self.data[self.z_name].sel(d=0))))
         else:
-            self.dx = np.average(np.abs(np.diff(self.data[self.x_name].values)))
-            self.dy = np.average(np.abs(np.diff(self.data[self.y_name].values)))
-            self.dz = np.average(np.abs(np.diff(self.data[self.z_name].values)))
+            self.dx = np.average(abs(np.diff(self.data[self.x_name].values)))
+            self.dy = np.average(abs(np.diff(self.data[self.y_name].values)))
+            self.dz = np.average(abs(np.diff(self.data[self.z_name].values)))
             
 
 
@@ -427,11 +427,11 @@ class RadarData(RadarConfig.RadarConfig):
     def _get_ab_incides(self, above=None, below=None):
 
         if above is not None:
-            bot_index = np.argsort(np.abs(self.data[self.z_name].values - above))[0]
+            bot_index = np.argsort(abs(self.data[self.z_name].values - above))[0]
         else:
             bot_index = deepcopy(self.bot_index)
         if below is not None:
-            top_index = np.argsort(np.abs(self.data[self.z_name].values - below))[0]
+            top_index = np.argsort(abs(self.data[self.z_name].values - below))[0]
         else:
             top_index = deepcopy(self.top_index)
 
@@ -486,7 +486,7 @@ class RadarData(RadarConfig.RadarConfig):
         offset = edges[maxarg]+dbin
 #        print hist, edges
         self.zdr_offset = deepcopy(offset)
-        if np.abs(offset) >= thresh:
+        if abs(offset) >= thresh:
             self.zdr_correct()
 
     def zdr_correct(self):
@@ -588,7 +588,7 @@ class RadarData(RadarConfig.RadarConfig):
 
 
     def get_T_height(self, temp, interp=False):
-        temp_index = np.argmin(np.abs(self.T[:,0,0] - temp))
+        temp_index = np.argmin(abs(self.T[:,0,0] - temp))
         return self.gridded_height[0,:,0,0][temp_index]
 
 
@@ -896,7 +896,7 @@ class RadarData(RadarConfig.RadarConfig):
         if y is None:
             y_ind = int(len(self.data[self.y_name])/2.0)
         else:
-            y_ind = np.argmin(np.abs(y - self.data[self.y_name]))
+            y_ind = np.argmin(abs(y - self.data[self.y_name]))
 
         fig, ax = plt.subplots(5,2, figsize = (9,9))
         
@@ -928,7 +928,7 @@ class RadarData(RadarConfig.RadarConfig):
         "CAPPI plot showing scores for all species, used as HID analysis tool"
 
         # first, get the appropriate z index from the z that's wanted in altitude
-        z_ind = np.argmin(np.abs(z - self.data[self.z_name]))
+        z_ind = np.argmin(abs(z - self.data[self.z_name]))
 
         fig, ax = plt.subplots(5,2, figsize = (9,9))
         
@@ -1149,7 +1149,7 @@ class RadarData(RadarConfig.RadarConfig):
         return fig
 
     def get_ind(self,val,dat):
-        dum = np.abs(val - dat)
+        dum = abs(val - dat)
         wh_t = np.squeeze(np.where(dum == min(dum)))
         try:
             t = (len(wh_t))
@@ -1182,6 +1182,7 @@ class RadarData(RadarConfig.RadarConfig):
                 tmind = np.where(np.array(self.date)==ts)[0]
      
         if latlon:
+
             if 'd' in self.data[self.lon_name].dims:
                 lons = self.data[self.lon_name].sel(d=tmind).values
                 lats = self.data[self.lat_name].sel(d=tmind).values
@@ -1212,25 +1213,20 @@ class RadarData(RadarConfig.RadarConfig):
 
             xdataset = self.data[self.lon_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
             ydataset = self.data[self.lat_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+        
         else:
-            if not xlim:
-                xmin, xmax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
-            else:
-                xmin, xmax = xlim[0], xlim[1]
-            if not ylim:
-                ymin, ymax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
-            else:
-                ymin, ymax = ylim[0], ylim[1]
 
-            if 'y' in self.data[self.x_name].dims:
-                xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
-            else:
-                xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax))
+            if not xlim: xmin, xmax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
+            else: xmin, xmax = min(xlim), max(xlim)
+            
+            if not ylim: ymin, ymax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
+            else: ymin, ymax = min(ylim), max(ylim)
 
-            if 'x' in self.data[self.y_name].dims:
-                ydataset = self.data[self.y_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
-            else:
-                ydataset = self.data[self.y_name].sel(y=slice(ymin,ymax))
+            if 'y' in self.data[self.x_name].dims: xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+            else: xdataset = self.data[self.x_name].sel(x=slice(xmin,xmax))
+
+            if 'x' in self.data[self.y_name].dims: ydataset = self.data[self.y_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
+            else: ydataset = self.data[self.y_name].sel(y=slice(ymin,ymax))
                 
         if 'd' in xdataset.dims:
             xdat = np.squeeze(xdataset.sel(d=tmind).values)
@@ -1255,14 +1251,15 @@ class RadarData(RadarConfig.RadarConfig):
             data = np.ma.masked_where(data < 0.5,data)
 
         if ax is None:
-            fig = plt.figure(figsize=(10,8))
-            if latlon:
+            if latlon: 
+                fig = plt.figure(figsize=(10,8))
                 ax = fig.add_subplot(111, projection=ccrs.Mercator())
             else:
-                ax = fig.add_subplot(111)
+                fig = plt.figure(figsize=(10,8))
+                ax = fig.add_subplot(111)      
         else:
             fig = ax.get_figure()
-
+        
         if var in self.lims.keys():
             if latlon:
                 dummy = ax.pcolormesh(xdat,ydat, data, vmin = self.lims[var][0], vmax = self.lims[var][1], cmap = self.cmaps[var], transform=ccrs.PlateCarree(), **kwargs)
@@ -1283,71 +1280,59 @@ class RadarData(RadarConfig.RadarConfig):
                     cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8, zorder=10, transform=ccrs.PlateCarree())
                 else:
                     cb = ax.contour(xdat, ydat, csvals, levels=[1,2], colors=['k'], linewidths=[3], alpha=0.8, zorder=10)
-             
-        if latlon:
-            if not xlim:
-                maxlons = []
-                minlons = []
-                maxlats = []
-                minlats = []
-                for ii in range(dataset.shape[0]):
-                    #if var.startswith('RR'):
-                    #    xdat_masked = np.ma.array(xdataset,mask=dataset.sel(d=ii).fillna(value=True)) 
-                    #    ydat_masked = np.ma.array(ydataset,mask=dataset.sel(d=ii).fillna(value=True))
-                    #else:
-                    if 'd' in xdataset.dims:
-                        xdat_masked = deepcopy(xdataset.sel(d=ii).values)
-                        ydat_masked = deepcopy(ydataset.sel(d=ii).values)
-                    else:
-                        xdat_masked = deepcopy(xdataset.values)
-                        ydat_masked = deepcopy(ydataset.values)
-                   
-                    xdat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
-                    ydat_masked[np.isnan(dataset.sel(d=ii).values)] = np.nan
+        
+        if not xlim:
+          
+            maxxs = []
+            minxs = []
+            maxys = []
+            minys = []
+            
+            for ii in range(dataset.shape[0]):
 
-                    minlons.append(np.nanmin(xdat_masked))
-                    maxlons.append(np.nanmax(xdat_masked))
-                    minlats.append(np.nanmin(ydat_masked))
-                    maxlats.append(np.nanmax(ydat_masked))
+                if 'd' in xdataset.dims:
+                    xdat_masked = deepcopy(xdataset.sel(d=ii).values)
+                    ydat_masked = deepcopy(ydataset.sel(d=ii).values)
+                else:
+                    xdat_masked = deepcopy(xdataset.values)
+                    ydat_masked = deepcopy(ydataset.values)
 
-                minlon = np.round(min(minlons)-0.1,1)
-                maxlon = np.round(self.lon_0+(self.lon_0-min(minlons))+0.1,1)
-                minlat = np.round(min(minlats)-0.1,1)
-                maxlat = np.round(max(maxlats)+0.1,1)
+            if not latlon and xdat_masked.ndim == 1: xdat_masked,ydat_masked = np.meshgrid(xdat_masked,ydat_masked) 
+            
+            xdat_masked = np.where(np.isnan(dataset.sel(d=ii).values),np.nan,xdat_masked)
+            ydat_masked = np.where(np.isnan(dataset.sel(d=ii).values),np.nan,ydat_masked)
+
+            minxs.append(np.nanmin(xdat_masked))
+            maxxs.append(np.nanmax(xdat_masked))
+            minys.append(np.nanmin(ydat_masked))
+            maxys.append(np.nanmax(ydat_masked))
+            
+            if latlon:
+            
+                minx = np.round(min(minxs)-0.1,1)
+                maxx = np.round(self.lon_0+(self.lon_0-min(minxs))+0.1,1)
+                miny = np.round(min(minys)-0.1,1)
+                maxy = np.round(max(maxys)+0.1,1)
+                
             else:
-                minlon = np.round(min(xlim),1)
-                maxlon = np.round(max(xlim),1)
-                minlat = np.round(min(ylim),1)
-                maxlat = np.round(max(ylim),1)
-           
-            self.co_gridlines(fig,ax,minlon=minlon,maxlon=maxlon,minlat=minlat,maxlat=maxlat,xlab=xlab,ylab=ylab)
-            if statpt: ax.plot(self.lon_0,self.lat_0,markersize=16,marker='^',color='k',transform=ccrs.PlateCarree())
-
+                
+                minx = np.round(min(minxs),1)
+                maxx = np.round(abs(min(minxs)),1)
+                miny = np.round(min(minys),1)
+                maxy = np.round(max(maxys),1)
+ 
         else:
-            ax.set_xlim([xmin,xmax])
-            ax.set_ylim([ymin,ymax])
-            if labels:
-                ax.set_xlabel('Distance E of radar (km)',fontsize=20)
-                ax.set_ylabel('Distance N of radar (km)',fontsize=20)
-                ax.tick_params(axis='both', which='major', labelsize=20)
-                cbthickness = 0.03
-            else:
-                if xlab:
-                    ax.set_xlabel('Distance E of radar (km)',fontsize=20)
-                    ax.tick_params(axis='x', which='major', labelsize=20)
-                else:
-                    ax.set_xticks([])
-                    ax.set_xticklabels([])
-                    ax.tick_params(axis='x', which='major', labelsize=0)
-                if ylab:
-                    ax.set_ylabel('Distance N of radar (km)',fontsize=20)
-                    ax.tick_params(axis='y', which='major', labelsize=20)
-                else:
-                    ax.set_yticks([])
-                    ax.set_yticklabels([])
-                    ax.tick_params(axis='y', which='major', labelsize=0)
-                cbthickness = 0.02
-            if statpt: ax.plot(0,0,markersize=16,marker='^',color='k')
+
+            minx = min(xlim)
+            maxx = max(xlim)
+            miny = min(ylim)
+            maxy = max(ylim)
+           
+        self.co_gridlines(fig,ax,latlonyn=latlon,minx=minx,maxx=maxx,miny=miny,maxy=maxy,xlab=xlab,ylab=ylab)
+        
+        if statpt: 
+            if latlon: ax.plot(self.lon_0,self.lat_0,markersize=16,marker='^',color='k',transform=ccrs.PlateCarree())
+            else: ax.plot(0,0,markersize=16,marker='^',color='k')
 
         if cbar == 1:
             if var.startswith('HID'): 
@@ -1358,10 +1343,11 @@ class RadarData(RadarConfig.RadarConfig):
                 cbt.set_label(self.names_uc[var]+' '+self.units[var], fontsize=16, rotation=270, labelpad=20)
             else:
                 self.mycbar(fig,ax,dummy,self.longnames[var]+' '+self.units[var])
+        
         elif cbar == 2 and var.startswith('HID'):
             lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur,bur-0.125,wur,0.03]
-            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames', lblsz=12)
+            cbar_ax_dims = [lur,bur-0.075,wur,0.03]
+            self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames', lblsz=14)
  
         # Now check for the vectors flag, if it's there then plot it over the radar stuff
         if vectors is not None:
@@ -1412,9 +1398,9 @@ class RadarData(RadarConfig.RadarConfig):
             ncols = int(np.ceil(nvars/2))
 
         if latlon:
-            fig, ax = plt.subplots(nrows,ncols,figsize=(16,8),subplot_kw={'projection': ccrs.Mercator()},gridspec_kw={'wspace': 0.3, 'hspace': 0.075, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
+            fig, ax = plt.subplots(nrows,ncols,figsize=(16,8),subplot_kw={'projection': ccrs.Mercator()},gridspec_kw={'wspace': 0.45, 'hspace': 0.075, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         else:
-            fig, ax = plt.subplots(nrows,ncols,figsize=(figx,figy),gridspec_kw={'wspace': 0.22, 'hspace': 0.07, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
+            fig, ax = plt.subplots(nrows,ncols,figsize=(16,8),gridspec_kw={'wspace': 0.45, 'hspace': 0.07, 'top': 1., 'bottom': 0., 'left': 0., 'right': 1.})
         
         if not isinstance(ax, np.ndarray) or not isinstance(ax, list): 
             ax = np.array([ax], **kwargs)
@@ -2005,7 +1991,7 @@ class RadarData(RadarConfig.RadarConfig):
 
         multiple = int(z_resolution/self.dz)
 
-        if np.nanstd(self.data[var].values) < np.abs(bins[0]-bins[-1]):
+        if np.nanstd(self.data[var].values) < abs(bins[0]-bins[-1]):
             if self.names_uc[var].startswith('RHO'):
                 bins = np.arange(0.95,bins[-1],0.001)
         
@@ -2460,7 +2446,7 @@ class RadarData(RadarConfig.RadarConfig):
         
         if cbar == 2:
             lur,bur,wur,hur = ax.get_position().bounds
-            cbar_ax_dims = [lur,bur-0.13,wur,0.03]
+            cbar_ax_dims = [lur,bur-0.125,wur,0.03]
             self.HID_barplot_colorbar(fig,cbar_ax_dims,orientation='horizontal',names='longnames')
 
         return fig, ax 
@@ -2609,7 +2595,7 @@ class RadarData(RadarConfig.RadarConfig):
         u = ax.plot(wprof['up'], self.data[self.z_name], color='red', linewidth=2, label='updrafts')
         d = ax.plot(wprof['down'], self.data[self.z_name], color='blue', linewidth=2, label='downdrafts')
 
-        max_abs = np.abs(np.array(ax.get_xlim())).max()
+        max_abs = abs(np.array(ax.get_xlim())).max()
 
         ax.set_xlim(-1*max_abs, max_abs)
         #ax.set_xlim()
@@ -2765,7 +2751,7 @@ class RadarData(RadarConfig.RadarConfig):
 #                 p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}e +lon_1 = {n}e +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=self.lon_0)) 
 #             else:
 #                 print('trying lat lon')
-#                 lon_0 = np.abs(self.lon_0)
+#                 lon_0 = abs(self.lon_0)
 #                 p = Proj('+proj=lcc +a=6370000.0m +lon_0={n}w +lon_1 = {n}w +lat_1={t}n +lat_2=60n +lat_0={t}n'.format(t=self.lat_0,n=lon_0)) 
 #         else:
 #             if self.lon_0 > 0:            
@@ -2974,43 +2960,75 @@ class RadarData(RadarConfig.RadarConfig):
             
         if statpt: ax.plot(self.lon_0,self.lat_0,markersize=12,marker='^',color='k',transform=ccrs.PlateCarree())
 
-        self.co_gridlines(fig,ax,minlon,maxlon,minlat,maxlat)
+        self.co_gridlines(fig,ax,latlonyn=True,minx=minlon,maxx=maxlon,miny=minlat,maxy=maxlat)
         self.mycbar(fig,ax,cb,'Composite '+self.longnames[var]+' '+self.units[var])
         
         return fig, ax
 
-    def co_gridlines(self,fig,ax,minlon=False,maxlon=False,minlat=False,maxlat=False,xlab=True,ylab=True,lnspc=2,ltspc=1,resolution='10m'):
-        
-        import cartopy.crs as ccrs
-        import matplotlib.ticker as ticker
-        import numpy as np
 
-        ax.coastlines(resolution=resolution)
-       
-        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
-        gl.xlocator = ticker.MultipleLocator(base=lnspc)
-        gl.ylocator = ticker.MultipleLocator(base=ltspc)
-        gl.xlabels_top = False
-        gl.ylabels_right = False 
-        gl.x_inline = False
-        gl.y_inline = False
-        if xlab:
-            gl.xlabel_style = {'size': 16, 'color': 'black'}
+    def co_gridlines(self,fig,ax,latlonyn=False,minx=-200,maxx=200,miny=-200,maxy=200,xlab=True,ylab=True,lnspc=2,ltspc=2,resolution='10m'):
+
+        if latlonyn == True:
+
+            import cartopy.crs as ccrs
+            import matplotlib.ticker as ticker
+
+            ax.coastlines(resolution=resolution)
+            lur,bur,wur,hur = ax.get_position().bounds
+          
+            gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1.5, alpha=0.75, linestyle='--')
+            gl.xlocator = ticker.MultipleLocator(base=lnspc)
+            gl.ylocator = ticker.MultipleLocator(base=ltspc)
+            gl.xlabels_top = False
+            gl.ylabels_right = False 
+            gl.x_inline = False
+            gl.y_inline = False
+            
+            if xlab:
+                gl.xlabel_style = {'size': 16, 'color': 'black'}
+                #ax.text(0.5,bur-0.15,'Longitude',fontsize=16,ha='center',va='bottom',rotation_mode='anchor',transform=ax.transAxes)
+            else:
+                gl.xlabels_bottom = False
+            if ylab:
+                gl.ylabel_style = {'size': 16, 'color': 'black'} #, 'rotation': 90}
+                #ax.text(lur-0.15,0.5,'Latitude',fontsize=16,ha='center',va='bottom',rotation_mode='anchor',rotation=90,transform=ax.transAxes)
+            else:
+                gl.xlabels_left = False
+                gl.ylabel_style = {'size': 0}
+                
+            #newax = fig.add_axes(ax.get_position(), frameon=False)
+            #newax.tick_params(axis='x', labelsize=0, length=0, pad=15)
+            #newax.tick_params(axis='y', labelsize=0, length=0, pad=45)
+            #if xlab: newax.set_xlabel('Longitude',fontsize=16)
+            #if ylab: newax.set_ylabel('Latitude',fontsize=16)
+
+            ax.set_extent([minx,maxx,miny,maxy],crs=ccrs.PlateCarree())
+            ax.set_aspect('auto')
+
         else:
-            gl.xlabels_bottom = False
-        if ylab:
-            gl.ylabel_style = {'size': 16, 'color': 'black'} 
-        else:
-            gl.xlabels_left = False
-            gl.ylabel_style = {'size': 0} 
- 
-        ax.set_extent([minlon,maxlon,minlat,maxlat])
-        
-        newax = fig.add_axes(ax.get_position(), frameon=False)
-        newax.tick_params(axis='x', labelsize=0, length=0, pad=15)
-        newax.tick_params(axis='y', labelsize=0, length=0, pad=45)
-        if xlab: newax.set_xlabel('Longitude',fontsize=16)
-        if ylab: newax.set_ylabel('Latitude',fontsize=16)
+
+            import numpy as np
+            
+            ax.set_xlim([minx,maxx])
+            ax.set_xticks(np.linspace(minx,maxx,5))
+            ax.set_ylim([miny,maxy])
+            ax.set_yticks(np.linspace(miny,maxy,5))
+
+            ax.grid(axis='both',c='grey',linewidth=1.5, alpha=0.75, linestyle='--')
+
+            if xlab:
+                ax.set_xlabel('Distance E of radar (km)',fontsize=16)
+                ax.tick_params(axis='x', which='major', labelsize=16)
+            else:
+                ax.set_xticklabels([])
+                ax.xaxis.set_ticks_position('none')
+            if ylab:
+                ax.set_ylabel('Distance N of radar (km)',fontsize=16)
+                ax.tick_params(axis='y', which='major', labelsize=16)
+            else:
+                ax.set_yticklabels([])
+                ax.yaxis.set_ticks_position('none')
+
 
     def mycbar(self,fig,ax,cb,labtxt):        
         
