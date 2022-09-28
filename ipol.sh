@@ -203,7 +203,7 @@ if [ -z $simdir ]; then
     echo
     sleep 3
 
-    template=$ipoldir/${agency}_${data}_config_template.txt
+    template=$ipoldir/${agency}_${data}_config.txt
     cp $template $configdir/$configfile
 
     sed -i '' "s/^type ==.*/type == $data == # Type of input data: 'obs' OR 'wrf' (obs + simulated)/g" $configdir/$configfile
@@ -242,7 +242,7 @@ else
     echo
     sleep 3
 
-    template=$ipoldir/${agency}_obs_config_template.txt
+    template=$ipoldir/${agency}_obs_config.txt
     cp $template $configdir/$configfile
 
     sed -i '' "s/^type ==.*/type == obs == # Type of input data: 'obs' OR 'wrf' (obs + simulated)/g" $configdir/$configfile
@@ -261,7 +261,7 @@ else
     sed -i '' "s/.*snd_on ==.*/snd_on == $snd_on == # Sounding temperature on/g" $configdir/$configfile
     sed -i '' "s/.*wrft_on ==.*/wrft_on == $wrft_on == # WRF temperature on/g" $configdir/$configfile
 
-    template2=$ipoldir/${agency}_wrf_config_template.txt
+    template2=$ipoldir/${agency}_wrf_config.txt
     cp $template2 $configdir/$configfile2
 
     sed -i '' "s/^type ==.*/type == wrf == # Type of input data: 'obs' OR 'wrf' (obs + simulated)/g" $configdir/$configfile2
