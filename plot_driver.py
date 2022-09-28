@@ -1136,13 +1136,15 @@ def make_single_pplots(rdat,config,y=None):
         for z in zspan: 
             
             print('\nz = '+str(z))
+            xlim = config['xlim']
+            ylim = config['ylim']
 
             for ii in range(len(tms)):
                 
                 ts = tms[ii]
                 print(ts)
                 
-                fig = rdat.cappi_multiplot(ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=z,res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),latlon=True,statpt=True,dattype=config['type']) #eval(config['cappi_contours']))
+                fig = rdat.cappi_multiplot(ts=ts,xlim=xlim,ylim=config['ylim'],z=z,res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),latlon=config['latlon'],statpt=True,dattype=config['type']) #eval(config['cappi_contours']))
                 #fig = rdat.cappi_multiplot(ts=ts,xlim=config['xlim'],ylim=config['ylim'],z=config['z'],res = config['cappi_vectres'],varlist = eval(config['cappi_vars']),vectors = eval(config['cvectors']),contours = None,statpt=True) #eval(config['cappi_contours']))
 
                 nvars = len(eval(config['cappi_vars']))
