@@ -295,7 +295,7 @@ def polarris_driver(configfile):
             newvals = np.where(np.isnan(refvals),np.nan,newvals)
             newvar = xr.DataArray(newvals, dims=['d','z','y','x'], name=config[v])
             rvar[config[v]] = newvar
-    
+   
     # =====
     # (3) Get datetime objects from radar file names.
     # =====
@@ -314,10 +314,16 @@ def polarris_driver(configfile):
     if config['type'].startswith('obs'):
         rvar = rvar.rename({config['zname']:'z'})
     elif config['type'].startswith('wrf'):
-        if 'd' in rvar['hgt'].dims:
-            hgt = rvar['hgt'].values[0,:]
-        else:
-            hgt = rvar['hgt'].values
+        currx = deepcopy(rvar['x'].values)
+        newx = xr.DataArray(currx-np.mean(currx), dims=['x'], name='x')
+        rvar['x'] = newx
+        
+        curry = deepcopy(rvar['y'].values)
+        newy = xr.DataArray(curry-np.mean(curry), dims=['y'], name='y')
+        rvar['y'] = newy
+
+        if 'd' in rvar['hgt'].dims: hgt = rvar['hgt'].values[0,:]
+        else: hgt = rvar['hgt'].values
         newz = xr.DataArray(hgt, coords={'z': hgt})
         rvar['z'] = newz
 
