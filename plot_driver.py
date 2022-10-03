@@ -1190,7 +1190,7 @@ def make_single_pplots(rdat,config,y=None):
 
         for i,v in enumerate(eval(config['cappi_vars'])):
            
-            print(v)
+            print(rdat.names_uc[v])
 
             if v is None:
                 continue
@@ -1249,7 +1249,7 @@ def make_single_pplots(rdat,config,y=None):
         os.makedirs(outdir,exist_ok=True)
 
         if not config['y'] == '': yspan = list([config['y']])
-        else: yspan = rdat.data[rdat.y_name].values[25::50]
+        else: yspan = rdat.data[rdat.y_name].values[0::50]
 
         for y in yspan:
 
@@ -1309,7 +1309,7 @@ def make_single_pplots(rdat,config,y=None):
                 continue
             else:
                 
-                print(v)
+                print(rdat.names_uc[v])
             
                 for y in yspan:
 
