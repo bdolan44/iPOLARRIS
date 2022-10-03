@@ -285,7 +285,7 @@ else:
         print('\nIN RUN_IPOLARRIS_NEW... creating COMPOSITE figures.')
         print('\nPlotting composites by time for variable '+rdata.dz_name+'...')
             
-        outdir = config['image_dir']+'composite_'+rdata.dz_name+'/'
+        outdir = config['image_dir']+'composite_'+rdata.names_uc[rdata.dz_name]+'/'
         os.makedirs(outdir,exist_ok=True)
       
         for i,rtimematch in enumerate(np.array(rdata.date)):

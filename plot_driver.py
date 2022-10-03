@@ -1204,7 +1204,7 @@ def make_single_pplots(rdat,config,y=None):
                         ts = tms[ii]
                         print(ts)
 
-                        outdir = outpath+'cappi_individ/'+v+'/'
+                        outdir = outpath+'cappi_individ/'+rdat.names_uc[v]+'/'
                         os.makedirs(outdir,exist_ok=True)
                         
                         if v.startswith('HID'): cbar = 2
@@ -1232,7 +1232,7 @@ def make_single_pplots(rdat,config,y=None):
                         st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
                         en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
 
-                        os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdat.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_individ_cappi_{t1}-{t2}_{h}.mp4'.format(p=config['ptype'],e=rdat.exper,i=outdir,v=v,t1=st,t2=en,h=z))
+                        os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdat.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_individ_cappi_{t1}-{t2}_{h}.mp4'.format(p=config['ptype'],e=rdat.exper,i=outdir,v=rdat.names_uc[v],t1=st,t2=en,h=z))
                     
             print('')
 
@@ -1319,7 +1319,7 @@ def make_single_pplots(rdat,config,y=None):
                         ts = tms[ii]
                         print(ts)
            
-                        outdir = outpath+'rhi_individ/'+v+'/'
+                        outdir = outpath+'rhi_individ/'+rdat.names_uc[v]+'/'
                         os.makedirs(outdir,exist_ok=True)
                         
                         if v.startswith('HID'): cbar = 2
@@ -1333,10 +1333,10 @@ def make_single_pplots(rdat,config,y=None):
                         ax.text(0.99, 0.99, 'y = {a} km'.format(a=y), horizontalalignment='right',verticalalignment='top', size=16, color='k', zorder=10, weight='bold', transform=ax.transAxes, bbox=dict(facecolor='w', edgecolor='none', pad=0.0))
                         
                         if not config['ptype'].startswith('mp4'):
-                            plt.savefig('{i}{e}_{v}_individ_rhi_{t:%Y%m%d_%H%M%S}_{h}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=y,t=ts,v=v),dpi=400,bbox_inches='tight')
+                            plt.savefig('{i}{e}_{v}_individ_rhi_{t:%Y%m%d_%H%M%S}_{h}.{p}'.format(p=config['ptype'],i=outdir,e=rdat.exper,h=y,t=ts,v=rdat.names_uc[v]),dpi=400,bbox_inches='tight')
                         else:
                             if len(rdat.date) < 6:
-                                plt.savefig('{i}{e}_{v}_individ_rhi_{t:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdat.exper,h=y,t=ts,v=v),dpi=400,bbox_inches='tight')
+                                plt.savefig('{i}{e}_{v}_individ_rhi_{t:%Y%m%d_%H%M%S}_{h}.png'.format(i=outdir,e=rdat.exper,h=y,t=ts,v=rdat.names_uc[v]),dpi=400,bbox_inches='tight')
                             else:
                                 plt.savefig(outdir+'/fig'+str(ii).zfill(3)+'.png',dpi=400,bbox_inches='tight')
                         
@@ -1346,7 +1346,7 @@ def make_single_pplots(rdat,config,y=None):
                         st = rdat.date[0].strftime('%Y%m%d_%H%M%S')
                         en = rdat.date[-1].strftime('%Y%m%d_%H%M%S')
 
-                        os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdat.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_individ_rhi_{t1}-{t2}_{h}.mp4'.format(p=config['ptype'],e=rdat.exper,i=outdir,v=v,t1=st,t2=en,h=y))
+                        os.system('ffmpeg -nostdin -y -r 1 -i '+outdir+'/fig%03d.png -c:v libx264 -r '+str(len(np.array(rdat.date)))+' -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" '+'{i}{e}_{v}_individ_rhi_{t1}-{t2}_{h}.mp4'.format(p=config['ptype'],e=rdat.exper,i=outdir,v=rdat.names_uc[v],t1=st,t2=en,h=y))
 
             print('')
 
