@@ -1196,21 +1196,15 @@ class RadarData(RadarConfig.RadarConfig):
             else:
                 xmin, xmax = min(xlim), max(xlim)
                 ymin, ymax = min(ylim), max(ylim)
-           
-            if dattype.startswith('obs'):
-                xshift = 0.5*(self.data[self.x_name].shape[0]-1)
-                xmin = np.where(lons[0,:] >= xmin)[0][0]-xshift
-                xmax = np.where(lons[0,:] <= xmax)[0][-1]-xshift
+            
+            xshift = 0.5*(self.data[self.x_name].shape[0]-1)
+            xmin = np.where(lons[0,:] >= xmin)[0][0]-xshift
+            xmax = np.where(lons[0,:] <= xmax)[0][-1]-xshift
 
-                yshift = 0.5*(self.data[self.y_name].shape[0]-1)
-                ymin = np.where(lats[:,0] >= ymin)[0][0]-yshift
-                ymax = np.where(lats[:,0] <= ymax)[0][-1]-yshift
-            else:
-                xmin = np.where(lons[0,:] >= xmin)[0][0]
-                xmax = np.where(lons[0,:] <= xmax)[0][-1]
-                ymin = np.where(lats[:,0] >= ymin)[0][0]
-                ymax = np.where(lats[:,0] <= ymax)[0][-1]
-
+            yshift = 0.5*(self.data[self.y_name].shape[0]-1)
+            ymin = np.where(lats[:,0] >= ymin)[0][0]-yshift
+            ymax = np.where(lats[:,0] <= ymax)[0][-1]-yshift
+            
             xdataset = self.data[self.lon_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
             ydataset = self.data[self.lat_name].sel(x=slice(xmin,xmax),y=slice(ymin,ymax))
         
