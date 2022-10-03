@@ -1053,8 +1053,9 @@ class RadarData(RadarConfig.RadarConfig):
                     ax.set_yticks([])
                     ax.set_yticklabels([])
                     ax.tick_params(axis='y', which='major', labelsize=0)
-                cbthickness = 0.02
-
+                cbthickness = 0.02 
+        ax.grid(color='grey', linestyle='-', linewidth=1)
+    
         if cbar == 1:  # call separate HID colorbar function for bar plots
             if var.startswith('HID'): 
                 lur,bur,wur,hur = ax.get_position().bounds
@@ -1967,9 +1968,9 @@ class RadarData(RadarConfig.RadarConfig):
                 cbpanels = [ncols*n+2 for n in range(0,nrows)]
                 cbbool = True if i in cbpanels else False
                 if not var.startswith('HID'):
-                    self.cfad_plot(var,ax=axf[i],xlab=1,ylab=ylabbool,cbar=cbbool,bins=self.cfbins[var],levels=1,zmax=zmax,z_resolution=z_resolution)
+                    self.cfad_plot(var,ax=axf[i],ylab=ylabbool,cbar=cbbool,bins=self.cfbins[var],levels=1,zmax=zmax,z_resolution=z_resolution)
                 else:
-                    self.plot_hid_cdf(ax=axf[i],xlab=1,ylab=ylabbool,zmax=zmax,z_resolution=z_resolution)
+                    self.plot_hid_cdf(ax=axf[i],ylab=ylabbool,zmax=zmax,z_resolution=z_resolution)
        
         return fig, ax
 
@@ -2425,8 +2426,8 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_xticks([])
             ax.set_xticklabels([])
             
-        ax.set_ylim(0,zmax+0.5)
         if ylab == 1:
+            ax.set_ylim(0,zmax+0.5)
             ax.set_ylabel('Height (km MSL)',fontsize=16)
             ax.tick_params(axis='y',which='major',labelsize=16)
         else:
