@@ -883,9 +883,11 @@ class RadarData(RadarConfig.RadarConfig):
         
         it = self.data[self.rr_name].shape[0]
         print('\nSaving RR to files...')
-        for ii in tqdm(range(it)):            
-            self.data[self.rr_name].sel(d=ii).to_netcdf(path=config['rr_dir']+'/RR_hidro_'+config['exper']+'_'+str(tm[ii].strftime('%Y%m%d_%H%M%S'))+'.nc', mode='w')  
+        for ii in tqdm(range(it)):
+            filepath = config['rr_dir']+'/RR_hidro_'+config['exper']+'_'+str(tm[ii].strftime('%Y%m%d_%H%M%S'))+'.nc'
+            if not os.path.isfile(filepath): self.data[self.rr_name].sel(d=ii).to_netcdf(path=filepath, mode='w')  
         print('')
+        
         return
 #############################################################################################################
 
@@ -2426,8 +2428,8 @@ class RadarData(RadarConfig.RadarConfig):
             ax.set_xticks([])
             ax.set_xticklabels([])
             
+        ax.set_ylim(0,zmax)
         if ylab == 1:
-            ax.set_ylim(0,zmax+0.5)
             ax.set_ylabel('Height (km MSL)',fontsize=16)
             ax.tick_params(axis='y',which='major',labelsize=16)
         else:
