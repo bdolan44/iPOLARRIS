@@ -964,7 +964,7 @@ class RadarData(RadarConfig.RadarConfig):
                 tmind = np.where(np.array(self.date) == ts)[0]
                 
         if not xlim:
-            xmin, xmax = self.data[self.x_name].values.min(), self.data[self.x_name].values.max()
+            xmin, xmax = np.floor(self.data[self.x_name].values.min()), np.ceil(self.data[self.x_name].values.max())
         else:
             xmin, xmax = xlim[0], xlim[1]
         if not zmax:
@@ -1008,54 +1008,48 @@ class RadarData(RadarConfig.RadarConfig):
         
         ####### plotting limits getting set here ######
         if self.x_name == 'longitude':
-            ax.set_xlim([xmin,xmax])
-            ax.set_ylim([0,zmax])
             if labels:
                 ax.set_xlabel('Distance E of Radar (km)', fontsize=lblsz)
                 ax.set_ylabel('Altitude (km MSL)', fontsize=lblsz)
                 ax.set_xlim([xmin,xmax])
                 ax.tick_params(axis='both', which='major', labelsize=lblsz)
-                cbthickness = 0.03
             else:
                 if xlab:
                     ax.set_xlabel('Distance E of Radar (km)', fontsize=lblsz)
                     ax.tick_params(axis='x', which='major', labelsize=lblsz)
                 else:
-                    ax.set_xticks([])
                     ax.set_xticklabels([])
-                    ax.tick_params(axis='x', which='major', labelsize=0)
+                    ax.xaxis.set_ticks_position('none')
                 if ylab:
                     ax.set_ylabel('Altitude (km MSL)', fontsize=lblsz)
                     ax.tick_params(axis='y', which='major', labelsize=lblsz)
                 else:
-                    ax.set_yticks([])
                     ax.set_yticklabels([])
-                    ax.tick_params(axis='y', which='major', labelsize=0)
-                cbthickness = 0.02
+                    ax.yaxis.set_ticks_position('none')
+        
         else:
-            ax.set_xlim([xmin,xmax])
-            ax.set_ylim([0,zmax])
             if labels:
                 ax.set_xlabel('Distance E of radar (km)',fontsize=lblsz)
                 ax.set_ylabel('Altitude (km MSL)',fontsize=lblsz)
                 ax.tick_params(axis='both', which='major', labelsize=lblsz)
-                cbthickness = 0.03
             else:
                 if xlab:
                     ax.set_xlabel('Distance E of radar (km)',fontsize=lblsz)
                     ax.tick_params(axis='x', which='major', labelsize=lblsz)
-                else:
-                    ax.set_xticks([])
+                else: 
                     ax.set_xticklabels([])
-                    ax.tick_params(axis='x', which='major', labelsize=0)
+                    ax.xaxis.set_ticks_position('none')
                 if ylab:
                     ax.set_ylabel('Altitude (km MSL)',fontsize=lblsz)
                     ax.tick_params(axis='y', which='major', labelsize=lblsz)
                 else:
-                    ax.set_yticks([])
                     ax.set_yticklabels([])
-                    ax.tick_params(axis='y', which='major', labelsize=0)
-                cbthickness = 0.02 
+                    ax.yaxis.set_ticks_position('none')
+ 
+        ax.set_xlim([xmin,xmax])
+        ax.set_xticks(np.linspace(xmin,xmax,5))
+        ax.set_ylim([0,zmax]) 
+        ax.set_yticks(np.linspace(0,zmax,6))
         ax.grid(color='grey', linestyle='-', linewidth=1)
     
         if cbar == 1:  # call separate HID colorbar function for bar plots
