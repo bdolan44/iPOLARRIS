@@ -964,7 +964,7 @@ def make_single_pplots(rdat,config,y=None):
                     print(v)
 
                     if not zmax == '':
-                        fig, ax = rdat.plot_hid_cdf(cbar=2,z_resolution=config['z_resolution'],zmax=zmax)
+                        fig, ax = rdat.plot_hid_cdf(cbar=2,z_resolution=config['z_resolution'],zmax=zmax+0.5)
                     else:
                         fig, ax = rdat.plot_hid_cdf(cbar=2,z_resolution=config['z_resolution'])
 
