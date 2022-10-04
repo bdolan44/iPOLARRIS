@@ -1231,13 +1231,7 @@ class RadarData(RadarConfig.RadarConfig):
         else:
             xdat = np.squeeze(xdataset.values)
             ydat = np.squeeze(ydataset.values)
-    
-        #if not var.startswith('RR'):
-        #    alldata = xr.DataArray(self.data[var].to_numpy(),dims=["d","z","y","x"],coords=dict(x=("x",self.data[self.x_name].values), y=("y",self.data[self.y_name].values), z=("z",self.data[self.z_name].values), lat=(["x","y"],self.data[self.lat_name].values), lon=(["x","y"],self.data[self.lon_name].values)),name=var)
-        #    dataset = alldata.sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
-        #else:
-        #    dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
-        
+           
         dataset = self.data[var].sel(z=z,x=slice(xmin,xmax),y=slice(ymin,ymax))
         
         data = np.squeeze(dataset.sel(d=tmind).values)
