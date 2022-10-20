@@ -6,4 +6,7 @@
 *.pyc
 *.p
 *.npy
+*.log
 output/*
+other_samples/*
+outputfig/*
