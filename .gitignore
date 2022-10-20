@@ -10,3 +10,5 @@
 output/*
 other_samples/*
 outputfig/*
+configtxt/*
+nexrad*
