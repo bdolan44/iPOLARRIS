@@ -345,9 +345,9 @@ def polarris_driver(configfile):
                     i = dfiles1.index(dfile)
                     #print(i,'i inner')
                     #wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']].sel(d=i)
-                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']][i,:,:,:]
-                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['uname']][i,:,:,:]
-                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['vname']][i,:,:,:]
+                    wvar[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['wname']][0,i,:,:,:]
+                    unew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['uname']][0,i,:,:,:]
+                    vnew[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['vname']][0,i,:,:,:]
                     #conv[q,zsubmin:zsubmax+1,ysubmin:ysubmax+1,xsubmin:xsubmax+1] = dvar[config['convname']][i,:,:,:]
 
         rvar[config['wname']] = (['d','z','y','x'],wvar)
